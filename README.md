@@ -1,5 +1,3 @@
-Creating a well-structured README for your "Virtual Hair Studio" project is crucial for providing clear documentation and information to potential users and contributors. Here's a sample README that covers key aspects of your project:
-
 # Virtual Hair Studio
 
 ![Virtual Hair Studio Logo](link_to_logo.png)
