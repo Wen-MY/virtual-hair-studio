@@ -1,0 +1,10 @@
+.nav{
+    top : 64;
+    left: 0;
+    flex: 1;
+    height: 100%;
+    position: absolute;
+}
+.nav.expanded .icon {
+    float : right;
+}
