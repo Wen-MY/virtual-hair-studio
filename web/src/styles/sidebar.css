@@ -1,0 +1,18 @@
+.nav{
+    top : 64;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    z-index: 2;
+    position: fixed;
+   
+}
+.nav.expanded .icon {
+    float : right;
+}
+.bottom-menu {
+    position: fixed;
+    bottom: 0;
+  }
+  

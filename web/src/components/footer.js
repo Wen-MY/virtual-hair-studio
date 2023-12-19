@@ -7,7 +7,6 @@ function Footer() {
   return (
     <div>
     <footer className="footer">
-      <Container>
         <Row>
           <Col xs={12} md={6} className="text-center text-md-start">
             <p>&copy; 2023 Your Company Name</p>
@@ -24,7 +23,6 @@ function Footer() {
             </a>
           </Col>
         </Row>
-      </Container>
     </footer>
     </div>
   );

@@ -1,6 +1,7 @@
 .App {
   text-align: center;
   height: 100%;
+  
 }
 
 .App-logo {
@@ -30,10 +31,11 @@
 .container{
   display: flex;
   height: 100%;
+  display: flex;
   flex-direction: row;
-  position: relative;
 }
 .content{
-  position: static;
+  display: flex;
+  flex-direction: row;
   margin-left : 100px;
 }
