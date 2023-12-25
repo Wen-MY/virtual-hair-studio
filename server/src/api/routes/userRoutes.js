@@ -43,7 +43,23 @@ router.post('/signin', async (req, res) => {
     }
 });
 
-router.get('/validate/:username', async (req, res) => {
+router.get('/validate/email/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+
+        const [rows, fields] = await database.poolUM.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+        if (rows.length > 0) {
+            res.status(200).json({ valid: false, message: 'Email already exists.' });
+        } else {
+            res.status(200).json({ valid: true, message: 'Email is available.' });
+        }
+    } catch (error) {
+        console.error('Error during email validation:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+});
+router.get('/validate/username/:username', async (req, res) => {
     try {
         const { username } = req.params;
 
@@ -63,16 +79,16 @@ router.get('/validate/:username', async (req, res) => {
 // Create User
 router.post('/create', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { first_name ,last_name ,email, password,} = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({ message: 'Username and password are required.' });
+        if (!email || !password || !first_name || !last_name) {
+            return res.status(400).json({ message: 'Username/Email and password are required.' });
         }
 
         // Hash the password before storing it in the database
         const hash = await bcrypt.hash(password, 10);
 
-        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash]);
+        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password, email, first_name,last_name) VALUES (?, ?, ?, ?, ?)', [email, hash, email,first_name,last_name]);
 
         res.status(201).json({ message: 'User created successfully!' });
     } catch (error) {

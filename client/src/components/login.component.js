@@ -78,7 +78,7 @@ export default class Login extends Component {
 
        <div className="d-grid">
           <Button variant="primary" type="submit" disabled={isLoading}>
-            {isLoading ? 'Loading...' : 'Submit'}
+            {isLoading ? 'Loading...' : 'Sign In'}
           </Button>
         </div>
 
