@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,5 +14,6 @@
     "express": "^4.18.2",
     "mongoose": "^8.0.3",
     "mysql": "^2.18.1"
-  }
+  },
+  "private": false
 }
