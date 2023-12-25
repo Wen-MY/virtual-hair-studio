@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from 'react'; 
 import '../styles/sidebar.css'
-import { BellFill,BoxArrowRight,GlobeAmericas,HouseFill, PersonFill,CalendarFill, Stars, ArrowsAngleExpand, ArrowsAngleContract } from "react-bootstrap-icons";
+import { BellFill,BoxArrowRight,GlobeAmericas,HouseFill, PersonFill,CalendarFill, Stars, ArrowBarRight,ArrowBarLeft } from "react-bootstrap-icons";
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 function SideNav(){
 const [collapsed, setCollapsed] = useState(true); // Initialize the 'collapsed' state
@@ -20,7 +20,7 @@ return(
         <Menu>
             <MenuItem 
             onClick={toggleCollapse}
-            >{collapsed? <ArrowsAngleExpand />:<ArrowsAngleContract className="icon"/>}</MenuItem>
+            >{collapsed? <ArrowBarRight />:<ArrowBarLeft className="icon"/>}</MenuItem>
             <MenuItem icon={<HouseFill/>}> Home </MenuItem>
             <MenuItem icon={<CalendarFill/>}> Appointment </MenuItem>
             <MenuItem icon={<BellFill/>}> Notification </MenuItem>

@@ -68,6 +68,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,

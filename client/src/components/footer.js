@@ -1,6 +1,6 @@
 import React from 'react';
 import '../styles/footer.css'
-import { Container, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { Facebook, Twitter, Github } from 'react-bootstrap-icons'; // Import Bootstrap icons
 
 function Footer() {
