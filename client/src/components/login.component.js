@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom';
 import { Form,Row,Button,Col } from 'react-bootstrap'
 export default class Login extends Component {
   state = {
@@ -20,17 +21,24 @@ export default class Login extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
+         credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful:', data);
-        // Handle successful login, e.g., redirect to a new page
+        console.log('Login successful:', data.message);
+        //store user data
+        const userData = data.user;
+
+        // Store user data in session storage
+        sessionStorage.setItem('userInfo', JSON.stringify(userData));
+        // Handle successful login, e.g., redirect to a new page (pending)
+        
       } else {
         const errorData = await response.json();
         console.error('Login failed:', errorData.message);
-        // Handle login failure, e.g., display an error message
+        // Handle login failure, e.g., display an error message (pending)
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -85,6 +93,10 @@ export default class Login extends Component {
       <p className="forgot-password text-right">
         Forgot <a href="#">password?</a>
       </p>
+
+      <Link to='/sign-up'>
+        Create an account
+      </Link>
     </Form>
     )
   }

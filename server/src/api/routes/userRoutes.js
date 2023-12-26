@@ -22,7 +22,7 @@ router.post('/signin', async (req, res) => {
 
             if (match) {
                 // Store user information in the session
-                req.session.user = {
+                const userData = {
                     id: user.id,
                     username: user.username,
                     email: user.email,
@@ -30,7 +30,7 @@ router.post('/signin', async (req, res) => {
                     last_name: user.last_name,
                     gender: user.gender
                 };
-                res.status(200).json({ message: 'Signin successful!' });
+                res.status(200).json({ message: 'Signin successful!', user: userData });
             } else {
                 res.status(401).json({ message: 'Invalid credentials.' });
             }

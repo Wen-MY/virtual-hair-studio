@@ -61,6 +61,7 @@ export default class SignUp extends Component {
   };
   render() {
     const {isLoading} = this.state;
+    
     return (
       <Form onSubmit={this.handleSubmit}>
       <h3>Sign Up</h3>

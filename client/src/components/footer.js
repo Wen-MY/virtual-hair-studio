@@ -3,7 +3,7 @@ import '../styles/footer.css'
 import { Row, Col } from 'react-bootstrap';
 import { Facebook, Twitter, Github } from 'react-bootstrap-icons'; // Import Bootstrap icons
 
-function Footer() {
+const Footer = () => {
   return (
     <div>
     <footer className="footer">
@@ -18,7 +18,7 @@ function Footer() {
             <a href="https://www.twitter.com">
               <Twitter className="social-icon" size={36}/>
             </a>
-            <a href="https://www.github.com">
+            <a href="https://github.com/Wen-MY/virtual-hair-studio">
               <Github className="social-icon" size={36} />
             </a>
           </Col>

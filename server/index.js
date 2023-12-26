@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 
 const corsOptions = {
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials: true,
     optionSuccessStatus: 200
 };
@@ -22,7 +22,9 @@ app.use(
         secret: 'vhs@123',
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: false }, // true if using HTTPS
+        cookie: { 
+            secure: false,
+            sameSite: 'none', }, // true if using HTTPS
     })
 );
 
