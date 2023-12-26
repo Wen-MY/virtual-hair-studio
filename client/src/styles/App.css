@@ -25,3 +25,7 @@ a:visited{
   text-decoration: none;
   color: inherit;
 }
+.loading{
+  margin: 50px;
+  
+}

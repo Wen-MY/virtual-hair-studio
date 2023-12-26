@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/sidebar.css'
 import { BellFill,BoxArrowRight,GlobeAmericas,HouseFill, PersonFill,CalendarFill, Stars, ArrowBarRight,ArrowBarLeft } from "react-bootstrap-icons";
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import Logout from "../utils/logout.function";
 const SideNav = () => {
 
 const [collapsed, setCollapsed] = useState(true); // Initialize the 'collapsed' state
@@ -15,7 +16,7 @@ const toggleCollapse = () => {
 }
 
 // Check if the current route is "/sign-in" or "/sign-up"
-const isSignInOrSignUp = location.pathname === '/sign-in' || location.pathname === '/sign-up';
+const isSignInOrSignUp = location.pathname === '/account/sign-in' || location.pathname === '/account/sign-up';
 
 // If it's "/sign-in" or "/sign-up", don't render the SideNav
 if (isSignInOrSignUp) {
@@ -24,11 +25,11 @@ if (isSignInOrSignUp) {
 
 const checkLoggedInStatusAndNavigate = (path) => {
   // Check if the user is logged in based on some criteria (e.g., presence of user ID in localStorage)
-  const userId = sessionStorage.getItem('user.id'); // You can customize this based on your authentication mechanism
+  const userId = localStorage.getItem('userInfo'); // You can customize this based on your authentication mechanism
 
   if (!userId) {
     // User is not logged in, redirect to the login page
-    navigate('/sign-in');
+    navigate('/account/sign-in');
   }
   else{
     navigate(path);
@@ -59,7 +60,11 @@ return(
         </Menu>
 
         <Menu className="bottom-menu">
-          <MenuItem icon={<BoxArrowRight/>} rootStyles={collapsed?{width:"80px"}:{width:"250px"}}>Logout </MenuItem>
+          <MenuItem 
+          icon={<BoxArrowRight/>} 
+          rootStyles={collapsed?{width:"80px"}:{width:"250px"}} 
+          onClick={Logout(navigate)}
+          >Logout </MenuItem>
         </Menu>
 
     </Sidebar>

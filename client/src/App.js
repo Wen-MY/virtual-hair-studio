@@ -3,8 +3,8 @@ import Header from './components/header';
 import Footer from './components/footer'
 import SideNav from './components/side-navigation'
 import Home from './pages/Home'
-import Login from './components/login.component';
-import SignUp from './components/signup.component';
+import Account from './pages/Account'
+import Profile from './pages/Profile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 function App() {
@@ -21,8 +21,8 @@ function App() {
           <div className="auth-inner">
             <Routes>
               <Route exact path="/" element={<Home />} />
-              <Route path="/sign-in" element={<Login />} />
-              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/account/*" element={<Account />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </div>
         </div>

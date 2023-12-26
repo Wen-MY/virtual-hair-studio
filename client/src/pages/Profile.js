@@ -2,12 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Home = () => {
+const Profile = () => {
     return(
       <div>
-        <h1>Hi</h1>
+        <h1>Profile Page</h1>
       </div>
     );
 }
-export default Home;
+export default Profile;
 

@@ -32,8 +32,9 @@ export default class Login extends Component {
         const userData = data.user;
 
         // Store user data in session storage
-        sessionStorage.setItem('userInfo', JSON.stringify(userData));
+        localStorage.setItem('userInfo', JSON.stringify(userData));
         // Handle successful login, e.g., redirect to a new page (pending)
+        window.location.reload();
         
       } else {
         const errorData = await response.json();
@@ -94,7 +95,7 @@ export default class Login extends Component {
         Forgot <a href="#">password?</a>
       </p>
 
-      <Link to='/sign-up'>
+      <Link to='/account/sign-up'>
         Create an account
       </Link>
     </Form>
