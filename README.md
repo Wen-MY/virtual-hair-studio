@@ -37,7 +37,7 @@ Keep track of the development progress of this project.
 ```diff
 ! User Group and Authorization setup.
 ! Side navigation menu integrated user authorities
-| Guest landing/Home page.
+! Guest landing/Home page.
 ```
 ### Pending
 ```diff
