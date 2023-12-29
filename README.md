@@ -6,6 +6,7 @@ Virtual Hair Studio is a modern web application built using React.js, designed t
 
 ## Table of Contents
 
+- [Project Progress Log](#project-progress-log)
 - [Features](#features)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
@@ -16,6 +17,39 @@ Virtual Hair Studio is a modern web application built using React.js, designed t
 - [Contributing](#contributing)
 - [License](#license)
 
+## Project Progress Log
+
+Keep track of the development progress of this project.
+
+### Finished
+
++ Overall Architecture Initialization. 3 module in total.
++ Account Login/Logout and Registration Implemented.
++ Side Navigation Initialized.
+
+### Planned
+
+@@ **Next Milestone:** Implement Appointment Module. @@
+@@ Plan for user account information manipulation. @@
+@@ Design UI/UX improvements. @@
+
+### In Progress
+
+! User Group and Authorization setup.
+! Side navigation menu integrated user authorities
+| Guest landing/Home page.
+
+### Pending
+
+# Feature A : Hairstyle Try-on Module.
+# Feature B : Appointment Module.
+# Feature C : Salon Owner Profile Customization Module.
+# Feature D : Messaging Module. TBD
+
+### Bug Found
+
+- null.
+--
 ## Features
 
 - **User Profiles**: Salon owners and salon users can create and manage their profiles with personalized information, photos, and preferences.
