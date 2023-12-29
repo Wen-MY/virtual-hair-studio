@@ -6,7 +6,7 @@
     height: 100%;
     z-index: 2;
     position: fixed;
-   
+    color: hsl(48, 44%, 87%);
 }
 .nav.expanded .icon {
     float : right;
@@ -14,5 +14,5 @@
 .bottom-menu {
     position: fixed;
     bottom: 0;
-  }
+}
   

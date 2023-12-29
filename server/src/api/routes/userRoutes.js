@@ -21,7 +21,6 @@ router.post('/signin', async (req, res) => {
             const match = await bcrypt.compare(password, user.password);
 
             if (match) {
-                // Store user information in the session
                 const userData = {
                     id: user.id,
                     username: user.username,

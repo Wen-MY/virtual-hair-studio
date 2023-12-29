@@ -39,7 +39,7 @@ return(
     <div className={`nav ${collapsed ? '' : 'expanded'}`}>
     <Sidebar 
         collapsed={collapsed}
-        backgroundColor="#00ff00"
+        backgroundColor="#008170"
         className="nav"
     >   
         <Menu>

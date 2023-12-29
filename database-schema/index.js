@@ -7,6 +7,7 @@ const connectionConfig = {
   host: 'localhost',
   user: 'root',
   password: 'root',
+  port: 3305,
   multipleStatements: true,
 };
 
@@ -54,5 +55,5 @@ const createDatabaseAndInitialize = (databaseName, schemaPath) => {
 };
 
 // Initialize databases
-createDatabaseAndInitialize('vhs_info', './resources/vhs_info/V1__DDL_Base_Structure.sql');
-createDatabaseAndInitialize('vhs_um', './resources/vhs_um/V1__DDL_Base_Structure.sql');
+createDatabaseAndInitialize('vhs_info', './resources/vhs_info/V1_0_0__DDL_baseline.sql');
+createDatabaseAndInitialize('vhs_um', './resources/vhs_um/V1_0_0__DDL_baseline.sql');

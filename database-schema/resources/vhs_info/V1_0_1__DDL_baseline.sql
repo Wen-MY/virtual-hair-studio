@@ -26,8 +26,8 @@ CREATE TABLE `appointments` (
   `booking_datetime` datetime NOT NULL,
   `status` varchar(20) NOT NULL,
   `remarks` text,
-  `created_at` datetime NOT NULL CURRENT_TIMESTAMP,
-  `last_updated` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `last_updated` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -40,7 +40,7 @@ CREATE TABLE `reviews` (
   `service_id` bigint NOT NULL,
   `rating` int NOT NULL,
   `comment` text,
-  `created_at` datetime DEFAULT NULL CURRENT_TIMESTAMP,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -1,7 +1,7 @@
 .header {
     width: 100%;
     height: 70px;
-    background-color: #00ff00; 
+    background-color: #008170; 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -14,13 +14,14 @@
 }
 
 .logo h1 {
-    color: black;
+    color: #ece6ce;
 }
 
 .userIcon {
     right: 36px;
     flex: 1;
     position: absolute;
+    color: #ece6ce;
 }
 h5 {
     margin: 0;

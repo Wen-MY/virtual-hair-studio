@@ -9,6 +9,7 @@ const poolUM = mysql.createPool({
     user: user,
     password: pass,
     database: 'vhs_um',
+    port: 3305
 });
 
 // Create a pool for vhm_info table
@@ -18,6 +19,7 @@ const poolInfo = mysql.createPool({
     user: user,
     password: pass,
     database: 'vhs_info',
+    port: 3305
 });
 
 module.exports = {

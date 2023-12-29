@@ -27,9 +27,9 @@ const Header = () => {
         </Link>
       </div>
       <div className='userIcon'>
-        <Link to="account/sign-in">
+        <Link to="account/sign-in" style={{ textDecoration: 'none' }}>
           <PersonSquare size={40}/>
-          <h5>{getUsername()}</h5>
+          <h5 id='username'>{getUsername()}</h5>
         </Link>
         
       </div>
