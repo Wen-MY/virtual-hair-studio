@@ -101,9 +101,8 @@ router.post('/create', async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
         //insert new user into user table
         const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [email, hash, email]);
-        //query created user from user table
+        //get user id from user last query
         const userId = rows.insertId;
-        //const [userId,params] = await database.poolUM.execute('SELECT id FROM users WHERE email = ?', [email]);
         //insert user to user_group table to assign authorities
         const [result,values] = await database.poolUM.execute('INSERT INTO user_group (user_id,group_id) VALUES (?,?)',[userId,type=="1"?3:4]);
         
