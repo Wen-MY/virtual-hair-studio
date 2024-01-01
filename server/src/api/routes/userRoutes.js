@@ -91,18 +91,26 @@ router.get('/validate/username/:username', async (req, res) => {
 // Create User
 router.post('/create', async (req, res) => {
     try {
-        const { first_name ,last_name ,email, password,} = req.body;
+        const { type ,email, password} = req.body;
 
-        if (!email || !password || !first_name || !last_name) {
+        if (!email || !password || !type) {
             return res.status(400).json({ message: 'Username/Email and password are required.' });
         }
 
         // Hash the password before storing it in the database
         const hash = await bcrypt.hash(password, 10);
-
-        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password, email, first_name,last_name) VALUES (?, ?, ?, ?, ?)', [email, hash, email,first_name,last_name]);
-
-        res.status(201).json({ message: 'User created successfully!' });
+        //insert new user into user table
+        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [email, hash, email]);
+        //query created user from user table
+        const userId = rows.insertId;
+        //const [userId,params] = await database.poolUM.execute('SELECT id FROM users WHERE email = ?', [email]);
+        //insert user to user_group table to assign authorities
+        const [result,values] = await database.poolUM.execute('INSERT INTO user_group (user_id,group_id) VALUES (?,?)',[userId,type=="1"?3:4]);
+        
+        if(result)
+            res.status(201).json({ message: 'User created successfully!' });
+        else
+            res.status(400).json({ message: 'Failed to create user.' });
     } catch (error) {
         console.error('Error during user creation:', error);
         res.status(500).json({ message: 'Internal Server Error.' });

@@ -9,12 +9,13 @@ import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  //remove this StrictMode to prevent double render
+  //<React.StrictMode>
     <Router>
     <Header/>
     <App/>
     <Footer/>
     </Router>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
 

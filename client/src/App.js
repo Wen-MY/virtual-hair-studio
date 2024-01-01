@@ -14,31 +14,29 @@ import config from './config';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   useEffect(() => {
-    const checkLoggedInStatus = async () => {
-      try {
-        const response = await fetch(config.serverUrl + '/auth/',{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: 'include'
-        });
-        if (response.ok) {
+      const checkLoggedInStatus = async () => {
+        try {
+          const response = await fetch(config.serverUrl + '/auth/',{
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include'
+          });
           const data = await response.json();
+          if (response.ok) {
+            console.log('Login Status :', data.message)
+          } else {
+            console.error('Login Status:', data.message);
+          }
           setIsLoggedIn(data.login);
-          console.log('Login Status :', data.message)
-        } else {
-          const data = await response.json();
-          setIsLoggedIn(data.login);
-          console.error('Login Status:', data.message);
+        } catch (error) {
+          // Handle error
+          console.error('Error during login status check:', error);
         }
-      } catch (error) {
-        // Handle error
-        console.error('Error during login status check:', error);
-      }
-    };
-    checkLoggedInStatus();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+      };
+      checkLoggedInStatus();
+  }, []);
   console.log(isLoggedIn);
   if (isLoggedIn == null) {
     // Wait for the API response before rendering

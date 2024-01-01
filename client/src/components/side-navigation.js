@@ -89,7 +89,7 @@ return(
           <MenuItem 
           icon={<Icon.BoxArrowRight/>} 
           rootStyles={collapsed?{width:"80px"}:{width:"250px"}} 
-          onClick={Logout(navigate)}
+          onClick={Logout()}
           >Logout </MenuItem>
         </Menu>
 

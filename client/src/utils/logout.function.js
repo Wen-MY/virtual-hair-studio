@@ -1,8 +1,7 @@
 // Logout.js
-import React from "react";
 import config from "../config";
 
-const Logout = (navigate) => {
+const Logout = () => {
   const handleLogout = async() => {
     // Remove user session
     try {
@@ -15,9 +14,8 @@ const Logout = (navigate) => {
         credentials: 'include'
       });
       if(response.ok) {
-        window.location.reload();
         // Redirect to the login page
-        navigate('/account/sign-in');
+        window.location.href= '/account/sign-in';
         
       }else {
         //Redirect to Invalid Operation

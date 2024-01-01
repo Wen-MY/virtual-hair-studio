@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Form,Row,Button,Col } from 'react-bootstrap'
 import config from '../config';
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    
     const username = event.target.elements.username.value;
     const password = event.target.elements.password.value;
     const apiUrl = config.serverUrl + '/user/signin';
@@ -27,8 +26,7 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data.message);
-        window.location.reload();
-        window.location.href = '/';
+        window.location.href = '/'; //redirect to protected home page
       } else {
         const errorData = await response.json();
         console.error('Login failed:', errorData.message);
@@ -41,17 +39,17 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
+//change to Floating Label !!!
     return (
       <Form onSubmit={handleSubmit}>
       <h3>Sign In</h3>
-
+      
       <Form.Group as={Row} className="mb-3" controlId="formPlaintextUsername">
         <Form.Label column sm="2">
           Username
         </Form.Label>
         <Col sm="10">
-          <Form.Control type="text" placeholder="Enter Username" name="username" />
+          <Form.Control type="text" placeholder="Enter Username" name="username" required/>
         </Col>
       </Form.Group>
 
@@ -60,7 +58,7 @@ const Login = () => {
           Password
         </Form.Label>
         <Col sm="10">
-          <Form.Control type="password" placeholder="Enter Password" name="password" />
+          <Form.Control type="password" placeholder="Enter Password" name="password" required/>
         </Col>
       </Form.Group>
 
