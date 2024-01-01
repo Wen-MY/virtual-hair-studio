@@ -15,7 +15,7 @@ const Account = () => {
                 // Add an artificial delay (you can replace this with your actual async action)
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                const storedUserData = localStorage.getItem('userInfo');
+                const storedUserData = sessionStorage.getItem('sessionID');
                 if (storedUserData) {
                     navigate("/profile");
                 } else {
@@ -47,7 +47,7 @@ const Account = () => {
     return (
         <div>
             <Routes>
-                <Route path="sign-in" element={<Login />} />
+                <Route path="sign-in" element={<Login/>} />
                 <Route path="sign-up" element={<SignUp />} />
             </Routes>
         </div>

@@ -1,1 +1,6 @@
-const serverUrl = 'https://localhost:4000'
+const config = {
+    serverUrl : 'http://localhost:4000',
+
+};
+
+export default config;

@@ -1,38 +1,37 @@
-import React, { Component } from 'react'
-import { Form,Row,Button,Col } from 'react-bootstrap'
-export default class SignUp extends Component {
-  state = {
-    isLoading: false,
-  }
-  handleSubmit = async (event) => {
+import React, { useState } from 'react';
+import { Form, Row, Button, Col } from 'react-bootstrap';
+import config from '../config';
+
+const SignUp = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const first_name = event.target.elements.firstName.value;
     const last_name = event.target.elements.lastName.value;
     const email = event.target.elements.email.value;
     const password = event.target.elements.password.value;
-    const apiUrl = 'http://localhost:4000/user/';
+    const apiUrl = config.serverUrl + '/user/';
 
     try {
-      this.setState({ isLoading: true });
-  
-      // Fetch to validate email
+      setIsLoading(true);
+
       const validateResponse = await fetch(apiUrl + `validate/email/${email}`, {
         method: 'GET',
       });
-  
+
       if (validateResponse.ok) {
         const validateData = await validateResponse.json();
-  
+
         if (validateData.valid) {
-          // If email is valid, proceed to create user
           const createResponse = await fetch(apiUrl + 'create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ first_name, last_name, email, password, }),
+            body: JSON.stringify({ first_name, last_name, email, password }),
           });
-  
+
           if (createResponse.ok) {
             const createData = await createResponse.json();
             console.log('User created successfully:', createData.message);
@@ -43,7 +42,6 @@ export default class SignUp extends Component {
             // Handle user creation failure, e.g., display an error message
           }
         } else {
-          // Handle case where email is not valid
           console.error('Email is not valid:', validateData.message);
           // Display an error message or take appropriate action
         }
@@ -56,14 +54,12 @@ export default class SignUp extends Component {
       console.error('Error during form submission:', error);
       // Handle network or other errors
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
-  render() {
-    const {isLoading} = this.state;
-    
-    return (
-      <Form onSubmit={this.handleSubmit}>
+
+  return (
+    <Form onSubmit={handleSubmit}>
       <h3>Sign Up</h3>
 
       <Form.Group as={Row} className="mb-3">
@@ -71,7 +67,7 @@ export default class SignUp extends Component {
           First name
         </Form.Label>
         <Col sm={10}>
-          <Form.Control type="text" placeholder="First name" name="firstName"/>
+          <Form.Control type="text" placeholder="First name" name="firstName" />
         </Col>
       </Form.Group>
 
@@ -80,7 +76,7 @@ export default class SignUp extends Component {
           Last name
         </Form.Label>
         <Col sm={10}>
-          <Form.Control type="text" placeholder="Last name" name="lastName"/>
+          <Form.Control type="text" placeholder="Last name" name="lastName" />
         </Col>
       </Form.Group>
 
@@ -89,7 +85,7 @@ export default class SignUp extends Component {
           Email address
         </Form.Label>
         <Col sm={10}>
-          <Form.Control type="email" placeholder="Enter email" name="email"/>
+          <Form.Control type="email" placeholder="Enter email" name="email" />
         </Col>
       </Form.Group>
 
@@ -98,13 +94,13 @@ export default class SignUp extends Component {
           Password
         </Form.Label>
         <Col sm={10}>
-          <Form.Control type="password" placeholder="Enter password" name="password"/>
+          <Form.Control type="password" placeholder="Enter password" name="password" />
         </Col>
       </Form.Group>
 
       <div className="d-grid">
         <Button variant="primary" type="submit" disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Sign Up'}
+          {isLoading ? 'Loading...' : 'Sign Up'}
         </Button>
       </div>
 
@@ -112,6 +108,7 @@ export default class SignUp extends Component {
         Already registered <a href="/account/sign-in">sign in?</a>
       </p>
     </Form>
-    )
-  }
-}
+  );
+};
+
+export default SignUp;

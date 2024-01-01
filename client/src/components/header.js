@@ -5,19 +5,7 @@ import { PersonSquare } from 'react-bootstrap-icons';
 
 
 const Header = () => {
-  const getUsername = () => {
-    try {
-      const storedUserData = localStorage.getItem('userInfo');
-      if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
-        return userData.username;
-      }
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-    }
-
-    return "Guest";
-  };
+  
   return (
     <div>
     <header className='header'>
@@ -29,7 +17,6 @@ const Header = () => {
       <div className='userIcon'>
         <Link to="account/sign-in" style={{ textDecoration: 'none' }}>
           <PersonSquare size={40}/>
-          <h5 id='username'>{getUsername()}</h5>
         </Link>
         
       </div>

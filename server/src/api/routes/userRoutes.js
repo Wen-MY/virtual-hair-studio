@@ -3,7 +3,6 @@ const router = express.Router();
 const database = require('../../../db-config');
 const bcrypt = require('bcrypt'); // for password hashing
 
-
 // Sign In
 router.post('/signin', async (req, res) => {
     const { username, password } = req.body;
@@ -29,7 +28,8 @@ router.post('/signin', async (req, res) => {
                     last_name: user.last_name,
                     gender: user.gender
                 };
-                res.status(200).json({ message: 'Signin successful!', user: userData });
+                req.session.user = userData;
+                res.status(200).json({ message: 'Signin successful!', userData: userData});
             } else {
                 res.status(401).json({ message: 'Invalid credentials.' });
             }
@@ -40,6 +40,19 @@ router.post('/signin', async (req, res) => {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
+    //console.log('Session in /signin route:', req.session);
+}); 
+
+router.post('/logout', (req, res) => {
+    // Clear the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error during logout:', err);
+        res.status(500).json({ message: 'Internal Server Error.' });
+      } else {
+        res.status(200).json({ message: 'Logout successful' });
+      }
+    });
 });
 
 router.get('/validate/email/:email', async (req, res) => {

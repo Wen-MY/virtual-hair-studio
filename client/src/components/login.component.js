@@ -1,41 +1,34 @@
-import React, { Component } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
 import { Form,Row,Button,Col } from 'react-bootstrap'
-export default class Login extends Component {
-  state = {
-    isLoading: false,
-  };
-  handleSubmit = async (event) => {
+import config from '../config';
+const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const username = event.target.elements.username.value;
     const password = event.target.elements.password.value;
-    const apiUrl = 'http://localhost:4000/user/signin';
+    const apiUrl = config.serverUrl + '/user/signin';
 
     try {
-
-      this.setState({ isLoading: true });
+      setIsLoading(true);
       
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-         credentials: 'include',
         body: JSON.stringify({ username, password }),
+        credentials: 'include'
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data.message);
-        //store user data
-        const userData = data.user;
-
-        // Store user data in session storage
-        localStorage.setItem('userInfo', JSON.stringify(userData));
-        // Handle successful login, e.g., redirect to a new page (pending)
         window.location.reload();
-        
+        window.location.href = '/';
       } else {
         const errorData = await response.json();
         console.error('Login failed:', errorData.message);
@@ -45,14 +38,12 @@ export default class Login extends Component {
       console.error('Error during login:', error);
       // Handle network or other errors
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
-  render() {
-    const { isLoading } = this.state;
 
     return (
-      <Form onSubmit={this.handleSubmit}>
+      <Form onSubmit={handleSubmit}>
       <h3>Sign In</h3>
 
       <Form.Group as={Row} className="mb-3" controlId="formPlaintextUsername">
@@ -100,5 +91,6 @@ export default class Login extends Component {
       </Link>
     </Form>
     )
-  }
 }
+
+export default Login;

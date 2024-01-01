@@ -4,6 +4,7 @@
     bottom: 0;
     width: 100%;
     position: absolute;
+    text-align: center;
   }
   .social-icon{
     margin: 12px;

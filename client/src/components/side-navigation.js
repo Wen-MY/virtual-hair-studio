@@ -1,40 +1,66 @@
 import React from "react";
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/sidebar.css'
-import { BellFill,BoxArrowRight,GlobeAmericas,HouseFill, PersonFill,CalendarFill, Stars, ArrowBarRight,ArrowBarLeft } from "react-bootstrap-icons";
+import * as Icon from "react-bootstrap-icons";
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import Logout from "../utils/logout.function";
+import config from  '../config'
 const SideNav = () => {
 
 const [collapsed, setCollapsed] = useState(true); // Initialize the 'collapsed' state
-const location = useLocation();
+const [menuItems, setMenuItems] = useState([]);
 const navigate = useNavigate();
 
 const toggleCollapse = () => {
   setCollapsed(!collapsed);
 }
 
-// Check if the current route is "/sign-in" or "/sign-up"
-const isSignInOrSignUp = location.pathname === '/account/sign-in' || location.pathname === '/account/sign-up';
+const apiUrl = config.serverUrl + '/auth/menu';
+useEffect(() => {
+  const fetchMenu = async () => {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
 
-// If it's "/sign-in" or "/sign-up", don't render the SideNav
-if (isSignInOrSignUp) {
-  return null;
-}
+      if (response.ok) {
+        const data = await response.json();
+        setMenuItems(data.results);
+      } else {
+        console.error('Failed to fetch menu:', response.status);
+      }
+    } catch (error) {
+      console.error('Error during menu fetch:', error);
+    }
+  };
 
-const checkLoggedInStatusAndNavigate = (path) => {
-  // Check if the user is logged in based on some criteria (e.g., presence of user ID in localStorage)
-  const userId = localStorage.getItem('userInfo'); // You can customize this based on your authentication mechanism
+  fetchMenu();
+}, [apiUrl]);
 
-  if (!userId) {
-    // User is not logged in, redirect to the login page
-    navigate('/account/sign-in');
+const getIconComponent = (iconName) => {
+  if (!iconName) {
+    // If no iconName is provided, return the default icon
+    return <Icon.CircleFill />;
   }
-  else{
-    navigate(path);
+  // Dynamically access the icon using square brackets
+  const DynamicIcon = Icon[iconName];
+
+  // Check if the requested icon exists before rendering
+  if (DynamicIcon) {
+    return <DynamicIcon />;
+  } else {
+    console.error(`Icon '${iconName}' not found`);
+    // Return a default icon or handle the case where the icon is not found
+    return <Icon.CircleFill />;
   }
-}
+};
+
+
 return(
     <div className={`nav ${collapsed ? '' : 'expanded'}`}>
     <Sidebar 
@@ -45,14 +71,14 @@ return(
         <Menu>
             <MenuItem 
               onClick={toggleCollapse}
-              >{collapsed? <ArrowBarRight />:<ArrowBarLeft className="icon"/>}
+              >{collapsed? <Icon.ArrowBarRight />:<Icon.ArrowBarLeft className="icon"/>}
             </MenuItem>
-            <MenuItem icon={<HouseFill/>} onClick={()=> navigate('/')}> Home </MenuItem>
-            <MenuItem icon={<CalendarFill/>} onClick={()=> checkLoggedInStatusAndNavigate('/appointment')}> Appointment </MenuItem>
-            <MenuItem icon={<BellFill/>} onClick={()=> checkLoggedInStatusAndNavigate('/notification')}> Notification </MenuItem>
-            <MenuItem icon={<PersonFill/>} onClick={()=> checkLoggedInStatusAndNavigate('/profile')}> Profile </MenuItem>
-            <MenuItem icon={<GlobeAmericas/>} onClick={()=> checkLoggedInStatusAndNavigate('/explore')}> Explore </MenuItem>
-            <MenuItem icon={<Stars/>} onClick={()=> navigate('/try-on')}> Try-On </MenuItem>
+            {menuItems.map((item) => (
+            <MenuItem key={item.id} icon={getIconComponent(item.icon)} onClick={() => navigate(item.url)}>
+              {item.name}
+            </MenuItem>
+          ))}
+            
             <SubMenu label="Example Sub Menu">
               <MenuItem onClick={()=> navigate('/appointment')}> Example 1 </MenuItem>
               <MenuItem onClick={()=> navigate('/appointment')}> Example 2 </MenuItem>
@@ -61,7 +87,7 @@ return(
 
         <Menu className="bottom-menu">
           <MenuItem 
-          icon={<BoxArrowRight/>} 
+          icon={<Icon.BoxArrowRight/>} 
           rootStyles={collapsed?{width:"80px"}:{width:"250px"}} 
           onClick={Logout(navigate)}
           >Logout </MenuItem>
@@ -72,3 +98,13 @@ return(
 );
 }
 export default SideNav;
+
+/*static menu deprecated
+<MenuItem icon={<HouseFill/>} onClick={()=> navigate('/')}> Home </MenuItem>
+            <MenuItem icon={<CalendarFill/>} onClick={()=> navigate('/appointment')}> Appointment </MenuItem>
+            <MenuItem icon={<BellFill/>} onClick={()=> navigate('/notification')}> Notification </MenuItem>
+            <MenuItem icon={<PersonFill/>} onClick={()=> navigate('/profile')}> Profile </MenuItem>
+            <MenuItem icon={<GlobeAmericas/>} onClick={()=> navigate('/explore')}> Explore </MenuItem>
+            <MenuItem icon={<Stars/>} onClick={()=> navigate('/try-on')}> Try-On </MenuItem>
+            
+*/

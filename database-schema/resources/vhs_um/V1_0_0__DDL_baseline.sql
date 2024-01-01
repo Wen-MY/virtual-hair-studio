@@ -1,4 +1,5 @@
 /*
+SQLyog Community v13.2.1 (64 bit)
 MySQL - 8.0.32 : Database - vhs_um
 *********************************************************************
 */
@@ -25,7 +26,7 @@ CREATE TABLE `authorities` (
   `feature_id` bigint NOT NULL,
   `desc` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `features` */
 
@@ -37,8 +38,9 @@ CREATE TABLE `features` (
   `url` varchar(255) DEFAULT NULL,
   `show_in_navigation` tinyint(1) NOT NULL DEFAULT '0',
   `parent_id` bigint DEFAULT NULL,
+  `icon` varchar(255) NOT NULL DEFAULT 'CircleFill',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `groups` */
 
@@ -48,7 +50,7 @@ CREATE TABLE `groups` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `user_group` */
 
@@ -59,7 +61,7 @@ CREATE TABLE `user_group` (
   `user_id` bigint NOT NULL,
   `group_id` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `users` */
 
@@ -76,7 +78,7 @@ CREATE TABLE `users` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
