@@ -40,7 +40,8 @@ insert  into `authorities`(`id`,`group_id`,`feature_id`,`desc`) values
 (19,4,4,'Grant Owner to Appointment'),
 (20,4,5,'Grant Owner to Profile'),
 (21,4,6,'Grant Owner to Account'),
-(22,4,7,'Grant Owner to Notification');
+(22,4,7,'Grant Owner to Notification'),
+(23,4,8,'Grant Owner to Reschedule');
 
 /*Data for the table `features` */
 
