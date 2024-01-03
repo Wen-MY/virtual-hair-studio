@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
-import { Form,Row,Button,Col } from 'react-bootstrap'
 import config from '../config';
+import FormBox from './form-box'
+import Cookies from 'js-cookie';
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (event) => {
@@ -26,6 +27,10 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data.message);
+        if(!data.userData.first_name || !data.userData.last_name)
+          Cookies.set("header_username",data.userData.username);
+        else
+        Cookies.set("header_username",data.userData.first_name + data.userData.last_name);
         window.location.href = '/'; //redirect to protected home page
       } else {
         const errorData = await response.json();
@@ -41,53 +46,61 @@ const Login = () => {
   };
 //change to Floating Label !!!
     return (
-      <Form onSubmit={handleSubmit}>
-      <h3>Sign In</h3>
-      
-      <Form.Group as={Row} className="mb-3" controlId="formPlaintextUsername">
-        <Form.Label column sm="2">
-          Username
-        </Form.Label>
-        <Col sm="10">
-          <Form.Control type="text" placeholder="Enter Username" name="username" required/>
-        </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
-        <Form.Label column sm="2">
-          Password
-        </Form.Label>
-        <Col sm="10">
-          <Form.Control type="password" placeholder="Enter Password" name="password" required/>
-        </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="mb-3" controlId="formCheckboxRememberMe">
-        <Col sm={{ span: 10, offset: 2 }}>
-          <Form.Check
-            inline
-            label="Remember Me"
-            name="group1"
-            type="checkbox"
-            id="inline-checkbox-1"
-          />
-        </Col>
-      </Form.Group>
-
-       <div className="d-grid">
-          <Button variant="primary" type="submit" disabled={isLoading}>
-            {isLoading ? 'Loading...' : 'Sign In'}
-          </Button>
-        </div>
-
-      <p className="forgot-password text-right">
-        Forgot <a href="#">password?</a>
-      </p>
-
-      <Link to='/account/sign-up'>
-        Create an account
-      </Link>
-    </Form>
+      <FormBox>
+        <form onSubmit={handleSubmit}>
+          <h3>Sign In</h3>
+            <div className="mb-3 form-floating">
+              <input
+                type="text"
+                className="form-control"
+                id="username"
+                placeholder="Enter Username"
+                name="username"
+                required
+              />
+                <label htmlFor="username">
+                  Username
+                </label>
+              </div>
+              <div className="mb-3 form-floating">
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="Enter Password"
+                name="password"
+                required
+              />
+              <label htmlFor="password">
+                Password
+              </label>
+            </div>
+            <div className="mb-3 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="rememberMe"
+                name="group1"
+              />
+              <label className="form-check-label" htmlFor="rememberMe">
+                Remember Me
+              </label>
+            </div>
+            <div className="d-grid">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Loading...' : 'Sign In'}
+              </button>
+            </div>
+            <p className="forgot-password text-right">
+              Forgot <a href="#">password?</a>
+            </p>
+          <Link to="/account/sign-up">Create an account</Link>
+        </form>
+      </FormBox>
     )
 }
 

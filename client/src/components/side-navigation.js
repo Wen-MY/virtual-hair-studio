@@ -1,9 +1,9 @@
 import React from "react";
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import '../styles/sidebar.css'
-import * as Icon from "react-bootstrap-icons";
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+
+import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import Logout from "../utils/logout.function";
 import config from  '../config'
 const SideNav = () => {
@@ -11,7 +11,7 @@ const SideNav = () => {
 const [collapsed, setCollapsed] = useState(true); // Initialize the 'collapsed' state
 const [menuItems, setMenuItems] = useState([]);
 const navigate = useNavigate();
-
+const location = useLocation();
 const toggleCollapse = () => {
   setCollapsed(!collapsed);
 }
@@ -42,52 +42,40 @@ useEffect(() => {
   fetchMenu();
 }, [apiUrl]);
 
-const getIconComponent = (iconName) => {
-  if (!iconName) {
-    // If no iconName is provided, return the default icon
-    return <Icon.CircleFill />;
-  }
-  // Dynamically access the icon using square brackets
-  const DynamicIcon = Icon[iconName];
-
-  // Check if the requested icon exists before rendering
-  if (DynamicIcon) {
-    return <DynamicIcon />;
-  } else {
-    console.error(`Icon '${iconName}' not found`);
-    // Return a default icon or handle the case where the icon is not found
-    return <Icon.CircleFill />;
-  }
-};
-
-
 return(
-    <div className={`nav ${collapsed ? '' : 'expanded'}`}>
+    <div className={`sidenav ${collapsed ? '' : 'expanded'}`}>
     <Sidebar 
         collapsed={collapsed}
         backgroundColor="#008170"
-        className="nav"
+        className="sidenav"
     >   
-        <Menu>
+        <Menu
+          menuItemStyles={{
+            button: ({active}) => {
+              return {
+                backgroundColor: active? '#009b86': undefined,'&:hover': {
+                  backgroundColor: '#00685a',  // Change the color to black on hover
+                },
+              }
+            },
+          }}>
             <MenuItem 
               onClick={toggleCollapse}
-              >{collapsed? <Icon.ArrowBarRight />:<Icon.ArrowBarLeft className="icon"/>}
+              >{collapsed? <span className="bi bi-arrow-bar-right"/>:<span className="bi bi-arrow-bar-left icon"/>}
             </MenuItem>
-            {menuItems.map((item) => (
-            <MenuItem key={item.id} icon={getIconComponent(item.icon)} onClick={() => navigate(item.url)}>
-              {item.name}
-            </MenuItem>
-          ))}
-            
-            <SubMenu label="Example Sub Menu">
-              <MenuItem onClick={()=> navigate('/appointment')}> Example 1 </MenuItem>
-              <MenuItem onClick={()=> navigate('/appointment')}> Example 2 </MenuItem>
-            </SubMenu>
+            <div className="menu">
+              {menuItems.map((item) => (
+              <MenuItem key={item.id} icon={<span className={"bi bi-" + item.icon}/>} onClick={() => navigate(item.url)} active={location.pathname===item.url}>
+                {item.name}
+              </MenuItem>
+              
+            ))}
+            </div>
         </Menu>
 
         <Menu className="bottom-menu">
           <MenuItem 
-          icon={<Icon.BoxArrowRight/>} 
+          icon={<span className="bi bi-box-arrow-right"/>} 
           rootStyles={collapsed?{width:"80px"}:{width:"250px"}} 
           onClick={Logout()}
           >Logout </MenuItem>
@@ -106,5 +94,8 @@ export default SideNav;
             <MenuItem icon={<PersonFill/>} onClick={()=> navigate('/profile')}> Profile </MenuItem>
             <MenuItem icon={<GlobeAmericas/>} onClick={()=> navigate('/explore')}> Explore </MenuItem>
             <MenuItem icon={<Stars/>} onClick={()=> navigate('/try-on')}> Try-On </MenuItem>
-            
+ <SubMenu label="Example Sub Menu">
+              <MenuItem onClick={()=> navigate('/appointment')}> Example 1 </MenuItem>
+              <MenuItem onClick={()=> navigate('/appointment')}> Example 2 </MenuItem>
+            </SubMenu>           
 */

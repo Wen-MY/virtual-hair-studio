@@ -1,4 +1,5 @@
 // Logout.js
+import Cookies from "js-cookie";
 import config from "../config";
 
 const Logout = () => {
@@ -16,6 +17,7 @@ const Logout = () => {
       if(response.ok) {
         // Redirect to the login page
         window.location.href= '/account/sign-in';
+        Cookies.remove("header_username");
         
       }else {
         //Redirect to Invalid Operation

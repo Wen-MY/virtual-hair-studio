@@ -1,4 +1,4 @@
-.nav{
+.sidenav{
     top : 64;
     left: 0;
     display: flex;
@@ -8,9 +8,10 @@
     position: fixed;
     color: hsl(48, 44%, 87%);
 }
-.nav.expanded .icon {
+.sidenav.expanded .icon {
     float : right;
 }
+
 .bottom-menu {
     position: fixed;
     bottom: 0;

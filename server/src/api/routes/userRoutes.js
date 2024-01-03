@@ -42,7 +42,7 @@ router.post('/signin', async (req, res) => {
     }
     //console.log('Session in /signin route:', req.session);
 }); 
-
+// Sign Out
 router.post('/logout', (req, res) => {
     // Clear the session
     req.session.destroy((err) => {
@@ -54,7 +54,7 @@ router.post('/logout', (req, res) => {
       }
     });
 });
-
+// Validate email existed (pending , wrong status send actually)
 router.get('/validate/email/:email', async (req, res) => {
     try {
         const { email } = req.params;
@@ -71,6 +71,7 @@ router.get('/validate/email/:email', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+// Validate username existed (pending , wrong status send actually)
 router.get('/validate/username/:username', async (req, res) => {
     try {
         const { username } = req.params;
@@ -87,7 +88,6 @@ router.get('/validate/username/:username', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
 // Create User
 router.post('/create', async (req, res) => {
     try {

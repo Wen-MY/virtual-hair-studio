@@ -38,7 +38,7 @@ CREATE TABLE `features` (
   `url` varchar(255) DEFAULT NULL,
   `show_in_navigation` tinyint(1) NOT NULL DEFAULT '0',
   `parent_id` bigint DEFAULT NULL,
-  `icon` varchar(255) NOT NULL DEFAULT 'CircleFill',
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'circle-fill',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

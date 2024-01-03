@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import Login from '../components/login.component';
-import SignUp from '../components/signup.component';
+import { useNavigate } from 'react-router-dom';
 import SyncLoader from 'react-spinners/SyncLoader'
 
 const Account = () => {
@@ -46,10 +44,7 @@ const Account = () => {
 
     return (
         <div>
-            <Routes>
-                <Route path="sign-in" element={<Login/>} />
-                <Route path="sign-up" element={<SignUp />} />
-            </Routes>
+            <h1 style={{textAlign: 'center'}}>Hi , this is Account Page</h1>
         </div>
     );
 };

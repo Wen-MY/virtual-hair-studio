@@ -45,17 +45,16 @@ insert  into `authorities`(`id`,`group_id`,`feature_id`,`desc`) values
 
 /*Data for the table `features` */
 
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values 
-(1,'Login','/account/sign-in',0,0,'CircleFill'),
-(2,'Sign Up','/account/sign-up',0,0,'CircleFill'),
-(3,'Home','/',1,0,'HouseFill'),
-(4,'Appointment','/appointment',1,0,'CalendarFill'),
-(5,'Profile','/profile',1,0,'PersonFill'),
-(6,'Account','/account',0,0,'CircleFill'),
-(7,'Notification','/notification',1,0,'BellFill'),
-(8,'Reschedule','/appointment/reschedule',1,0,'ClockHistory'),
-(9,'Explore','/explore',1,0,'GlobeAmericas'),
-(10,'Try On','/try-on',1,0,'Stars');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (1,'Login','/account/sign-in',0,0,'circle-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (2,'Sign Up','/account/sign-up',0,0,'circle-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (3,'Home','/',1,0,'house-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (4,'Appointment','/appointment',1,0,'calendar-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (5,'Profile','/profile',1,0,'person-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (6,'Account','/account',0,0,'circle-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (7,'Notification','/notification',1,0,'bell-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (8,'Reschedule','/appointment/reschedule',1,0,'clock-history');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (9,'Explore','/explore',1,0,'globe-americas');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (10,'Try On','/try-on',1,0,'stars');
 
 /*Data for the table `groups` */
 

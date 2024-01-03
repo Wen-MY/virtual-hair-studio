@@ -22,8 +22,13 @@
     flex: 1;
     position: absolute;
     color: #ece6ce;
+    text-align: center;
 }
-h5 {
-    margin: 0;
+.user-icon {
+    font-size: 36px;
+}
+.link {
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
 }

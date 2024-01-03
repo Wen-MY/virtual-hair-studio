@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Row, Button, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import '../styles/form-box.css'
 import config from '../config';
+import FormBox from './form-box';
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +37,9 @@ const SignUp = () => {
             if (createResponse.ok) {
               const createData = await createResponse.json();
               console.log('User created successfully:', createData.message);
-              // Handle successful user creation, e.g., redirect or show success message
+              // Handle successful user creation, e.g., redirect with timeout and show success message 
+              // Redirect to the login page
+              window.location.href= '/account/sign-in';
             } else {
               const createErrorData = await createResponse.json();
               console.error('User creation failed:', createErrorData.message);
@@ -57,51 +60,96 @@ const SignUp = () => {
       } finally {
         setIsLoading(false);
       }
+  }else{
+    console.log("Password not Same");
   }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3>Sign Up</h3>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Check type="radio" label="Salon Client" name="type" inline defaultChecked value={1}/>
-        <Form.Check type="radio" label="Salon Owner" name="type" inline value={2}/>
-      </Form.Group>
-      
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm={2}>
+    <FormBox>
+    <form onSubmit={handleSubmit}>
+      <h3 className="mb-3" >Sign Up</h3>
+      <div className="mb-3 ">
+        <div className="form-check form-check-inline">
+          <input
+            type="radio"
+            className="btn-check"
+            id="salonClient"
+            name="type"
+            defaultChecked
+            value={1}
+          />
+          <label className="btn btn-outline-success" htmlFor="salonClient">
+            Salon Client
+          </label>
+        </div>
+        <div className="form-check form-check-inline">
+          <input
+            type="radio"
+            className="btn-check"
+            id="salonOwner"
+            name="type"
+            value={2}
+          />
+          <label className="btn btn-outline-primary" htmlFor="salonOwner">
+            Salon Owner
+          </label>
+        </div>
+      </div>
+  
+      <div className="mb-3 form-floating">
+        <input
+          type="email"
+          className="form-control"
+          id="email"
+          placeholder="Enter email"
+          name="email"
+        />
+        <label htmlFor="email">
           Email address
-        </Form.Label>
-        <Col sm={10}>
-          <Form.Control type="email" placeholder="Enter email" name="email" />
-        </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm={2}>
+        </label>
+      </div>
+  
+      <div className="mb-3 form-floating">
+        <input
+          type="password"
+          className="form-control"
+          id="password"
+          placeholder="Enter password"
+          name="password"
+        />
+        <label htmlFor="password">
           Password
-        </Form.Label>
-        <Col sm={10}>
-          <Form.Control type="password" placeholder="Enter password" name="password" />
-        </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm={2}>
+        </label>
+      </div>
+  
+      <div className="mb-3 form-floating">
+        <input
+          type="password"
+          className="form-control"
+          id="password2"
+          placeholder="Confirm password"
+          name="password2"
+        />
+        <label htmlFor="password2">
           Confirm Password
-        </Form.Label>
-        <Col sm={10}>
-          <Form.Control type="password" placeholder="Confirm password" name="password2" />
-        </Col>
-      </Form.Group>
-
-      <Button variant="primary" type="submit" disabled={isLoading}>
+        </label>
+      </div>
+  
+      <button
+        type="submit"
+        className="btn btn-primary mb-3"
+        disabled={isLoading}
+      >
         {isLoading ? 'Loading...' : 'Sign Up'}
-      </Button>
+      </button>
+  
       <p className="forgot-password text-right">
-        Already registered <Link to='/account/sign-in'>sign in?</Link>
+        Already registered{' '}
+        <Link to="/account/sign-in">sign in?</Link>
       </p>
-    </Form>
+    </form>
+    </FormBox>
   );
 };
 

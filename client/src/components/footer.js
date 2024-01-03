@@ -1,29 +1,29 @@
 import React from 'react';
-import '../styles/footer.css'
-import { Row, Col } from 'react-bootstrap';
-import { Facebook, Twitter, Github } from 'react-bootstrap-icons'; // Import Bootstrap icons
+import '../styles/footer.css';
 
 const Footer = () => {
   return (
     <div>
-    <footer className="footer">
-        <Row>
-          <Col xs={12} md={6} className="text-center text-md-start">
-            <p>&copy; 2023 Your Company Name</p>
-          </Col>
-          <Col xs={12} md={6} className="text-center text-md-end">
-            <a href="https://www.facebook.com">
-              <Facebook className="social-icon" size={36}/>
-            </a>
-            <a href="https://www.twitter.com">
-              <Twitter className="social-icon" size={36}/>
-            </a>
-            <a href="https://github.com/Wen-MY/virtual-hair-studio">
-              <Github className="social-icon" size={36} />
-            </a>
-          </Col>
-        </Row>
-    </footer>
+      <footer className="footer">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12 text-center">
+              <p>&copy; 2023 Your Company Name</p>
+            </div>
+            <div className="col-md-12 text-center">
+                  <a href="https://www.facebook.com" className="social-icon-link">
+                    <i className="bi bi-facebook social-icon"></i>
+                  </a>
+                  <a href="https://www.twitter.com" className="social-icon-link">
+                    <i className="bi bi-twitter social-icon"></i>
+                  </a>
+                  <a href="https://github.com/Wen-MY/virtual-hair-studio" className="social-icon-link">
+                    <i className="bi bi-github social-icon"></i>
+                  </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -60,12 +60,13 @@ function App() {
               {isLoggedIn ?(
                 <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/account/sign-in/*" element={<Account/>} />
+                <Route path="/account" element={<Account/>} />
                 <Route path="/profile" element={<Profile />} />
               </Routes>
               ):(
                 <Routes>
                 <Route path="/" element={<Guest/>}/>
+                <Route path="/account" element={<Login/>} />
                 <Route path="/account/sign-in" element={<Login/>} />
                 <Route path="/account/sign-up" element={<SignUp />} />
               </Routes>
