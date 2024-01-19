@@ -1,4 +1,5 @@
 ### Node ###
+firebase-config.js
 # Logs
 logs
 *.log
@@ -191,4 +192,3 @@ $RECYCLE.BIN/
 # comment the following lines
 !.yarn/cache
 
-firebase-config.js
