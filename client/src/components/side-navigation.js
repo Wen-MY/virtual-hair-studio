@@ -61,7 +61,7 @@ return(
           }}>
             <MenuItem 
               onClick={toggleCollapse}
-              >{collapsed? <span className="bi bi-arrow-bar-right"/>:<span className="bi bi-arrow-bar-left icon"/>}
+              >{collapsed? <span className="bi bi-list"/>:<span className="bi bi-arrow-bar-left icon"/>}
             </MenuItem>
             <div className="menu">
               {menuItems.map((item) => (

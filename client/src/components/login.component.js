@@ -30,7 +30,7 @@ const Login = () => {
         if(!data.userData.first_name || !data.userData.last_name)
           Cookies.set("header_username",data.userData.username);
         else
-        Cookies.set("header_username",data.userData.first_name + data.userData.last_name);
+        Cookies.set("header_username",data.userData.first_name +" "+ data.userData.last_name);
         window.location.href = '/'; //redirect to protected home page
       } else {
         const errorData = await response.json();

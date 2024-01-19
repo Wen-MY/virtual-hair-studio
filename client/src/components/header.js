@@ -6,7 +6,6 @@ import Cookies from 'js-cookie';
 const Header = () => {
   const username = Cookies.get('header_username');
   return (
-    <div>
     <header className='header'>
       <div className='logo'>
         <Link to="/" style={{ textDecoration: 'none' }}>
@@ -21,7 +20,6 @@ const Header = () => {
         
       </div>
     </header>
-    </div>
   );
 };
 

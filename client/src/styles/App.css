@@ -1,22 +1,22 @@
 
 .App {
   text-align: center;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-
-
-.container{
-  height: 100%;
-}
 .content{
   display: flex;
-  justify-content: space-around;
   flex-direction: row;
+  justify-content: space-around;
+  margin: 15px;
+  margin-left: 95px;
+  
 }
 a:visited{
   text-decoration: none;
@@ -25,4 +25,13 @@ a:visited{
 .loading{
   margin: 50px;
   text-align: center;
+}
+
+#carousel-container{
+  width: 90vw;
+}
+
+#carousel-container img{
+  height: 360px;
+  object-fit: cover;
 }

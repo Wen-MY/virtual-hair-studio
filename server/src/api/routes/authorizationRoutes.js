@@ -19,7 +19,7 @@ router.get('/menu', async (req, res) => {
             //user's group found
             const groupId = rows[0].group_id;
             const [results, fields] = await database.poolUM.execute('SELECT * FROM features JOIN authorities ON features.id = authorities.feature_id WHERE group_id = ? AND show_in_navigation = ?', [groupId,1]);
-            console.log(results);
+            //console.log(results);
             if (results.length > 0) {
                 //authorities found
                 res.status(200).json({ message: 'Successful!', results: results });

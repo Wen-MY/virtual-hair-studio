@@ -1,4 +1,5 @@
 import './styles/App.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState,useEffect } from 'react';
 import SyncLoader from 'react-spinners/SyncLoader'
 import SideNav from './components/side-navigation'
@@ -6,11 +7,11 @@ import Home from './pages/Home'
 import Account from './pages/Account'
 import Profile from './pages/Profile';
 import { Routes, Route } from 'react-router-dom';
-import { Container } from 'react-bootstrap';
 import Guest from './pages/Guest';
 import Login from './components/login.component';
 import SignUp from './components/signup.component';
 import config from './config';
+import Cookies from 'js-cookie';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   useEffect(() => {
@@ -34,6 +35,9 @@ function App() {
           // Handle error
           console.error('Error during login status check:', error);
         }
+        if(!isLoggedIn){
+          Cookies.remove("header_username");
+        }
       };
       checkLoggedInStatus();
   }, []);
@@ -53,7 +57,6 @@ function App() {
   return (
     <div className="App">
       {isLoggedIn? <SideNav />:null}
-      <Container>
       <div className='content'>
         <div className="auth-wrapper">
           <div className="auth-inner">
@@ -76,7 +79,6 @@ function App() {
       </div>
      
     
-    </Container>
     </div>
   );
 }

@@ -40,7 +40,6 @@ router.post('/signin', async (req, res) => {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
-    //console.log('Session in /signin route:', req.session);
 }); 
 // Sign Out
 router.post('/logout', (req, res) => {
@@ -133,5 +132,51 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+
+// Update User
+router.post('/update', async (req, res) => {
+    try{
+        const { email, username, first_name, last_name, gender} = req.body;
+        const id = req.session.user?.id;
+        if(id){
+            
+            const [results, fields] = await database.poolUM.execute(
+                'UPDATE users SET username = ?, first_name = ?, last_name = ?,gender = ? WHERE id = ?',[username,first_name,last_name,gender,id]);
+            if(results.affectedRows > 0) {
+                res.status(200).json({message: 'User account updated sucessfully!'});
+            } else {
+                res.status(404).json({ message: 'Failed to update user account.' });
+            }
+        }else{
+            res.status(401).json({ message: 'Failed to update user account. Session expired' });
+        }
+    } catch (error) {
+        console.error('Error during user update:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+})
+
+router.get('/retrieve', async(req,res)=> {
+    try{
+        const id = req.session.user?.id;
+        if(id){
+        const [results, fields] = await database.poolUM.execute(
+            'SELECT username, email, first_name, last_name, gender FROM users WHERE id = ?',[id]);
+            console.log(results);
+            if(results.length > 0) {
+                res.status(200).json({message: 'User account retrieve sucessfully!', results: results[0]});
+            } else {
+                res.status(404).json({ message: 'Failed to retrieve user account.' });
+            }
+        }else{
+            res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
+        }
+        
+    } catch (error) {
+        console.error('Error during get user account info:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+})
+
 
 module.exports = router;

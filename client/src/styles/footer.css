@@ -3,8 +3,9 @@
     color: white;
     bottom: 0;
     width: 100%;
-    position: absolute;
+    position: relative;
     text-align: center;
+    height: 10vh;
   }
 
   .social-icon{
