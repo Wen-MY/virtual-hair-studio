@@ -191,5 +191,4 @@ $RECYCLE.BIN/
 # comment the following lines
 !.yarn/cache
 
-# and uncomment the following lines
-# .pnp.*
+firebase-config.js
