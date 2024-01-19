@@ -1,5 +1,5 @@
 ### Node ###
-firebase-config.js
+server/firebase-config.js
 # Logs
 logs
 *.log
