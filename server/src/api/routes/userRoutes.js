@@ -162,7 +162,6 @@ router.get('/retrieve', async(req,res)=> {
         if(id){
         const [results, fields] = await database.poolUM.execute(
             'SELECT username, email, first_name, last_name, gender FROM users WHERE id = ?',[id]);
-            console.log(results);
             if(results.length > 0) {
                 res.status(200).json({message: 'User account retrieve sucessfully!', results: results[0]});
             } else {
@@ -178,5 +177,49 @@ router.get('/retrieve', async(req,res)=> {
     }
 })
 
+router.post('/change-password', async (req, res) => {
+    try {
+      const userId = req.session.user?.id;
+      const { oldPassword, newPassword } = req.body;
+  
+      if (userId && oldPassword && newPassword) {
+        // Check if the old password is correct
+        const [userResults] = await database.poolUM.execute(
+          'SELECT password FROM users WHERE id = ?',
+          [userId]
+        );
+  
+        if (userResults.length > 0) {
+          const isPasswordMatch = await bcrypt.compare(oldPassword, userResults[0].password);
+  
+          if (isPasswordMatch) {
+            // Hash the new password before updating the database
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  
+            // Update the password in the database
+            const [updateResults] = await database.poolUM.execute(
+              'UPDATE users SET password = ? WHERE id = ?',
+              [hashedNewPassword, userId]
+            );
+  
+            if (updateResults.affectedRows > 0) {
+              res.status(200).json({ message: 'Password changed successfully!' });
+            } else {
+              res.status(500).json({ message: 'Failed to update password.' });
+            }
+          } else {
+            res.status(401).json({ message: 'Old password is incorrect.' });
+          }
+        } else {
+          res.status(404).json({ message: 'User not found.' });
+        }
+      } else {
+        res.status(400).json({ message: 'Invalid request. Please provide oldPassword and newPassword.' });
+      }
+    } catch (error) {
+      console.error('Error during password change:', error);
+      res.status(500).json({ message: 'Internal Server Error.' });
+    }
+  });
 
 module.exports = router;

@@ -35,3 +35,8 @@ a:visited{
   height: 360px;
   object-fit: cover;
 }
+
+.label-text-box{
+  max-width: 100px;
+  min-width: 100px;
+}
