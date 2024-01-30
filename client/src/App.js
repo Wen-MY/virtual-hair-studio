@@ -12,7 +12,7 @@ import Home from './pages/Home'
 import Account from './pages/Account'
 import Profile from './pages/Profile';
 import Guest from './pages/Guest';
-import Appointment from './pages/Appointment';
+import AppointmentsList from './pages/AppointmentsList';
 
 import config from './config';
 function App() {
@@ -65,7 +65,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/account" element={<Account/>} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/appointment" element={<Appointment />} />
+                <Route path="/appointment" element={<AppointmentsList />} />
               </Routes>
               ):(
                 <Routes>

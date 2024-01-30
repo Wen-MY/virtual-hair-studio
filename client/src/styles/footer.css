@@ -2,10 +2,10 @@
     background-color: rgba(33, 37, 41);
     color: white;
     bottom: 0;
-    width: 100%;
     position: relative;
     text-align: center;
     height: 10vh;
+    margin-left: 36px;
   }
 
   .social-icon{
