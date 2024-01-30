@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import config from '../config';
 import FormBox from './form-box'
-import Cookies from 'js-cookie';
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (event) => {
@@ -27,10 +26,6 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data.message);
-        if(!data.userData.first_name || !data.userData.last_name)
-          Cookies.set("header_username",data.userData.username);
-        else
-        Cookies.set("header_username",data.userData.first_name +" "+ data.userData.last_name);
         window.location.href = '/'; //redirect to protected home page
       } else {
         const errorData = await response.json();

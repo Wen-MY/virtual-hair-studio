@@ -1,3 +1,8 @@
-+ appointment CRUD
-+ firestore setup
+client side
 + error validation for login, edit user info and change password
++ fullcalendar reschedule page https://www.npmjs.com/package/fullcalendar?activeTab=readme
++ react-big-calendar
++++ appointment listing view 
+server side
++++ extract db connection from api routes
++- session expiration check extraction for all api request

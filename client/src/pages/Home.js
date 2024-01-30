@@ -8,7 +8,6 @@ const Home = () => {
       const contentElement = document.querySelector('.content');
       if (contentElement) {
         const widthInPixels = contentElement.offsetWidth;
-        console.log('Width in pixels:', widthInPixels);
         setContentWidth(contentElement.offsetWidth);
       }
     };
@@ -24,13 +23,13 @@ const Home = () => {
     };
   }, []);
     const calculateNumberOfCardsInRow = () => {
-      return Math.floor(contentWidth / 240); // Assuming each card takes up 240px
+      return Math.floor(contentWidth / 260); // Assuming each card takes up 260px , may take fixed amount
     };
 
     const generateSalonCards = () => {
       const numberOfCardsInRow = calculateNumberOfCardsInRow();
       const cards = [];
-
+      //API request here to obtain random salon profile
       for (let i = 0; i < numberOfCardsInRow; i++) {
         cards.push(
           <SalonCard
@@ -46,7 +45,9 @@ const Home = () => {
     };
     return(
       <div id='home-page' className='home'>
-        <div id='carousel-container' className='carousel slide w-100' data-bs-ride='carousel'>
+        <div id='carousel-container' className='carousel slide' data-bs-ride='carousel'> {
+          //width 100 disable since auto resize problem (may fix later)
+        }
         <div className="carousel-indicators ">
           <button type="button" data-bs-target="#carousel-container" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
           <button type="button" data-bs-target="#carousel-container" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -63,6 +64,7 @@ const Home = () => {
             <img src={`${process.env.PUBLIC_URL}/sample-image/sample-banner-3.jpg`} className="d-block w-100" alt="Carousel Slide 3"></img>
           </div>
         </div>
+        {/* temporary hide the button
         <button className="carousel-control-prev" type="button" data-bs-target="#carousel-container" data-bs-slide="prev">
           <span className="carousel-control-prev-icon" aria-hidden="true"></span>
           <span className="visually-hidden">Previous</span>
@@ -71,13 +73,12 @@ const Home = () => {
           <span className="carousel-control-next-icon" aria-hidden="true"></span>
           <span className="visually-hidden">Next</span>
         </button>
+        */
+        }   
         </div>
         <div className="row mt-4 card-wrapper">
           {generateSalonCards()}
         </div>   
-        <div className="row mt-4 card-wrapper">
-          {generateSalonCards()}
-        </div>  
       </div>
     );
 }

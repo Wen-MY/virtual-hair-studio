@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Loader from '../utils/loading-spinner';
 import config from '../config';
 import FormBox from '../components/form-box';
-import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,6 +16,7 @@ const Account = () => {
         first_name: '',
         last_name: '',
         gender: '',
+
     });
 
     const [passwordFormData, setPasswordFormData] = useState({
@@ -24,6 +24,10 @@ const Account = () => {
         newPassword: '',
         confirmNewPassword: '',
     });
+
+    const [profilePictureFile, setProfilePictureFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState('');
+    const [profilePicture, setProfilePicture] = useState('');
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -38,6 +42,7 @@ const Account = () => {
                 if (response.ok) {
                     setUserData(data.results);
                     setFormData(data.results);
+                    setProfilePicture(data.results.profilePictureUrl || '');
                 } else {
                     console.error('Error fetching user data:', data.message);
                     if (response.status === 401) {
@@ -53,12 +58,14 @@ const Account = () => {
 
         fetchUserData();
     }, [navigate]);
+    //----------profile information change handling----------
     const handleInputChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
+    //----------password change handling----------
     const handlePasswordInputChange = (e) => {
         setPasswordFormData({
             ...passwordFormData,
@@ -73,6 +80,20 @@ const Account = () => {
           confirmNewPassword: '',
         });
     };
+    //----------profile picture handling----------
+    const handleProfilePictureChange = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            setProfilePictureFile(file);
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
+    const clearProfilePictureModal = () => {
+        setProfilePictureFile(null);
+        setPreviewImage('');
+    };
+    //----------profile information api request----------
     const handleUpdate = async () => {
         try {
             const response = await fetch(config.serverUrl + '/user/update', {
@@ -88,7 +109,6 @@ const Account = () => {
 
             if (response.ok) {
                 console.log('User data updated successfully:', data.message);
-                Cookies.set("header_username",formData.username);
                 window.location.reload();
             } else {
                 console.error('Error updating user data:', data.message);
@@ -100,7 +120,7 @@ const Account = () => {
             console.error('Error updating user data:', error);
         }
     };
-
+    //----------password change api request----------
     const handleChangePassword = async () => {
         try {
             if(passwordFormData.newPassword !== passwordFormData.confirmNewPassword){
@@ -131,18 +151,68 @@ const Account = () => {
             toast.error(error.message, { autoClose: 3000 });
         }
     };
+    //----------profile picture change api request----------
+    const handleChangeProfilePicture = async () => {
+        try {
+            if (profilePictureFile) {
+                // Upload new profile picture
+                const formData = new FormData();
+                formData.append('profilePicture', profilePictureFile);
+
+                const response = await fetch(`${config.serverUrl}/user/update-profile-picture`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Profile picture updated successfully:', data.message);
+                    setProfilePicture(data.results.profilePictureUrl);
+                    setPreviewImage('');
+                    document.getElementById('closeProfilePictureModal').click();
+                    toast.success('Profile picture updated successfully', { autoClose: 3000 });
+                    window.location.reload();
+                } else {
+                    console.error('Error updating profile picture:', data.message);
+                    toast.warning(data.message, { autoClose: 3000 });
+                }
+            }
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            toast.error(error.message, { autoClose: 3000 });
+        }
+    };
     if (loading) {
         return(
         <Loader/>
         );
     }
 
-
     return (
         <div>
             <h1 style={{ textAlign: 'center' }}>Account Information</h1>
             <FormBox>
             <form>
+                <div className="input-group mb-3">
+                    {userData.profilePictureUrl ? (
+                            <img
+                                src={userData.profilePictureUrl}
+                                alt="Profile"
+                                className="image-square-large image-cover rounded mx-auto d-block"
+                                data-bs-toggle="modal"
+                                data-bs-target="#changeProfilePictureModal"
+                            />
+                        ) : (
+                            <i 
+                                className="bi bi-person-square w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#changeProfilePictureModal"
+                                style={{ fontSize: '100px' }}
+                            />
+                        )}
+                </div>
                 <div className="input-group mb-3">
                     <span className="input-group-text label-text-box">Email</span>
                     <input
@@ -297,6 +367,62 @@ const Account = () => {
                                     data-bs-dismiss="modal"
                                     id="closeChangePasswordModal"
                                     onClick={clearChangePasswordModal}>
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="modal fade mx-5" id="changeProfilePictureModal" aria-labelledby="changeProfilePictureModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="changePasswordModalLabel">Update Profile Picture</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body">
+                            <form className="w-100">
+                                <div className="mb-3">
+                                    {profilePictureFile && (
+                                        <img
+                                            src={previewImage || userData.profilePictureUrl}
+                                            alt="Preview"
+                                            className="img-fluid mb-3 image-cover image-square-medium"
+                                        />
+                                    )}
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="profilePictureInput" className="form-label">
+                                        Select Profile Picture
+                                    </label>
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        id="profilePictureInput"
+                                        accept="image/jpeg, image/png"
+                                        onChange={handleProfilePictureChange}
+                                    />
+                                </div>
+                            </form>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleChangeProfilePicture}>
+                                    Save Change
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                    id="closeProfilePictureModal"
+                                    onClick={clearProfilePictureModal}>
                                     Close
                                 </button>
                             </div>

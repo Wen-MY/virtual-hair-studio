@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS `appointments`;
 CREATE TABLE `appointments` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `customer_id` bigint NOT NULL,
+  `salon_name` varchar(255) NOT NULL,
   `service_id` bigint NOT NULL,
   `booking_datetime` datetime NOT NULL,
   `status` varchar(20) NOT NULL,

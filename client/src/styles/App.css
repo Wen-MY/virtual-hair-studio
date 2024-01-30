@@ -6,10 +6,6 @@
   min-height: 80vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
 .content{
   display: flex;
   flex-direction: row;
@@ -39,4 +35,23 @@ a:visited{
 .label-text-box{
   max-width: 100px;
   min-width: 100px;
+}
+
+.image-square-large{
+  width: 200px;
+  height: 200px;
+}
+
+.image-square-medium{
+  width: 125px;
+  height: 125px;
+}
+
+.image-square-small{
+  width: 50px;
+  height: 50px;
+}
+
+.image-cover{
+  object-fit: cover;
 }

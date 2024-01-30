@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
 const bcrypt = require('bcrypt'); // for password hashing
+const multer = require('multer');
+const { getProfilePicture, saveProfilePicture } = require('../firestore/userCollections');
+// Set up Multer storage
+const upload = multer({
+    storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
+  });
+
 
 // Sign In
 router.post('/signin', async (req, res) => {
@@ -163,7 +170,12 @@ router.get('/retrieve', async(req,res)=> {
         const [results, fields] = await database.poolUM.execute(
             'SELECT username, email, first_name, last_name, gender FROM users WHERE id = ?',[id]);
             if(results.length > 0) {
-                res.status(200).json({message: 'User account retrieve sucessfully!', results: results[0]});
+                const userData = results[0];
+                const profilePictureUrl = await getProfilePicture(id);
+                res.status(200).json({
+                    message: 'User account retrieved successfully!',
+                    results: { ...userData, profilePictureUrl },
+                });
             } else {
                 res.status(404).json({ message: 'Failed to retrieve user account.' });
             }
@@ -220,6 +232,33 @@ router.post('/change-password', async (req, res) => {
       console.error('Error during password change:', error);
       res.status(500).json({ message: 'Internal Server Error.' });
     }
+});
+router.post('/update-profile-picture', upload.single('profilePicture'), async (req, res) => {
+    try {
+      const userId = req.session.user?.id;
+  
+      if (!userId) {
+        return res.status(401).json({ message: 'Failed to update profile picture. Session expired' });
+      }
+  
+      // Check if a file is provided in the request
+      if (!req.file) {
+        return res.status(400).json({ message: 'No profile picture file provided' });
+      }
+  
+      const fileBuffer = req.file.buffer;
+  
+      // Save the profile picture to storage and get the updated profile picture URL
+      const profilePictureUrl = await saveProfilePicture(userId, fileBuffer);
+  
+      if (profilePictureUrl) {
+        return res.status(200).json({ message: 'Profile picture updated successfully', results: { profilePictureUrl } });
+      } else {
+        return res.status(500).json({ message: 'Failed to update profile picture' });
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
   });
-
 module.exports = router;

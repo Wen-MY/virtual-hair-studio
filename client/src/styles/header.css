@@ -8,12 +8,13 @@
     align-items: center;
     position: relative;
 }
-.logo {
-    left: 100px;
+
+.logo{
+    left: 0px;
     flex: 1;
     position: absolute;
+    margin-left: 36px;
 }
-
 .logo h1 {
     color: #ece6ce;
 }
@@ -28,8 +29,18 @@
 .user-icon {
     font-size: 36px;
 }
+.user-image{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: auto;
+}
 .link {
     display: flex;
     flex-direction: column;
     text-decoration: none;
+}
+.left-indent{
+    margin-left: 100px;
 }

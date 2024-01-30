@@ -1,17 +1,20 @@
 import './styles/App.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState,useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import SyncLoader from 'react-spinners/SyncLoader'
+
 import SideNav from './components/side-navigation'
+import Login from './components/login.component';
+import SignUp from './components/signup.component';
+
 import Home from './pages/Home'
 import Account from './pages/Account'
 import Profile from './pages/Profile';
-import { Routes, Route } from 'react-router-dom';
 import Guest from './pages/Guest';
-import Login from './components/login.component';
-import SignUp from './components/signup.component';
+import Appointment from './pages/Appointment';
+
 import config from './config';
-import Cookies from 'js-cookie';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   useEffect(() => {
@@ -34,9 +37,6 @@ function App() {
         } catch (error) {
           // Handle error
           console.error('Error during login status check:', error);
-        }
-        if(!isLoggedIn){
-          Cookies.remove("header_username");
         }
       };
       checkLoggedInStatus();
@@ -65,6 +65,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/account" element={<Account/>} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/appointment" element={<Appointment />} />
               </Routes>
               ):(
                 <Routes>

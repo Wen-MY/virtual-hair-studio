@@ -1,4 +1,4 @@
-// Home.js
+// Profile.js --for owner only
 import React from 'react';
 
 const Profile = () => {
