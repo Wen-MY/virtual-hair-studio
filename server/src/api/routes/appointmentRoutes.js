@@ -128,7 +128,36 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+router.get('/get/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Check session expiration
+        const userId = req.session.user?.id;
+        if (!userId) return res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
 
+        // Check if the appointment exists and belongs to the current user
+        if (checkAppointmentOwnership(userId,id)) {
+            // Build the base update query
+            const [appointmentResults] = await database.poolInfo.execute(
+                `SELECT appointments.*, services.*
+                    FROM appointments
+                    JOIN services ON appointments.service_id = services.id
+                    WHERE appointments.id = ?`,
+                [id]
+            );
+            if (appointmentResults.length > 0) {
+                res.status(200).json({ message: 'Appointment details queried successfully!', result: appointmentResults[0] });
+            } else {
+                res.status(500).json({ message: 'Failed to retrieve appointment details.' });
+            }
+        } else {
+            res.status(401).json({ message: 'Invalid request. Appointment not found or does not belong to the current user.' });
+        }
+    } catch (error) {
+        console.error('Error during getting user\'s appointment info:', error);
+        res.status(500).json({ message: 'Internal Server Error.'});
+    }
+});
 router.post('/update/:id', async (req, res) => {
     try {
         // Check session expiration
@@ -137,14 +166,9 @@ router.post('/update/:id', async (req, res) => {
 
         const { id } = req.params;
 
-        // Retrieve the appointment from the database to check ownership
-        const [appointmentResults] = await database.poolInfo.execute(
-            'SELECT customer_id FROM appointments WHERE id = ?',
-            [id]
-        );
-
-        // Check if the appointment exists and belongs to the current user
-        if (appointmentResults.length > 0 && appointmentResults[0].customer_id === userId) {
+        // Check if the appointment exists and belongs to the current client or owner 
+        if (checkAppointmentOwnership(userId,id))
+            {
             // Build the base update query
             let updateQuery = 'UPDATE appointments SET ';
 
@@ -191,5 +215,19 @@ router.post('/update/:id', async (req, res) => {
     }
 });
 
-
+const checkAppointmentOwnership = async (userId,appointmentId) => { 
+    const [ownershipCheckClient] = await database.poolInfo.execute(
+        'SELECT customer_id FROM appointments WHERE id = ?',
+        [appointmentId]
+    );
+    const [ownershipCheckOwner] = await database.poolInfo.execute(
+        'SELECT services.salon_id FROM services JOIN appointments ON services.id = appointments.service_id WHERE appointments.id = ?',
+        [appointmentId]
+    );
+    return(
+        ownershipCheckClient.length > 0 && ownershipCheckClient[0].customer_id === userId
+        ||
+        ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].salon_id === userId
+    )
+}
 module.exports = router;

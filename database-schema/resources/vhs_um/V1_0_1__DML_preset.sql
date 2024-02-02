@@ -48,7 +48,7 @@ insert  into `authorities`(`id`,`group_id`,`feature_id`,`desc`) values
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (1,'Login','/account/sign-in',0,0,'circle-fill');
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (2,'Sign Up','/account/sign-up',0,0,'circle-fill');
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (3,'Home','/',1,0,'house-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (4,'Appointment','/appointment',1,0,'calendar-fill');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (4,'Appointment','/appointments',1,0,'calendar-fill');
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (5,'Profile','/profile',1,0,'person-fill');
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (6,'Account','/account',0,0,'circle-fill');
 insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (7,'Notification','/notification',1,0,'bell-fill');

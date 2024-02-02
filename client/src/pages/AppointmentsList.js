@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate} from 'react-router-dom';
+import { formatDate,formatTime } from '../utils/datetimeFormatter';
 import config from '../config';
+import StatusBadge from '../components/status-pill';
 
 const AppointmentsList = () => {
   const [appointments, setAppointments] = useState([]);
@@ -10,7 +13,7 @@ const AppointmentsList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [limit, setLimit] = useState(10);
   const [searching, setSearching] = useState(0);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(`${config.serverUrl}/appointment/retrieve?status=${statusFilter}&searchTerm=${searchTerm}&limit=${limit}&currentPage=${currentPage}`,{
@@ -33,40 +36,23 @@ const AppointmentsList = () => {
     setCurrentPage(page);
   };
 
-  function formatDate(dateString) {
-    let date = new Date(dateString);
-    let day = ("0" + date.getDate()).slice(-2);
-    let month = ("0" + (date.getMonth() + 1)).slice(-2);
-    let year = date.getFullYear();;
-    return day + "-" + month + "-" + year;
-  }
-  function formatTime(dateString){
-    let date = new Date(dateString);
-    let hours = ("0" + date.getHours()).slice(-2);
-    let minutes = ("0" + date.getMinutes()).slice(-2);
-    return hours + ":" + minutes;
-  }
-  function statusPillElement(status){
-    switch(status){
-      case "CONFIRMED":
-        return <span className='badge rounded-pill text-bg-success'>Confirmed</span>
-      case "COMPLETED":
-        return <span className='badge rounded-pill text-bg-secondary'>Completed</span>
-      case "CANCELLED":
-        return <span className='badge rounded-pill text-bg-danger'>Cancelled</span>
-      case "IN PROGRESS":
-        return <span className='badge rounded-pill text-bg-info'>In Progress</span>
-      case "PENDING":
-        return <span className='badge rounded-pill text-bg-warning'>Pending</span>
-      default:
-        return <span className='badge rounded-pill text-bg-light'>Unknown</span>
-    }
-  }
+  const handleRowClick = (id) => {
+    navigate(`/appointments/detail`, { state: { id } });
+  };
   return (
-    <div className="container mt-4" style={{width : '150vh'}}>
+    <div className="container mt-4" style={{width: '150vh'}}>
 
       <div className="mb-3 row g-3">
-        <div className='col-md-6'>
+        <div className="col-md-6">
+          <input
+            type="text"
+            className="form-control mb-2"
+            placeholder="Search by salon or service"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className='col-md-2'>
           <select
             className="form-select mb-2"
             value={statusFilter}
@@ -80,7 +66,7 @@ const AppointmentsList = () => {
             <option value="COMPLETED">Completed</option>
           </select>
         </div>
-        <div className='col-md-6'>
+        <div className='col-md-2'>
           <select
             className="form-select mb-2"
             value={limit}
@@ -90,15 +76,6 @@ const AppointmentsList = () => {
             <option value="20">20 per page</option>
             <option value="50">50 per page</option>
           </select>
-        </div>
-        <div className="col-md-10">
-          <input
-            type="text"
-            className="form-control mb-2"
-            placeholder="Search by salon or service"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
         </div>
         <div className="col-md-2">
           <button className="btn btn-primary w-100" onClick={()=> setSearching(!searching)}>Search</button>
@@ -119,12 +96,15 @@ const AppointmentsList = () => {
 
         <tbody>
           {appointments.map((appointment) => (
-            <tr key={appointment.id}>
+            <tr 
+              key={appointment.id}
+              onClick={() => handleRowClick(appointment.id)}
+            >
               <td className="col-md-2 text-center align-middle"><i className='bi bi-person-circle user-icon mx-3 text-center align-middle'></i>{appointment.salon_name}</td>
               <td className="col-md-2 text-center align-middle">{appointment.service_name}</td>
               <td className="col-md-2 text-center align-middle">{formatDate(appointment.booking_datetime)}</td>
               <td className="col-md-2 text-center align-middle">{formatTime(appointment.booking_datetime)}</td>
-              <td className="col-md-2 text-center align-middle">{statusPillElement(appointment.status)}</td>
+              <td className="col-md-2 text-center align-middle"><StatusBadge status={appointment.status}/></td>
             </tr>
           ))}
         </tbody>
@@ -133,7 +113,7 @@ const AppointmentsList = () => {
       <p>Total Results: {totalResults}</p>
           */}
       <nav>
-        <ul className="pagination justify-content-center">
+        <ul className="pagination justify-content-end">
           <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`} ><button className="page-link" onClick={() => currentPage > 1 ? handlePageChange(currentPage-1):null}>Previous</button></li>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
             <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>

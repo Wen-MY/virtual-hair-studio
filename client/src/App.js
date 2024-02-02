@@ -13,6 +13,7 @@ import Account from './pages/Account'
 import Profile from './pages/Profile';
 import Guest from './pages/Guest';
 import AppointmentsList from './pages/AppointmentsList';
+import AppointmentDetail from './pages/AppointmentDetail';
 
 import config from './config';
 function App() {
@@ -61,14 +62,15 @@ function App() {
         <div className="auth-wrapper">
           <div className="auth-inner">
               {isLoggedIn ?(
-                <Routes>
+              <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/account" element={<Account/>} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/appointment" element={<AppointmentsList />} />
+                <Route path="/appointments" element={<AppointmentsList />} />
+                <Route path="/appointments/detail" element={<AppointmentDetail/>} />
               </Routes>
               ):(
-                <Routes>
+              <Routes>
                 <Route path="/" element={<Guest/>}/>
                 <Route path="/account" element={<Login/>} />
                 <Route path="/account/sign-in" element={<Login/>} />

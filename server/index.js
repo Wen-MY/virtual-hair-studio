@@ -28,7 +28,7 @@ app.use(session({
     },
   }));
 // Use the sessionExpirationMiddleware for all routes
-//app.use(sessionExpirationMiddleware);
+//app.use(sessionExpirationMiddleware.checkSessionExpiration);
 
 app.use('/user',userRoutes);
 app.use('/auth',authorizationRoutes)
