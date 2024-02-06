@@ -3,6 +3,9 @@ import { Link, useNavigate} from 'react-router-dom';
 import { formatDate,formatTime } from '../utils/datetimeFormatter';
 import config from '../config';
 import StatusBadge from '../components/status-pill';
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
+import '../styles/dateRangePicker.css';
+import 'react-calendar/dist/Calendar.css';
 
 const AppointmentsList = () => {
   const [appointments, setAppointments] = useState([]);
@@ -12,6 +15,7 @@ const AppointmentsList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [limit, setLimit] = useState(10);
+  const [dateRange, setDateRange] = useState([new Date(),new Date()]);
   const [searching, setSearching] = useState(0);
   const navigate = useNavigate();
   useEffect(() => {
@@ -40,10 +44,10 @@ const AppointmentsList = () => {
     navigate(`/appointments/detail`, { state: { id } });
   };
   return (
-    <div className="container mt-4" style={{width: '150vh'}}>
+    <div className="container mt-4 full-width">
 
-      <div className="mb-3 row g-3">
-        <div className="col-md-6">
+      <div className="mb-3 row g-3 border border-2 rounded-3 bg-white p-2">
+        <div className="col-md-4 ">
           <input
             type="text"
             className="form-control mb-2"
@@ -52,7 +56,7 @@ const AppointmentsList = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className='col-md-2'>
+        <div className='col-md-3'>
           <select
             className="form-select mb-2"
             value={statusFilter}
@@ -66,22 +70,14 @@ const AppointmentsList = () => {
             <option value="COMPLETED">Completed</option>
           </select>
         </div>
-        <div className='col-md-2'>
-          <select
-            className="form-select mb-2"
-            value={limit}
-            onChange={(e) => setLimit(e.target.value)}
-          >
-            <option value="10">10 per page</option>
-            <option value="20">20 per page</option>
-            <option value="50">50 per page</option>
-          </select>
+        <div className='col-md-3'>
+          <DateRangePicker className="dateRange form-control mb-2" onChange={setDateRange} value={dateRange}/>
         </div>
         <div className="col-md-2">
           <button className="btn btn-primary w-100" onClick={()=> setSearching(!searching)}>Search</button>
         </div>
       </div>
-
+      <div className='border border-2 rounded-4 bg-white p-3 row mb-4'>
       <table className="table table-hover">
 
         <thead>
@@ -109,6 +105,7 @@ const AppointmentsList = () => {
           ))}
         </tbody>
       </table>
+      </div>
       {/*
       <p>Total Results: {totalResults}</p>
           */}

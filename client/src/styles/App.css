@@ -64,3 +64,6 @@ a:visited{
 .full-width{
   width: 160vh;
 }
+.min-height{
+  min-height: 50vh;
+}

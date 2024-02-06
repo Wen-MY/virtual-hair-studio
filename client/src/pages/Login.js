@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import config from '../config';
-import FormBox from './form-box'
+import FormBox from '../components/form-box'
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (event) => {

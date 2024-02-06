@@ -2,11 +2,11 @@ import './styles/App.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState,useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import SyncLoader from 'react-spinners/SyncLoader'
+import Loader from './components/loading-spinner';
 
 import SideNav from './components/side-navigation'
-import Login from './components/login.component';
-import SignUp from './components/signup.component';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 
 import Home from './pages/Home'
 import Account from './pages/Account'
@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Guest from './pages/Guest';
 import AppointmentsList from './pages/AppointmentsList';
 import AppointmentDetail from './pages/AppointmentDetail';
+import Services from './pages/Services';
 import NotFound from './pages/NotFound';
 
 import config from './config';
@@ -64,13 +65,7 @@ function App() {
   if (isLoggedIn == null) {
     // Wait for the API response before rendering
     return(
-      <div className='loading'>
-          <SyncLoader
-          color="#36d7b7"
-          margin={3}
-          speedMultiplier={1}
-          />
-      </div>
+      <Loader/>
       );
   }
   return (
@@ -87,6 +82,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/appointments" element={<AppointmentsList />} />
                 <Route path="/appointments/detail" element={<AppointmentDetail/>} />
+                <Route path="/salon/services" element={<Services/>} />
               </>
               ):(
               <>

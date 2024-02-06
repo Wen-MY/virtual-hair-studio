@@ -48,7 +48,7 @@ const Profile = () => {
             </div>
           </div>
           {/* Salon Information */}
-          <div className="row mb-4 text-start p-3">
+          <div className="row text-start p-3">
             <div className="col">
               <p>Contact: {salonInformation.contact}</p>
               <p>Business Hours: {salonInformation.businessHour}</p>
@@ -56,15 +56,18 @@ const Profile = () => {
               <p>State: {salonInformation.state}</p>
             </div>
           </div>
+           {/* Salon Button */}
+          <div className="row mb-4 text-start p-3 pt-0 mx-3">
+            <button type="button" className="btn btn-primary mb-3">Book Appointment</button>
+            <button type="button" className="btn btn-secondary mb-3">Make Enquiry</button>
+          </div>
         </div>
-     
+        
 
+       {/*right side section*/}
       <div className="col-md-8 px-4">
 
-      {/*right side section*/}
-
       {/* Services Section */}
-      
       <div className="row mb-3">
         <div className="col border border-2 rounded-4 bg-white p-5 pt-4">
         <h2 className='section-title text-start mb-4'>Services Provided</h2>
@@ -133,7 +136,7 @@ const Profile = () => {
           <h2 className='section-title text-start mb-5'>Customer Reviews</h2>
           <ul className="list-group">
             {reviews.map((review, index) => (
-              <li key={index} className="list-group-item">
+              <li key={index} className="list-group-item text-start">
                 <strong>{review.user}</strong> - Rating: {review.rating} <i class="bi bi-star-fill"></i>
                 <p>{review.comment}</p>
               </li>
