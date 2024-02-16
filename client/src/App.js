@@ -14,7 +14,8 @@ import Profile from './pages/Profile';
 import Guest from './pages/Guest';
 import AppointmentsList from './pages/AppointmentsList';
 import AppointmentDetail from './pages/AppointmentDetail';
-import Services from './pages/Services';
+import SalonManagement from './pages/SalonManagement';
+import AppointmentCreation from './pages/AppointmentCreation'
 import NotFound from './pages/NotFound';
 
 import config from './config';
@@ -82,7 +83,8 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/appointments" element={<AppointmentsList />} />
                 <Route path="/appointments/detail" element={<AppointmentDetail/>} />
-                <Route path="/salon/services" element={<Services/>} />
+                <Route path="/salon/management" element={<SalonManagement/>} />
+                <Route path="/appointment/create" element={<AppointmentCreation />}/>
               </>
               ):(
               <>

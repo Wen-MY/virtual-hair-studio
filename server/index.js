@@ -6,6 +6,8 @@ const sessionExpirationMiddleware = require('./src/api/middleware');
 const userRoutes = require('./src/api/routes/userRoutes');
 const authorizationRoutes = require('./src/api/routes/authorizationRoutes');
 const appointmentRoutes = require('./src/api/routes/appointmentRoutes');
+const serviceRoutes = require('./src/api/routes/serviceRoutes')
+const hairstylistRoutes = require('./src/api/routes/hairstylistRoutes')
 const app = express();
 
 app.use(bodyParser.json());
@@ -33,6 +35,8 @@ app.use(session({
 app.use('/user',userRoutes);
 app.use('/auth',authorizationRoutes)
 app.use('/appointment',appointmentRoutes);
+app.use('/service',serviceRoutes);
+app.use('/hairstylist',hairstylistRoutes);
 
 const port = 4000;
 const server = app.listen(port, () => {

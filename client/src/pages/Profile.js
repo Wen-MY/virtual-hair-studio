@@ -1,28 +1,30 @@
 // Profile.js
 import React from 'react';
+import {Link} from 'react-router-dom';
 
 const Profile = () => {
   // Dummy Data
-  const salonName = 'Elegance Salon';
-  const salonImageMainSrc = 'https://placekitten.com/700/500'; 
-
   const salonInformation ={
+    id: 1,
+    name: 'Elegance Salon',
+    thumbnailSrc: 'https://placekitten.com/700/500',
     contact: '+603 8922-2332',
-    businessHour: '10:30 a.m - 8.30 p.m. | Every Monday - Saturday',
+    businessHour: '1-6/10:30-20:30',
+    businessHourFormatted:'10:30 a.m - 8.30 p.m. | Every Monday - Saturday',
     address: 'No 1, Jalan Sultan Azlan Shah, Butterworth',
     state: 'Penang',
   }
   
   const services = [
-    { category: 'Haircut', services: ['Men Haircut', 'Women Haircut', 'Kids Haircut', 'Women Haircut', 'Kids Haircut', 'Women Haircut', 'Kids Haircut', 'Women Haircut', 'Kids Haircut'] },
+    { category: 'Haircut', services: ['Men Haircut', 'Women Haircut', 'Kids Haircut', 'Normal Haircut'] },
     { category: 'Coloring', services: ['Highlights', 'Balayage', 'Root Touch-up'] },
     { category: 'Styling', services: ['Blowout', 'Updo', 'Curls'] },
   ];
 
   const hairstylists = [
-    { name: 'John Doe', imageSrc: 'https://placekitten.com/100/100', rating: 4.5 },
-    { name: 'Jane Smith', imageSrc: 'https://placekitten.com/100/100', rating: 4.8 },
-    { name: 'Manager', imageSrc: 'https://placekitten.com/100/100', rating: 4.5 },
+    { name: 'John Doe', imageSrc: 'https://placekitten.com/100/100',title:'Senior Hairstylist', rating: 4.5 },
+    { name: 'Jane Smith', imageSrc: 'https://placekitten.com/100/100',title:'Master Hairstylist', rating: 4.8 },
+    { name: 'Manager', imageSrc: 'https://placekitten.com/100/100',title:'Junior Hairstylist', rating: 4.5 },
   ];
 
   const reviews = [
@@ -38,27 +40,27 @@ const Profile = () => {
           {/* Salon Name and Profile Picture */}
           <div className="row">
             <div className="col-12 p-3 pt-2">
-              <img src={salonImageMainSrc} alt="Salon Profile Main" className="img-fluid rounded-4" />
+              <img src={salonInformation.thumbnailSrc} alt="Salon Profile Main" className="img-fluid rounded-4" />
             </div>
           </div>
           {/* Salon Name */}
           <div className="row text-start px-3 py-2 ">
             <div className="col">
-              <h1>{salonName}</h1>
+              <h1>{salonInformation.name}</h1>
             </div>
           </div>
           {/* Salon Information */}
           <div className="row text-start p-3">
             <div className="col">
               <p>Contact: {salonInformation.contact}</p>
-              <p>Business Hours: {salonInformation.businessHour}</p>
+              <p>Business Hours: {salonInformation.businessHourFormatted}</p>
               <p>Address: {salonInformation.address}</p>
               <p>State: {salonInformation.state}</p>
             </div>
           </div>
            {/* Salon Button */}
           <div className="row mb-4 text-start p-3 pt-0 mx-3">
-            <button type="button" className="btn btn-primary mb-3">Book Appointment</button>
+            <Link to="/appointment/create" state={{ salonInformation }} className="btn btn-primary mb-3 text-light">Book Appointment</Link>
             <button type="button" className="btn btn-secondary mb-3">Make Enquiry</button>
           </div>
         </div>
@@ -99,9 +101,11 @@ const Profile = () => {
               >
                 <ul className="list-group">
                   {category.services.map((service, serviceIndex) => (
+                    <Link to="/appointment/create" state={{ salonInformation, service:service }} className="text-decoration-none">
                     <li key={serviceIndex} className="list-group-item">
                       {service}
                     </li>
+                    </Link>
                   ))}
                 </ul>
               </div>
@@ -117,11 +121,12 @@ const Profile = () => {
           <div className="row">
             {hairstylists.map((hairstylist, index) => (
               <div key={index} className="col mb-3">
-                <div className="card mx-auto" style={{ width: '12rem' }}>
+                <div className="card mx-auto border-dark text-start" style={{ width: '12rem' }}>
                   <img src={hairstylist.imageSrc} className="card-img-top" alt={hairstylist.name} />
                   <div className="card-body">
                     <h5 className="card-title">{hairstylist.name}</h5>
-                    <p className="card-text">Rating: {hairstylist.rating} <i class="bi bi-star-fill"></i></p>
+                    <p className='card-text mb-0'>{hairstylist.title}</p>
+                    <p className="card-text">{hairstylist.rating} <i className="bi bi-star-fill"></i></p>
                   </div>
                 </div>
               </div>
@@ -137,7 +142,7 @@ const Profile = () => {
           <ul className="list-group">
             {reviews.map((review, index) => (
               <li key={index} className="list-group-item text-start">
-                <strong>{review.user}</strong> - Rating: {review.rating} <i class="bi bi-star-fill"></i>
+                <strong>{review.user}</strong> - Rating: {review.rating} <i className="bi bi-star-fill"></i>
                 <p>{review.comment}</p>
               </li>
             ))}

@@ -215,6 +215,93 @@ router.post('/update/:id', async (req, res) => {
     }
 });
 
+router.get('/timeslots', async (req,res)=>{
+    try{
+        const {serviceId, appointmentDate} = req.query;
+        if(!serviceId || !appointmentDate)
+            return res.status(400).json({ message: 'Bad request, service id , appointment date is not provided'});
+        
+        // Get salon id and duration of the service
+        const [serviceInfo] = await database.poolInfo.execute('SELECT salon_id, duration FROM services WHERE id = ?', [serviceId]);
+        if (serviceInfo.length === 0)
+            return res.status(404).json({ message: 'Service not found' });
+        const { salon_id, duration } = serviceInfo[0];
+
+        // Get salon business hour
+        const [salonInfo] = await database.poolInfo.execute('SELECT business_hour FROM salons WHERE id = ?', [salon_id]);
+        if (salonInfo.length === 0)
+            return res.status(404).json({ message: 'Salon not found' });
+
+        const { business_hour } = salonInfo[0];
+        const [businessDay, businessHour] = business_hour.split('/');
+        const [businessStartDay, businessEndDay] = businessDay.split('-');
+        const [businessStartHour, businessEndHour] = businessHour.split('-');
+        //check salon operate day 
+        const appointmentDay = new Date(appointmentDate).getDay();
+        if (appointmentDay < businessStartDay || appointmentDay > businessEndDay) {
+            return res.status(400).json({ message: 'Salon is closed on the selected day' });
+        }
+
+         // Get appointments for the given salon and appointment date
+        const [appointmentResults] = await database.poolInfo.execute(
+            `SELECT a.*, s.duration
+            FROM appointments AS a
+            INNER JOIN services AS s ON a.service_id = s.id
+            WHERE a.salon_id = ? 
+            AND DATE(a.booking_datetime) = ?
+            AND a.status NOT IN ('CANCELLED', 'COMPLETED')`,
+            [salon_id, appointmentDate]
+        );
+
+        // Calculate occupied time slots
+        const occupiedTimeSlots = [];
+        appointmentResults.forEach(appointment => {
+            const startDateTime = new Date(appointment.booking_datetime);
+            const endDateTime = new Date(startDateTime.getTime() + (appointment.duration * 60000)); // Convert duration to milliseconds
+            occupiedTimeSlots.push({ start: startDateTime, end: endDateTime });
+        });
+        console.log(occupiedTimeSlots);
+        // Generate unoccupied time slots based on salon business hours and occupied time slots
+        const unoccupiedTimeSlots = [];
+
+        // Parse business start and end hours with minutes to minutes only
+        const [businessStartHourInt, businessStartMinute] = businessStartHour.split(':').map(str => parseInt(str));
+        const [businessEndHourInt, businessEndMinute] = businessEndHour.split(':').map(str => parseInt(str));
+
+        const businessStartTime = businessStartHourInt*60 + businessStartMinute;
+        const businessEndTime = businessEndHourInt*60 + businessEndMinute;
+
+        //console.log(businessStartTime);
+        //console.log(businessEndTime);
+        // Iterate over each hour within the business hours
+        for (let slot = businessStartTime; slot <= businessEndTime; slot+=duration) {
+            // Set start and end time for the current hour
+            const startTime = new Date(appointmentDate);
+            startTime.setHours(Math.floor(slot/60),slot % 60, 0, 0);
+            
+            const endTime = new Date(appointmentDate);
+            endTime.setHours(Math.floor((slot + duration)/60), (slot + duration)% 60, 0, 0);
+            //console.log(startTime , ' to ',endTime);
+            // Check if the time slot is occupied
+            const isOccupied = occupiedTimeSlots.some(slot_occupied => {
+                return (startTime >= slot_occupied.start && startTime < slot_occupied.end) || (endTime > slot_occupied.start && endTime <= slot_occupied.end);
+            });
+
+            // If the time slot is not occupied, add it to the unoccupiedTimeSlots array
+            if (!isOccupied) {
+                unoccupiedTimeSlots.push({ start: startTime, end: endTime });
+            }
+        }
+
+        //console.log(unoccupiedTimeSlots);
+
+
+        res.json(unoccupiedTimeSlots);
+    }catch (error) {
+        console.error('Error during retrive available timeslot:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+});
 const checkAppointmentOwnership = async (userId,appointmentId) => { 
     const [ownershipCheckClient] = await database.poolInfo.execute(
         'SELECT customer_id FROM appointments WHERE id = ?',

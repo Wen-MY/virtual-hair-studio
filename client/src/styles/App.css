@@ -67,3 +67,18 @@ a:visited{
 .min-height{
   min-height: 50vh;
 }
+
+.switch-container {
+  display: flex;
+  align-items: center;
+}
+
+.switch-container .form-check-input {
+  width: 5rem;
+  height: 2.5rem; /* Adjust height as needed */
+  margin-right: 0.5rem; /* Adjust margin as needed */
+}
+
+.switch-container .btn {
+  margin-right: 0.5rem; /* Adjust margin as needed */
+}
