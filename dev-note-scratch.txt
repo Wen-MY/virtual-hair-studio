@@ -7,7 +7,6 @@ client side
 
 server side
 +++ extract db connection from api routes
-+- session expiration check extraction for all api request
 +service routes
 +profile routes
 +review routes 

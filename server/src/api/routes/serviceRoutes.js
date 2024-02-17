@@ -82,10 +82,7 @@ router.get('/get/:serviceId', async (req, res) => {
 
 router.post('/add:salonId', async (req,res) =>{
     try{
-        const userId = req.session.user?.id;
-        if(!userId)
-            return res.status(400).json({ message: 'Session expired, re-login your account.'});
-            const {salonId} = req.params;
+        const {salonId} = req.params;
         if(!salonId)
             return res.status(400).json({message: 'Bad request , salon Id not provided'})
         const {serviceName, categoryId, duration,hairstylists, desc} = req.body;
@@ -97,7 +94,7 @@ router.post('/add:salonId', async (req,res) =>{
             'SELECT user_id FROM salons WHERE id = ?', [salonId]
         );
         const userIds = ownershipResults.map(result => result.user_id);
-        const userExists = userIds.some(id => id === userId);
+        const userExists = userIds.some(id => id === req.userId);
 
         if(userExists){
             const [serviceCreation] = await database.poolInfo.execute('INSERT INTO services (salon_id,service_name,category_id,duration,desc) VALUES(?,?,?,?,?)',[salonId,serviceName,categoryId,duration,desc]);

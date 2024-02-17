@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import config from '../config';
-import { useLocation } from 'react-router-dom';
+import { redirect, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -267,6 +267,7 @@ useEffect(() => {
               <div>
                 <h2 className='text-center'>Return to home</h2>
                 <div className='step-content d-flex justify-content-center mt-5'>
+                  <button className="btn btn-lg btn-secondary me-3" onClick={redirect('./appointments')}>Prev Step</button>
                 </div>
               </div>
             )}

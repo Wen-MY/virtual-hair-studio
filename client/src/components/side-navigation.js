@@ -16,7 +16,7 @@ const toggleCollapse = () => {
   setCollapsed(!collapsed);
 }
 
-const apiUrl = config.serverUrl + '/auth/menu';
+const apiUrl = config.serverUrl + '/menu';
 useEffect(() => {
   const fetchMenu = async () => {
     try {

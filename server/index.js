@@ -2,12 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const sessionExpirationMiddleware = require('./src/api/middleware');
+const sessionExpirationMiddleware = require('./src/api/middleware/session');
 const userRoutes = require('./src/api/routes/userRoutes');
 const authorizationRoutes = require('./src/api/routes/authorizationRoutes');
+const menuRoutes = require('./src/api/routes/menuRoutes');
 const appointmentRoutes = require('./src/api/routes/appointmentRoutes');
-const serviceRoutes = require('./src/api/routes/serviceRoutes')
-const hairstylistRoutes = require('./src/api/routes/hairstylistRoutes')
+const serviceRoutes = require('./src/api/routes/serviceRoutes');
+const hairstylistRoutes = require('./src/api/routes/hairstylistRoutes');
 const app = express();
 
 app.use(bodyParser.json());
@@ -30,10 +31,11 @@ app.use(session({
     },
   }));
 // Use the sessionExpirationMiddleware for all routes
-//app.use(sessionExpirationMiddleware.checkSessionExpiration);
+app.use(sessionExpirationMiddleware.checkSessionExpiration);
 
 app.use('/user',userRoutes);
 app.use('/auth',authorizationRoutes)
+app.use('/menu',menuRoutes);
 app.use('/appointment',appointmentRoutes);
 app.use('/service',serviceRoutes);
 app.use('/hairstylist',hairstylistRoutes);

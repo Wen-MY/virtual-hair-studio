@@ -13,7 +13,7 @@ const SignUp = () => {
     const email = event.target.elements.email.value;
     const password = event.target.elements.password.value;
     const password2 = event.target.elements.password2.value;
-    const apiUrl = config.serverUrl + '/user/';
+    const apiUrl = config.serverUrl + '/auth/';
     if(password === password2){
       try {
         setIsLoading(true);

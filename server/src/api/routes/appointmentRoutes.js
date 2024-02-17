@@ -3,13 +3,9 @@ const router = express.Router();
 const database = require('../../../db-config');
 
 router.get('/retrieve', async (req, res) => {
-    try{
-        // check session expiration
-        const userId = req.session.user?.id;
-        if(!userId) return res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
-        
+    try{     
         // check user role
-        const [userGroup] = await database.poolUM.execute('SELECT group_id FROM user_group WHERE user_id = ?', [userId]);
+        const [userGroup] = await database.poolUM.execute('SELECT group_id FROM user_group WHERE user_id = ?', [req.userId]);
         const userGroupId = userGroup.length > 0 ? userGroup[0].group_id : null;
         // Define base query and parameters
         let baseQuery;
@@ -28,7 +24,7 @@ router.get('/retrieve', async (req, res) => {
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 WHERE appointments.customer_id = ?`;
-            queryParams.push(userId);
+            queryParams.push(req.userId);
         } else if (userGroupId === 4) {
             // Owner
             baseQuery = `
@@ -41,7 +37,7 @@ router.get('/retrieve', async (req, res) => {
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 WHERE services.salon_id = ?`;
-            queryParams.push(userId);
+            queryParams.push(req.userId);
         } else {
             // Unauthorized user
             return res.status(403).json({ message: 'Unauthorized access' });
@@ -91,10 +87,6 @@ router.get('/retrieve', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {
-        // Check session expiration
-        const userId = req.session.user?.id;
-        if (!userId) return res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
-
         const { serviceId, bookingDateTime, remarks } = req.body;
 
         if (serviceId && bookingDateTime) {
@@ -105,7 +97,7 @@ router.post('/create', async (req, res) => {
                 // Service is available, proceed with appointment creation
                 const result = await database.poolInfo.execute(
                     'INSERT INTO appointments (customer_id, service_id, booking_datetime, status, remarks) VALUES (?,?,?,?,?)',
-                    [userId, serviceId, bookingDateTime, 'PENDING', remarks ? remarks : null]
+                    [req.userId, serviceId, bookingDateTime, 'PENDING', remarks ? remarks : null]
                 );
 
                 if (result.affectedRows > 0) {
@@ -131,12 +123,9 @@ router.post('/create', async (req, res) => {
 router.get('/get/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        // Check session expiration
-        const userId = req.session.user?.id;
-        if (!userId) return res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
 
         // Check if the appointment exists and belongs to the current user
-        if (checkAppointmentOwnership(userId,id)) {
+        if (checkAppointmentOwnership(req.userId,id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
                 `SELECT appointments.*, services.*
@@ -160,14 +149,10 @@ router.get('/get/:id', async (req, res) => {
 });
 router.post('/update/:id', async (req, res) => {
     try {
-        // Check session expiration
-        const userId = req.session.user?.id;
-        if (!userId) return res.status(401).json({ message: 'Failed to retrieve user account. Session expired' });
-
         const { id } = req.params;
 
         // Check if the appointment exists and belongs to the current client or owner 
-        if (checkAppointmentOwnership(userId,id))
+        if (checkAppointmentOwnership(req.userId,id))
             {
             // Build the base update query
             let updateQuery = 'UPDATE appointments SET ';
@@ -308,13 +293,13 @@ const checkAppointmentOwnership = async (userId,appointmentId) => {
         [appointmentId]
     );
     const [ownershipCheckOwner] = await database.poolInfo.execute(
-        'SELECT services.salon_id FROM services JOIN appointments ON services.id = appointments.service_id WHERE appointments.id = ?',
+        'SELECT salons.user_id FROM salons JOIN appointments ON salons.id = appointments.salon_id WHERE appointments.id = ?',
         [appointmentId]
     );
     return(
         ownershipCheckClient.length > 0 && ownershipCheckClient[0].customer_id === userId
         ||
-        ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].salon_id === userId
+        ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].user_id === userId
     )
 }
 module.exports = router;

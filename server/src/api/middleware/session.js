@@ -1,4 +1,14 @@
 const checkSessionExpiration = (req, res, next) => {
+
+    console.log('session checked\n')
+    const whitelist = ['/auth'];
+
+    const skipSessionCheck = whitelist.some(route => req.path.startsWith(route));
+
+    if (skipSessionCheck) {
+        return next(); // Move to the next middleware/route handler
+    }
+
     const userId = req.session.user?.id;
 
     if (!userId) {

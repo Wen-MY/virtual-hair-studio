@@ -1,7 +1,7 @@
 import './styles/App.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState,useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route,  Navigate } from 'react-router-dom';
 import Loader from './components/loading-spinner';
 
 import SideNav from './components/side-navigation'
@@ -89,7 +89,7 @@ function App() {
               ):(
               <>
                 <Route path="/" element={<Guest/>}/>
-                <Route path="/account" element={<Login/>} />
+                <Route path="/account" element={<Navigate to="/account/sign-in" replace />} />
                 <Route path="/account/sign-in" element={<Login/>} />
                 <Route path="/account/sign-up" element={<SignUp />} />
               </>

@@ -9,7 +9,7 @@ const Login = () => {
     
     const username = event.target.elements.username.value;
     const password = event.target.elements.password.value;
-    const apiUrl = config.serverUrl + '/user/signin';
+    const apiUrl = config.serverUrl + '/auth/signin';
 
     try {
       setIsLoading(true);
