@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import config from '../config';
-import { redirect, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -11,6 +11,7 @@ import AsyncSelect from 'react-select/async';
 const AppointmentCreation = () => {
   //---------------------------- state variable -------------------------------//
   let { state } = useLocation();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
 
@@ -19,6 +20,7 @@ const AppointmentCreation = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   //format to .toISOString().split('T')[0] before concat with time
   const [selectedTime, setSelectedTime] = useState(null);
+  const [remarks,setRemarks] = useState(null);
 
   //static options
   const [options, setOptions] = useState([]);
@@ -34,12 +36,13 @@ const AppointmentCreation = () => {
   const salonId = state?.salonInformation.id;
   const salonName = state?.salonInformation.name;
   
-
+  //Appointment creation status
+  const [creationStatus, setCreationStatus] = useState(null);
   //---------------------------- remote option api request -------------------------------//
   //load only available services
   const loadServices = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/service/all/${salonId}?status=1`);
+      const response = await fetch(`${config.serverUrl}/service/all/${salonId}?status=1`,{credentials: 'include'});
       const data = await response.json();
       const options = data.result.map((service) => ({
         value: service.id,
@@ -56,7 +59,7 @@ const AppointmentCreation = () => {
 
   const loadHairstylists = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/service/get/${selectedService.value}`);
+      const response = await fetch(`${config.serverUrl}/service/get/${selectedService.value}`,{credentials: 'include'});
       const data = await response.json();
       setOptions(data.hairstylists.map(hairstylist => ({
         value: hairstylist.id,
@@ -74,7 +77,7 @@ const AppointmentCreation = () => {
 useEffect(() => {
   const loadAvailableTimeSlots = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/appointment/timeslots?serviceId=${selectedService.value}&appointmentDate=${selectedDate.toISOString().split('T')[0]}`);
+      const response = await fetch(`${config.serverUrl}/appointment/timeslots?serviceId=${selectedService.value}&appointmentDate=${selectedDate.toISOString().split('T')[0]}`,{credentials: 'include'});
 
       if (!response.ok) {
         throw new Error('Failed to fetch data');
@@ -88,7 +91,7 @@ useEffect(() => {
     }
   }
 
-  if (currentStep == 3) {
+  if (currentStep === 3) {
     loadAvailableTimeSlots();
   }
 }, [currentStep]);
@@ -118,18 +121,46 @@ useEffect(() => {
     }
   };
   
-  const handleComplete = () => {
-    // Handle complete action
-    setCurrentStep(currentStep + 1);
+  const handleComplete = async () => {
+    
+    try{
+      const response = await fetch(`${config.serverUrl}/appointment/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          serviceId : selectedService.value, 
+          hairstylistId : selectedHairstylist.value, 
+          bookingDateTime : (selectedDate.toISOString().split('T')[0]) + ' ' + (selectedTime) ,
+          remarks : remarks
+        }),
+        credentials: 'include'
+      });
+      if(response.ok){
+        setCreationStatus(true);
+        console.log("Appointment Creation Successfully.");
+      }else{
+        setCreationStatus(false);
+        console.error("Appointment Creation Failed." , response.json().message);
+      }
+      setCurrentStep(currentStep + 1);
+    } catch(error){
+
+    }
+    
   };
 
   //handle change input for not null
   const handleSelectChange = (selectedOption, setSelected, setDefault, setError) => {
     setSelected(selectedOption);
+    console.log("State changed");
     if(setDefault !== null)
       setDefault(null);
     setError(false);
   };
+
   //---------------------------- helper and formatting method -------------------------------//
   
   //---------------------------- html -------------------------------//
@@ -137,7 +168,7 @@ useEffect(() => {
     <div className="container-fluid my-3 full-width">
       <div className='border border-2 rounded-4 p-4 ps-5 bg-white min-height mb-4'>
         <div className="progress mb-4">
-          <div className={`progress-bar ${currentStep == 5 ? 'bg-success' : ''}`} role="progressbar" style={{ width: `${(currentStep-1) / totalSteps * 100}%` }} aria-valuenow={(currentStep - 1) / totalSteps * 100} aria-valuemin="0" aria-valuemax="100"></div>
+          <div className={`progress-bar ${currentStep === 5 ? 'bg-success' : ''}`} role="progressbar" style={{ width: `${(currentStep-1) / totalSteps * 100}%` }} aria-valuenow={(currentStep - 1) / totalSteps * 100} aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         {/* Step content */}
         <div className="mb-3">
@@ -241,8 +272,8 @@ useEffect(() => {
                     {availableTimeSlots.map((slot, index) => (
                       <div key={index} className="col mb-5">
                         <button
-                          className={`btn btn-outline-primary btn-lg ${selectedTime === new Date(slot.start).toTimeString() ? 'active' : ''}`}
-                          onClick={() => handleSelectChange(new Date(slot.start).toTimeString(), setSelectedTime,null, setTimeError)}>
+                          className={`btn btn-outline-primary btn-lg ${selectedTime === new Date(slot.start).toLocaleTimeString('it-IT') ? 'active' : ''}`}
+                          onClick={() => handleSelectChange(new Date(slot.start).toLocaleTimeString('it-IT'), setSelectedTime,null, setTimeError)}>
                           {new Date(slot.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })} - {new Date(slot.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                         </button>
                       </div>
@@ -263,17 +294,46 @@ useEffect(() => {
               </div>
             )}
             {/* Step 4 content */}
-            {currentStep > totalSteps && (
+            {currentStep > totalSteps && creationStatus === null && (
+              <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )}
+            {currentStep > totalSteps && creationStatus === true && (
               <div>
-                <h2 className='text-center'>Return to home</h2>
-                <div className='step-content d-flex justify-content-center mt-5'>
-                  <button className="btn btn-lg btn-secondary me-3" onClick={redirect('./appointments')}>Prev Step</button>
+                <h2 className='text-start'>Appointment Completed</h2>
+                <div className='step-content mt-5 d-flex justify-content-center'>
+                  <div className='row justify-content-center'>
+                      <i className='bi bi-check2-circle text-success' style={{ fontSize: '6rem' }}></i>
+                      <h3>Scheduled your Appointment</h3> {/* Heading */}
+                      <p className='col-3 mt-4'>Your appointment is submitted, the service provider will review your appointment within 24 - 48 hours, kindly check your appointment status to confirm your appointment.</p> {/* Paragraph */}
+                      <div className='col-12 my-4'>
+                      <button className="btn btn-lg btn-success" onClick={() => navigate('/')}>Return to Home</button> {/* Button */}
+                      </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {currentStep > totalSteps && creationStatus === false && (
+              <div>
+                <h2 className='text-start'>Appointment Failed</h2>
+                <div className='step-content mt-5 d-flex justify-content-center'>
+                  <div className='row justify-content-center'>
+                      <i className='bi bi-calendar-x text-danger' style={{ fontSize: '6rem' }}></i>
+                      <h3>Failed to Scheduled your Appointment</h3> {/* Heading */}
+                      <p className='col-3 mt-4'>Your appointment is not submitted, please try again later. Thank you.</p> {/* Paragraph */}
+                      <div className='col-12 my-4'>
+                      <button className="btn btn-lg btn-success" onClick={() => navigate('/')}>Return to Home</button> {/* Button */}
+                      </div>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
-        {currentStep <= totalSteps && (
+        {currentStep <= totalSteps &&(
           <div className={`d-flex justify-content-${currentStep === 1?'end':'between' }`}>
             {/* Prev button */}
             {currentStep !== 1 && (

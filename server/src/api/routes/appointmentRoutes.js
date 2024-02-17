@@ -87,20 +87,20 @@ router.get('/retrieve', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {
-        const { serviceId, bookingDateTime, remarks } = req.body;
+        const { serviceId, bookingDateTime, hairstylistId, remarks } = req.body;
 
-        if (serviceId && bookingDateTime) {
+        if (serviceId && bookingDateTime && hairstylistId) {
             // Check service availability
             const [serviceAvailability] = await database.poolInfo.execute('SELECT availability FROM services WHERE id = ?', [serviceId]);
 
             if (serviceAvailability.length > 0 && serviceAvailability[0].availability > 0) {
                 // Service is available, proceed with appointment creation
                 const result = await database.poolInfo.execute(
-                    'INSERT INTO appointments (customer_id, service_id, booking_datetime, status, remarks) VALUES (?,?,?,?,?)',
-                    [req.userId, serviceId, bookingDateTime, 'PENDING', remarks ? remarks : null]
+                    'INSERT INTO appointments (customer_id, service_id,hairstylist_id, booking_datetime, status, remarks) VALUES (?,?,?,?,?,?)',
+                    [req.userId, serviceId,hairstylistId,bookingDateTime, 'PENDING', remarks ? remarks : null]
                 );
-
-                if (result.affectedRows > 0) {
+                console.log(result);
+                if (result[0].affectedRows > 0) {
                     // Appointment made successfully
                     res.status(200).json({ message: 'Appointment made successfully!' });
                 } else {
@@ -116,10 +116,12 @@ router.post('/create', async (req, res) => {
             res.status(400).json({ message: 'Invalid request. Please provide service and booking date time.' });
         }
     } catch (error) {
-        console.error('Error during create user\'s appointment info:', error);
+        console.error('Error during create user\'s appointment:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+
+//full details 
 router.get('/get/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -128,9 +130,11 @@ router.get('/get/:id', async (req, res) => {
         if (checkAppointmentOwnership(req.userId,id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
-                `SELECT appointments.*, services.*
+                `SELECT appointments.*, services.*,hairstylists.name, salons.name, salon.address
                     FROM appointments
                     JOIN services ON appointments.service_id = services.id
+                    JOIN hairstylists ON appointments.hairstylist_id = hairstylists.id
+                    JOIN salons ON appointments.salon_id = salons.id
                     WHERE appointments.id = ?`,
                 [id]
             );
@@ -232,7 +236,7 @@ router.get('/timeslots', async (req,res)=>{
             `SELECT a.*, s.duration
             FROM appointments AS a
             INNER JOIN services AS s ON a.service_id = s.id
-            WHERE a.salon_id = ? 
+            WHERE s.salon_id = ? 
             AND DATE(a.booking_datetime) = ?
             AND a.status NOT IN ('CANCELLED', 'COMPLETED')`,
             [salon_id, appointmentDate]
