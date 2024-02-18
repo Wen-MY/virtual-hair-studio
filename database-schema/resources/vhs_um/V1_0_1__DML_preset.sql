@@ -36,25 +36,30 @@ insert  into `authorities`(`id`,`group_id`,`feature_id`,`desc`) values
 (15,3,7,'Grant Client to Notification'),
 (16,3,9,'Grant Client to Salon Explore'),
 (17,3,10,'Grant Client to Virtual Try On'),
-(18,4,3,'Grant Owner to Home'),
+(18,4,11,'Grant Owner to Manage Salon Dashboard'),
 (19,4,4,'Grant Owner to Appointment'),
-(20,4,5,'Grant Owner to Profile'),
 (21,4,6,'Grant Owner to Account'),
 (22,4,7,'Grant Owner to Notification'),
-(23,4,8,'Grant Owner to Reschedule');
+(23,4,8,'Grant Owner to Reschedule'),
+(24,4,12,'Grant Owner to Manage Salon Service'),
+(26,2,11,NULL),
+(27,2,12,NULL);
 
 /*Data for the table `features` */
 
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (1,'Login','/account/sign-in',0,0,'circle-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (2,'Sign Up','/account/sign-up',0,0,'circle-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (3,'Home','/',1,0,'house-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (4,'Appointment','/appointments',1,0,'calendar-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (5,'Profile','/profile',1,0,'person-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (6,'Account','/account',0,0,'circle-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (7,'Notification','/notification',1,0,'bell-fill');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (8,'Reschedule','/appointment/reschedule',1,0,'clock-history');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (9,'Explore','/explore',1,0,'globe-americas');
-insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values (10,'Try On','/try-on',1,0,'stars');
+insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon`) values 
+(1,'Login','/account/sign-in',0,0,'circle-fill'),
+(2,'Sign Up','/account/sign-up',0,0,'circle-fill'),
+(3,'Home','/',1,0,'house-fill'),
+(4,'Appointment','/appointments',1,0,'calendar-fill'),
+(5,'Profile','/profile',1,0,'person-fill'),
+(6,'Account','/account',0,0,'circle-fill'),
+(7,'Notification','/notification',0,0,'bell-fill'),
+(8,'Reschedule','/appointment/reschedule',1,0,'clock-history'),
+(9,'Explore','/explore',1,0,'globe-americas'),
+(10,'Try On','/try-on',1,0,'stars'),
+(11,'Dashboard','/salon/dashboard',1,0,'house-fill'),
+(12,'Services','/salon/management',1,0,'scissors');
 
 /*Data for the table `groups` */
 
@@ -74,8 +79,8 @@ insert  into `user_group`(`id`,`user_id`,`group_id`) values
 /*Data for the table `users` */
 
 insert  into `users`(`id`,`username`,`password`,`email`,`first_name`,`last_name`,`gender`,`created_at`,`updated_at`) values 
-(1,'admin','$2b$10$Lz7B0Vhn4rlfxrHsPC005utj.l9BCAzWxGoeOcPlJIG7Ffn0feuX6','admin@example.com','admin','admin','m','2023-12-27 09:03:41','2023-12-29 14:58:10'),
-(2,'client','$2a$10$HTCKk35dFmwShoKjy1FBVurON5bpmK7ohAarLj47sxZlHbcqPjNx6','client@example.com','client','client','f','2023-12-29 14:58:26','2023-12-29 14:58:30'),
+(1,'admin','$2b$10$vOlc5KVNGgLxiOA9U9pUdunZywUchfknpg2OAVQzp1oQhynUGJvny','admin@example.com','admin','','m','2023-12-27 09:03:41','2024-01-22 16:39:55'),
+(2,'client','$2b$10$4heodR5YWu5VZCtN.Kvud.aW/cxskmWqvBeJe.3VGdhN/U.kS/vQG','client@example.com','Yong','Yao Wen','f','2023-12-29 14:58:26','2024-02-17 15:58:37'),
 (3,'owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','owner@example.com','owner','owner','o','2023-12-29 14:59:49','2023-12-29 14:59:49');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
