@@ -130,11 +130,11 @@ router.get('/get/:id', async (req, res) => {
         if (checkAppointmentOwnership(req.userId,id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
-                `SELECT appointments.*, services.*,hairstylists.name, salons.name, salon.address
+                `SELECT appointments.*, services.*,hairstylists.name, salons.name, salons.address
                     FROM appointments
                     JOIN services ON appointments.service_id = services.id
                     JOIN hairstylists ON appointments.hairstylist_id = hairstylists.id
-                    JOIN salons ON appointments.salon_id = salons.id
+                    JOIN salons ON services.salon_id = salons.id
                     WHERE appointments.id = ?`,
                 [id]
             );
@@ -297,7 +297,10 @@ const checkAppointmentOwnership = async (userId,appointmentId) => {
         [appointmentId]
     );
     const [ownershipCheckOwner] = await database.poolInfo.execute(
-        'SELECT salons.user_id FROM salons JOIN appointments ON salons.id = appointments.salon_id WHERE appointments.id = ?',
+        `SELECT salons.user_id FROM salons  
+        JOIN services ON salons.id = services.salon_id 
+        JOIN appointments ON services.id = appointments.service_id
+        WHERE appointments.id = ?`,
         [appointmentId]
     );
     return(
