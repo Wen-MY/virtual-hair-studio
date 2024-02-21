@@ -141,7 +141,7 @@ router.get('/get/:id', async (req, res) => {
             if (appointmentResults.length > 0) {
                 res.status(200).json({ message: 'Appointment details queried successfully!', result: appointmentResults[0] });
             } else {
-                res.status(500).json({ message: 'Failed to retrieve appointment details.' });
+                res.status(404).json({ message: 'Failed to retrieve appointment details. Appointment not found' });
             }
         } else {
             res.status(401).json({ message: 'Invalid request. Appointment not found or does not belong to the current user.' });

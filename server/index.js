@@ -8,7 +8,9 @@ const authorizationRoutes = require('./src/api/routes/authorizationRoutes');
 const menuRoutes = require('./src/api/routes/menuRoutes');
 const appointmentRoutes = require('./src/api/routes/appointmentRoutes');
 const serviceRoutes = require('./src/api/routes/serviceRoutes');
+const salonRoutes= require('./src/api/routes/salonRoutes')
 const hairstylistRoutes = require('./src/api/routes/hairstylistRoutes');
+const reviewRoutes= require('./src/api/routes/reviewRoutes')
 const app = express();
 
 app.use(bodyParser.json());
@@ -38,7 +40,9 @@ app.use('/auth',authorizationRoutes)
 app.use('/menu',menuRoutes);
 app.use('/appointment',appointmentRoutes);
 app.use('/service',serviceRoutes);
+app.use('/salon',salonRoutes)
 app.use('/hairstylist',hairstylistRoutes);
+app.use('/review',reviewRoutes);
 
 const port = 4000;
 const server = app.listen(port, () => {
