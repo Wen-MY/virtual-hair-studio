@@ -5,8 +5,10 @@ const database = require('../../../db-config');
 
 router.get('/retrieve', async (req, res) => {
     try {
-        const { salonId, limit, offset } = req.body;
-        const query = `
+        const { salonId, limit, offset } = req.query;
+        
+        // Query to retrieve reviews from poolInfo database
+        const reviewQuery = `
             SELECT 
                 r.*, s.*
             FROM 
@@ -18,13 +20,41 @@ router.get('/retrieve', async (req, res) => {
             LIMIT 
                 ? OFFSET ?;
         `;
-        const [results, fields] = await database.poolInfo.execute(query, [salonId, limit, offset]);
-        res.status(200).json({ message: 'Reviews retrieved successfully', results });
+        const [reviewResults, reviewFields] = await database.poolInfo.execute(reviewQuery, [salonId, limit, offset]);
+
+        // Extract customer IDs from review results
+        const customerIds = reviewResults.map(review => review.customer_id);
+
+        // Query to retrieve usernames from poolUM database
+        const userQuery = `
+            SELECT 
+                id, username
+            FROM 
+                users
+            WHERE
+                id IN (${customerIds.join(', ')});
+        `;
+        const [userResults] = await database.poolUM.execute(userQuery);
+        console.log(userResults);
+        // Map user IDs to usernames
+        const userIdToUsername = {};
+        userResults.forEach(user => {
+            userIdToUsername[user.id] = user.username;
+        });
+
+        // Append usernames to review results
+        const reviewsWithUsernames = reviewResults.map(review => ({
+            ...review,
+            username: userIdToUsername[review.customer_id]
+        }));
+
+        res.status(200).json({ message: 'Reviews retrieved successfully', results: reviewsWithUsernames });
     } catch (error) {
         console.error('Error retrieving reviews:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+
 
 router.post('/create', async (req, res) => {
     try {

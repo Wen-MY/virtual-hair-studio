@@ -10,7 +10,7 @@ import SignUp from './pages/SignUp';
 
 import Home from './pages/Home'
 import Account from './pages/Account'
-import Profile from './pages/Profile';
+import Salon from './pages/Salon';
 import Guest from './pages/Guest';
 import AppointmentsList from './pages/AppointmentsList';
 import AppointmentDetail from './pages/AppointmentDetail';
@@ -72,15 +72,13 @@ function App() {
   return (
     <div className="App">
       {isLoggedIn? <SideNav />:null}
-      <div className='content'>
-        <div className="auth-wrapper">
-          <div className="auth-inner">
+      <div className={`content${isLoggedIn? ' left-indent p-4':''}`}>
           <Routes>
               {isLoggedIn ?(
               <>
                 <Route path="/" element={<Home />} />
                 <Route path="/account" element={<Account/>} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/salon/:salonId" element={<Salon />} />
                 <Route path="/appointments" element={<AppointmentsList />} />
                 <Route path="/appointments/detail" element={<AppointmentDetail/>} />
                 <Route path="/salon/management" element={<SalonManagement/>} />
@@ -96,8 +94,6 @@ function App() {
               )}
               <Route path='*' element={<NotFound />} />
             </Routes>
-          </div>
-        </div>
       </div>
      
     

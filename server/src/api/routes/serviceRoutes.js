@@ -13,7 +13,7 @@ router.get('/all/:salonId', async (req, res) => {
             return res.status(400).json({ message: 'Bad request, salon Id not provided' });
         }
 
-        let sqlQuery = 'SELECT * FROM services WHERE salon_id = ?';
+        let sqlQuery = 'SELECT services.*, categories.name AS category FROM services JOIN categories ON services.category_id = categories.id WHERE salon_id = ?';
         const sqlParams = [salonId];
 
         if (status !== undefined) {

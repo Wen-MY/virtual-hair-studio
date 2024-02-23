@@ -10,11 +10,13 @@ router.get('/retrieve',async (req,res) => {
         let countQuery;
         let queryParams = [];
         baseQuery = `
-        SELECT salons.*, ROUND(AVG(CAST(reviews.rating AS FLOAT)), 1) AS average_rating
-        FROM reviews
-        JOIN services ON reviews.service_id = services.id
-        JOIN salons ON services.salon_id = salons.id
-        GROUP BY salons.id
+        SELECT 
+        salons.*, 
+        ROUND(AVG(CAST(reviews.rating AS FLOAT)), 1) AS average_rating
+        FROM salons
+        LEFT JOIN services ON salons.id = services.salon_id
+        LEFT JOIN reviews ON services.id = reviews.service_id
+        GROUP BY salons.id;
         `;
         countQuery = `
         SELECT COUNT(salons.id) as total
@@ -55,13 +57,14 @@ router.get('/retrieve',async (req,res) => {
 })
 
 //get all information related to the salon
-router.get('/get:salonId',async (req,res) => {
+router.get('/get/:salonId',async (req,res) => {
     try{
-        const salonId = req.query;
+        const {salonId} = req.params;
         if(!salonId){
             return res.status(400).json({message: 'Invalid request, salon id required'});
         }
-        const [salonResult] = await database.poolInfo.execute(`SELECT * FROM salons WHERE id = ?`,[salonId]);
+        const [salonResult] = await database.poolInfo.execute(`SELECT salons.id,salons.name,salons.address, salons.state,salons.contact_number,salons.business_hour FROM salons WHERE id = ?`,[salonId]);
+        console.log(salonId ,':' ,salonResult);
         if(salonResult.length > 0){
             res.status(200).json({ message: 'Salon details queried successfully!' , result: salonResult[0]})
         }else{

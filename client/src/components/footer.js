@@ -4,10 +4,10 @@ import '../styles/footer.css';
 const Footer = () => {
   return (
       <footer className="footer">
-        <div className="container">
+        <div className="container p-3">
           <div className="row">
             <div className="col-md-12 text-center">
-              <p>&copy; 2023 Your Company Name</p>
+              <p>&copy; 2024 Virtual Hair Studio. All Right Reserved</p>
             </div>
             <div className="col-md-12 text-center">
                   <a href="https://www.facebook.com" className="social-icon-link">

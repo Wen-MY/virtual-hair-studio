@@ -15,7 +15,10 @@ const AppointmentCreation = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
 
-  const [selectedService, setSelectedService] = useState(state?.service || null);
+  const [selectedService, setSelectedService] = useState(
+    {value : state?.service?.id, 
+     label : state?.service?.service_name
+    });
   const [selectedHairstylist, setSelectedHairstylist] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   //format to .toISOString().split('T')[0] before concat with time
@@ -54,9 +57,7 @@ const AppointmentCreation = () => {
       return [];
     }
   };
-  
   useEffect(()=> {
-
   const loadHairstylists = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/service/get/${selectedService.value}`,{credentials: 'include'});
@@ -65,13 +66,17 @@ const AppointmentCreation = () => {
         value: hairstylist.id,
         label: hairstylist.name
       })));
+
+      
     } catch (error) {
       console.error('Error fetching hairstylists:', error);
       return [];
     }
   };
-  if(selectedService)
+  if(selectedService){
+    console.log(selectedService);
     loadHairstylists();
+  }
 },[selectedService]);
 
 useEffect(() => {

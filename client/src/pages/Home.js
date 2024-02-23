@@ -44,8 +44,8 @@ const Home = () => {
       return cards;
     };
     return(
-      <div id='home-page' className='home'>
-        <div id='carousel-container' className='carousel slide' data-bs-ride='carousel'> {
+      <div className='home '>
+        <div id='carousel-container' className='carousel slide mx-auto' data-bs-ride='carousel'> {
           //width 100 disable since auto resize problem (may fix later)
         }
         <div className="carousel-indicators ">
