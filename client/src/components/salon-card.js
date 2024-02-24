@@ -10,7 +10,7 @@ const SalonCard = ({ imageSrc, cardTitle, cardText }) => {
         <div className="card-body">
           <h5 className="card-title">{cardTitle}</h5>
           <p className="card-text">{cardText}</p>
-          <a href="#" className="btn btn-primary">Go somewhere</a>
+          {/*<a href="#" className="btn btn-primary">Go somewhere</a>*/}
         </div>
       </div>
     </div>

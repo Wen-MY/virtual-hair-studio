@@ -11,14 +11,18 @@ import SignUp from './pages/SignUp';
 import Home from './pages/Home'
 import Account from './pages/Account'
 import Salon from './pages/Salon';
+import SalonExplore from './pages/SalonExplore';
+import SalonManagement from './pages/SalonManagement';
 import Guest from './pages/Guest';
 import AppointmentsList from './pages/AppointmentsList';
 import AppointmentDetail from './pages/AppointmentDetail';
-import SalonManagement from './pages/SalonManagement';
 import AppointmentCreation from './pages/AppointmentCreation'
+import AppointmentReschedule from './pages/AppointmentReschedule';
 import NotFound from './pages/NotFound';
 
 import config from './config';
+
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [retryCounter, setRetryCounter] = useState(0);//api call failure attempt
@@ -83,6 +87,8 @@ function App() {
                 <Route path="/appointments/detail" element={<AppointmentDetail/>} />
                 <Route path="/salon/management" element={<SalonManagement/>} />
                 <Route path="/appointment/create" element={<AppointmentCreation />}/>
+                <Route path="/explore" element={<SalonExplore />}/>
+                <Route path="/appointment/reschedule" element={<AppointmentReschedule/>}/>
               </>
               ):(
               <>

@@ -18,39 +18,7 @@ const SalonManagement = () => {
   })
   const [services, setServices] = useState([]);
   const [hairstylists, setHairstylists] = useState([]);
-  // Dummy data for categories and services (to be replaced with data from server)
   const [categories, setCategories] = useState([]);
-  /*
-  const [services, setServices] = useState([
-    { id: 1, categoryId: 1, name: 'Haircut', availability: 1, duration: 30, desc: 'Classic haircut for men and women' },
-    { id: 2, categoryId: 2, name: 'Balayage Color', availability: 1, duration: 120, desc: 'Hand-painted highlights for a natural look' },
-    { id: 3, categoryId: 5, name: 'Keratin Treatment', availability: 1, duration: 90, desc: 'Smoothing treatment for frizz-free hair' },
-    { id: 4, categoryId: 3, name: 'Updo Styling', availability: 0, duration: 60, desc: 'Elegant updo styling for special occasions' },
-    { id: 5, categoryId: 5, name: 'Deep Conditioning', availability: 1, duration: 45, desc: 'Intensive moisture treatment for hair health' },
-    { id: 6, categoryId: 2, name: 'Highlights & Lowlights', availability: 1, duration: 90, desc: 'Dimensional color for a vibrant look' },
-    { id: 7, categoryId: 3, name: 'Bridal Hair', availability: 1, duration: 120, desc: 'Customized bridal hair styling for the big day' },
-    { id: 8, categoryId: 7, name: 'Beard Trim', availability: 0, duration: 15, desc: 'Precise trimming and shaping for men' },
-    { id: 9, categoryId: 2, name: 'Root Touch-Up', availability: 1, duration: 60, desc: 'Color touch-up for roots to maintain consistency' },
-    { id: 10, categoryId: 5, name: 'Scalp Massage', availability: 1, duration: 30, desc: 'Relaxing massage to promote scalp health' },
-    { id: 11, categoryId: 2, name: 'Root Touch-Up', availability: 1, duration: 60, desc: 'Color touch-up for roots to maintain consistency' },
-    { id: 12, categoryId: 2, name: 'Root Touch-Up', availability: 1, duration: 60, desc: 'Color touch-up for roots to maintain consistency' },
-  ]);
-
-  //Dummy data for hairstylist selection
-  const [hairstylists, setHairstylists] = useState([
-    { value: 1, label: 'David Heng Tiek Tet' },
-    { value: 2, label: 'Tiffany Chew Sien Meh' },
-    { value: 3, label: 'Thanuja Mudukasan' },
-    { value: 4, label: 'Pang Dou Jia' },
-  ]);
-
-  const [hairstylistList, setHairstylistList] = useState([
-    { id: 1, name: 'David Heng Tiek Tet', title: 'Senior Hairstylist', rating: 5 },
-    { id: 2, name: 'Tiffany Chew Sien Meh', title: 'Master', rating: 4.7 },
-    { id: 3, name: 'Thanuja Mudukasan', title: 'Junior Hairstylist', rating: 4.5 },
-    { id: 4, name: 'Pang Dou Jia', title: 'Senior Hairstylist', rating: 4 },
-  ]);
-  */
   //----------------api-request-----------------------//
   useEffect(()=>{
     const fetchSalonId = async () => {
@@ -142,8 +110,6 @@ const SalonManagement = () => {
     hairstylists: [],
     desc: '',
   });
-
-  
 
   // Effect to set default active tab index to 0
   useEffect(() => {

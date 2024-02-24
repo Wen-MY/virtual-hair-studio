@@ -6,9 +6,10 @@ import { Link, useParams } from 'react-router-dom';
 import NotFound from './NotFound';
 
 const Salon = () => {
+
+  //------------------------------state-variable------------------------------//
   const [loading, setLoading] = useState(true);
   const { salonId } = useParams();
-  // Dummy Data
   const [salonInformation, setSalonInformation] = useState({
     id: null,
     name: '',
@@ -19,20 +20,9 @@ const Salon = () => {
   })
   const [services, setServices] = useState([]);
   const [hairstylists, setHairstylists] = useState([]);
-  /*
-  const hairstylists = [
-    { name: 'John Doe', imageSrc: 'https://placekitten.com/100/100', title: 'Senior Hairstylist', rating: 4.5 },
-    { name: 'Jane Smith', imageSrc: 'https://placekitten.com/100/100', title: 'Master Hairstylist', rating: 4.8 },
-    { name: 'Manager', imageSrc: 'https://placekitten.com/100/100', title: 'Junior Hairstylist', rating: 4.5 },
-  ];
-  */
   const[reviews, setReviews] = useState([]);
-  /*
-  const reviews = [
-    { user: 'Customer 1', rating: 5, comment: 'Great salon! Excellent service.' },
-    { user: 'Customer 2', rating: 4.5, comment: 'Love the hairstylists and atmosphere.' },
-  ];
-  */
+
+  //------------------------------api-request------------------------------//
   useEffect(() => {
     const fetchSalonData = async () => {
       try {
@@ -143,6 +133,7 @@ const Salon = () => {
       <NotFound/>
     );
   }
+  //------------------------------html------------------------------//
   return (
     <div className="container-fluid my-3 full-width">
       <div className="row">
