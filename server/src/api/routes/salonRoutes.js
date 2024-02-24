@@ -2,7 +2,21 @@ const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
 
-
+router.get('/id',async (req,res) => {
+    const userId = req.userId;
+    try{
+        const [result] = await database.poolInfo.execute(`SELECT id FROM salons WHERE user_id = ?`,[userId]); 
+        if(result.length > 0){
+            res.status(200).json({message : 'Successful current user get salon id', result : result[0]});
+        }
+        else{
+            res.status(404).json({message : 'Salon belong to current user not found'});
+        }
+    }catch(error){
+        console.error('Error during get salon id:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+})
 //get all with pagination
 router.get('/retrieve',async (req,res) => {
     try{

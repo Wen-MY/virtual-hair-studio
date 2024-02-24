@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import config from '../config';
 import Loader from '../components/loading-spinner';
 import { Link, useParams } from 'react-router-dom';
+import NotFound from './NotFound';
 
 const Salon = () => {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,8 @@ const Salon = () => {
           setSalonInformation(salonData.result);
         } else {
           console.error('Failed to fetch salon information:', salonData.message);
+          setLoading(false);
+          return;
         }
 
         const servicesResponse = await fetch(config.serverUrl + `/service/all/${salonId}`, {
@@ -132,6 +135,12 @@ const Salon = () => {
   if (loading) {
     return (
       <Loader />
+    );
+  }
+
+  if(!salonInformation.id){
+    return (
+      <NotFound/>
     );
   }
   return (

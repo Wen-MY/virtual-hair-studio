@@ -214,7 +214,7 @@ router.put('/update/:serviceId', async (req, res) => {
     }
 });
 
-router.get('/categorties', async (req,res) => {
+router.get('/categories', async (req,res) => {
     try{
         const [results] = await database.poolInfo.execute('SELECT * FROM categories',[]);
         if(results.length > 0){
