@@ -30,24 +30,33 @@ router.get('/retrieve',async (req,res) => {
         FROM salons
         LEFT JOIN services ON salons.id = services.salon_id
         LEFT JOIN reviews ON services.id = reviews.service_id
-        GROUP BY salons.id;
+        WHERE 1 = 1
         `;
         countQuery = `
         SELECT COUNT(salons.id) as total
         FROM salons
+        LEFT JOIN services ON salons.id = services.salon_id
+        WHERE 1 = 1
         `
 
         // Add filter conditions dynamically
-        const { searchFilter, locationFilter, limit = 16, currentPage = 1 } = req.query;
+        const { search, state, service, limit = 16, currentPage = 1 } = req.query;
 
-        if (searchFilter) {
-            baseQuery += ` AND (salons.name LIKE '%${searchFilter}%'`;
-            countQuery += ` AND (salons.name LIKE '%${searchFilter}%'`;
+        if (search) {
+            baseQuery += ` AND (salons.name LIKE '%${search}%'`;
+            countQuery += ` AND (salons.name LIKE '%${search}%'`;
         }
         
-        if (locationFilter) {
-            baseQuery += ` AND salons.state = ${locationFilter}`;
-            countQuery += ` AND salons.state = ${locationFilter}`;
+        if (state) {
+            baseQuery += ` AND salons.state = ?`;
+            countQuery += ` AND salons.state = ?`;
+            queryParams.push(state);
+        }
+
+        if (service) {
+            baseQuery += ` AND services.category_id = ?`;
+            countQuery += ` AND services.category_id = ?`;
+            queryParams.push(service);
         }
 
         // Query for count first to obtain total appointment
@@ -55,8 +64,7 @@ router.get('/retrieve',async (req,res) => {
         const totalResults = countResult[0].total;
 
         // Pagination query 
-        baseQuery += ` LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
-        //queryParams.push(limit, ((currentPage) - 1) * limit);
+        baseQuery += ` GROUP BY salons.id LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
         const [results, fields] = await database.poolInfo.execute(baseQuery, queryParams);
         if (results.length > 0) {
             res.status(200).json({ message: 'Salon retrieve sucessfully', results: results, totalResults: totalResults });

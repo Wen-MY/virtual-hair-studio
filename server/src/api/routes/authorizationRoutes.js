@@ -3,10 +3,11 @@ const router = express.Router();
 const database = require('../../../db-config');
 const bcrypt = require('bcrypt'); // for password hashing
 
-router.get('/',(req,res) =>{
+router.get('/', async (req,res) =>{
     try {
         if (req.session.user) {
-            res.status(200).json({ login: true, message: 'Logged in' });
+            const [role] = await database.poolUM.execute('SELECT groups.name FROM `groups` JOIN user_group ON user_group.group_id = groups.id WHERE user_group.user_id = ?',[req.session.user.id]);
+            res.status(200).json({ login: true, message: 'Logged in', role: role[0] });
         } else {
             res.status(200).json({ login: false, message: 'Not logged in' });
         }

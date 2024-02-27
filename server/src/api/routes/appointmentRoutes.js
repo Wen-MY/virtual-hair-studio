@@ -125,12 +125,11 @@ router.post('/create', async (req, res) => {
 router.get('/get/:id', async (req, res) => {
     try {
         const { id } = req.params;
-
         // Check if the appointment exists and belongs to the current user
         if (checkAppointmentOwnership(req.userId,id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
-                `SELECT appointments.*, services.*,hairstylists.name, salons.name, salons.address
+                `SELECT appointments.*, services.service_name, services.desc, services.duration ,hairstylists.name, salons.name, salons.address
                     FROM appointments
                     JOIN services ON appointments.service_id = services.id
                     JOIN hairstylists ON appointments.hairstylist_id = hairstylists.id
@@ -189,8 +188,7 @@ router.post('/update/:id', async (req, res) => {
 
             // Execute the update query
             const updateResult = await database.poolInfo.execute(updateQuery, queryParams);
-
-            if (updateResult.affectedRows > 0) {
+            if (updateResult[0].affectedRows > 0) {
                 res.status(200).json({ message: 'Appointment updated successfully!' });
             } else {
                 res.status(500).json({ message: 'Failed to update appointment.' });

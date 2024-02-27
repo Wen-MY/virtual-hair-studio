@@ -1,16 +1,98 @@
 import React, { useState, useEffect } from 'react';
+import {useNavigate} from 'react-router-dom';
 import SalonCard from '../components/salon-card';
 import config from '../config';
 const SalonExplore = () => {
     //------------------------------state-variable------------------------------//
-    const [selectedState, setSelectedState] = useState('');
-    const [selectedService, setSelectedService] = useState('');
+    const [salons, setSalons] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
+
+    const [limit, setLimit] = useState(16);
+    const [searchKeywords, setSearchKeywords] = useState('');
+    const [filterState, setFilterState] = useState('');
+    const [filterService, setFilterService] = useState('');
     const [sortBy, setSortBy] = useState('');
-    const states = ['Malaysia', 'Singapore', 'Indonesia']; // Placeholder for states
-    const services = ['Haircut', 'Coloring', 'Styling', 'Texturizing', 'Treatments', 'Extensions', "Men's Grooming", 'Others']; // Placeholder for services
+
+    const [searching, setSearching] = useState(0);
+
+    const navigate = useNavigate();
+
+    //filter options
+    const states = [
+        'Johor',
+        'Kedah',
+        'Kelantan',
+        'Melaka',
+        'Negeri Sembilan',
+        'Pahang',
+        'Perak',
+        'Perlis',
+        'Pulau Pinang',
+        'Sabah',
+        'Sarawak',
+        'Selangor',
+        'Terengganu',
+        'Kuala Lumpur',
+        'Labuan',
+        'Putrajaya'
+      ];
+
+    // Placeholder for states
+    const [services,setServices] = useState(null);
     const sortOptions = ['Latest', 'Rating', 'Price']; // Placeholder for sort options
-    const salonList = Array.from({ length: 16 }, (_, i) => i + 1); // Placeholder for salon list (16 items)
+    //const salonList = Array.from({ length: 16 }, (_, i) => i + 1); // Placeholder for salon list (16 items)
     //------------------------------api-request------------------------------//
+    useEffect(() => {
+        fetchSalons();
+        fetchAvailableServiceCategories();
+    },[currentPage,searching,filterService,filterState])
+    
+    const fetchSalons = async () => {
+        try{
+        const response = await fetch(`${config.serverUrl}/salon/retrieve?search=${searchKeywords}&state=${filterState}&service=${filterService}&limit=${limit}&currentPage=${currentPage}`,{
+            method: 'GET',
+            credentials: 'include'
+          });
+          const data = await response.json();
+      
+          if (data.results) {
+            setSalons(data.results);
+            setTotalResults(data.totalResults);
+            setTotalPages(Math.ceil(data.totalResults / limit));
+          }else{
+            setSalons([]);
+            setTotalResults(0);
+            setTotalPages(1);
+          }
+        }catch (error) {
+            console.error('Error fetching salons data:', error);
+            //setLoading(false);
+        }
+    }
+    const fetchAvailableServiceCategories = async () => {
+        try{
+            const response = await fetch(`${config.serverUrl}/service/categories`,{
+                method: 'GET',
+                credentials: 'include'
+              });
+              const data = await response.json();
+              if (data.result) {
+                setServices(data.result);
+              }
+            }catch (error) {
+                console.error('Error fetching service categories data:', error);
+            }
+    }
+    //------------------------------input-handling-method------------------------------//
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+      };
+    
+      const handleRowClick = (id) => {
+        navigate(`/salon/${id}`);
+      };
     //------------------------------helper-formatter-method------------------------------//
     //------------------------------html------------------------------//
     return (
@@ -23,7 +105,7 @@ const SalonExplore = () => {
                         <div className="col-12">
                             <h3>Filter By</h3>
                             <label htmlFor="stateSelector" className="form-label fw-semibold">Select State</label>
-                            <select id="stateSelector" className="form-select" value={selectedState} onChange={(e) => setSelectedState(e.target.value)}>
+                            <select id="stateSelector" className="form-select" value={filterState} onChange={(e) => setFilterState(e.target.value)}>
                                 <option value="">-- Select State --</option>
                                 {states.map((state, index) => (
                                     <option key={index} value={state}>{state}</option>
@@ -32,17 +114,19 @@ const SalonExplore = () => {
                         </div>
                     </div>
                     {/* Services Selection (Radio Buttons) */}
+                    {services &&
                     <div className="row mb-3">
                         <div className="col-12">
                             <label className="form-label fw-semibold">Select Service</label>
-                            {services.map((service, index) => (
-                                <div key={index} className="form-check">
-                                    <input className="form-check-input" type="radio" name="serviceRadio" id={`serviceRadio${index}`} value={service} checked={selectedService === service} onChange={() => setSelectedService(service)} />
-                                    <label className="form-check-label" htmlFor={`serviceRadio${index}`}>{service}</label>
+                            {services.map((service) => (
+                                <div key={service.id} className="form-check">
+                                    <input className="form-check-input" type="radio" name="serviceRadio" id={`serviceRadio-${service.id}`} value={service.id} checked={filterService === service.id} onChange={() => setFilterService(service.id)} />
+                                    <label className="form-check-label" htmlFor={`serviceRadio-${service.id}`}>{service.name}</label>
                                 </div>
                             ))}
                         </div>
                     </div>
+                    }
                     {/* Pagination Placeholder */}
                     <div className="row">
                         <div className="col-12">
@@ -56,53 +140,57 @@ const SalonExplore = () => {
                 <div className="col-md-10 px-4">
                     {/* Sorting Section */}
                     <div className="row mb-3">
-                        <div className="col border border-2 rounded-4 p-3 bg-white">
-                            <div className='float-end'>
-                                <label htmlFor="sortBySelector" className="col-sm-5 col-form-label">Sort By :</label>
-                                <select id="sortBySelector" className="col-form-select col-sm-7" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                        <div className="border border-2 rounded-4 p-3 bg-white ">
+                            <div className='d-flex justify-content-end'>
+                                <label htmlFor="sortBySelector" className="col-sm-1 col-form-label">Sort By :</label>
+                                <div className="col-sm-2">
+                                <select id="sortBySelector" className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                                     <option value="">-- Sort By --</option>
                                     {sortOptions.map((option, index) => (
                                         <option key={index} value={option}>{option}</option>
                                     ))}
                                 </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     {/* Salon Listing Section */}
                     <div className="row">
                         <div className="col border border-2 rounded-4 p-5 bg-white min-height">
-                            <div className="row row-cols-1 row-cols-md-4 g-4">
-                                {salonList.map((salon, index) => (
-                                    <div className="col mb-4" key={index}>
+                        {salons.length > 0?(
+                        <div className="row row-cols-1 row-cols-md-4 g-4">
+                                {salons.map((salon) => (
+                                    <div className="col mb-4" key={salon.id} onClick={() => handleRowClick(salon.id)}>
                                     <SalonCard
-                                        key={index}
-                                        imageSrc="https://dummyimage.com/400X300/000/fff.png&text=++++image++++"
-                                        cardText="Some quick example text to build on the card title and make up the bulk of the card's content"
-                                        cardTitle={`Salon ${index + 1}`}
+                                        key={salon.id}
+                                        imageSrc="https://picsum.photos/400/300"
+                                        cardText={salon.average_rating?salon.average_rating:'No rating'}
+                                        cardTitle={salon.name}
                                     />
                                     </div>
                                 ))}
-                            </div>
+                            </div>)
+                            :(
+                                <div className='min-height d-flex align-items-center justify-content-center'> 
+                                <div className='border border-2 p-3 rounded-4 bg-light'>
+                                <h3>No Matched Salon found</h3>
+                                </div>
+                                </div>
+                            )}
                             {/* Pagination Placeholder */}
                             <div className="row mt-5">
                                 <div className="col-12 d-flex justify-content-end">
-                                    <nav aria-label="Page navigation">
-                                        <ul className="pagination">
-                                            <li className="page-item">
-                                                <a className="page-link" href="#" aria-label="Previous">
-                                                    <span aria-hidden="true">Prev</span>
-                                                </a>
-                                            </li>
-                                            <li className="page-item"><a className="page-link active" href="#">1</a></li>
-                                            <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                            <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                            <li className="page-item">
-                                                <a className="page-link" href="#" aria-label="Next">
-                                                    <span aria-hidden="true">Next</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
+                                <nav>
+                                    <ul className="pagination justify-content-end">
+                                    <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`} ><button className="page-link" onClick={() => currentPage > 1 ? handlePageChange(currentPage-1):null}>Previous</button></li>
+                                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                                        <button className="page-link" onClick={() => handlePageChange(page)}>{page}</button>
+                                        </li>
+                                    ))}
+                                    <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}><button className="page-link" onClick={() => currentPage < totalPages ? handlePageChange(currentPage+1):null}>Next</button></li>
+                                    </ul>
+                                </nav>
                                 </div>
                             </div>
                         </div>

@@ -152,7 +152,7 @@ useEffect(() => {
       }
       setCurrentStep(currentStep + 1);
     } catch(error){
-
+      console.error('Failed to create appointment :', error);
     }
     
   };

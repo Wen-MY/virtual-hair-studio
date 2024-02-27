@@ -52,13 +52,13 @@ insert  into `features`(`id`,`name`,`url`,`show_in_navigation`,`parent_id`,`icon
 (2,'Sign Up','/account/sign-up',0,0,'circle-fill'),
 (3,'Home','/',1,0,'house-fill'),
 (4,'Appointment','/appointments',1,0,'calendar-fill'),
-(5,'Profile','/profile',1,0,'person-fill'),
+(5,'Salon','/salon/1',1,0,'person-fill'),
 (6,'Account','/account',0,0,'circle-fill'),
 (7,'Notification','/notification',0,0,'bell-fill'),
 (8,'Reschedule','/appointment/reschedule',1,0,'clock-history'),
 (9,'Explore','/explore',1,0,'globe-americas'),
 (10,'Try On','/try-on',1,0,'stars'),
-(11,'Dashboard','/salon/dashboard',1,0,'house-fill'),
+(11,'Dashboard','/salon-dashboard',1,0,'house-fill'),
 (12,'Services','/salon/management',1,0,'scissors');
 
 /*Data for the table `groups` */
@@ -81,7 +81,9 @@ insert  into `user_group`(`id`,`user_id`,`group_id`) values
 insert  into `users`(`id`,`username`,`password`,`email`,`first_name`,`last_name`,`gender`,`created_at`,`updated_at`) values 
 (1,'admin','$2b$10$vOlc5KVNGgLxiOA9U9pUdunZywUchfknpg2OAVQzp1oQhynUGJvny','admin@example.com','admin','','m','2023-12-27 09:03:41','2024-01-22 16:39:55'),
 (2,'client','$2b$10$4heodR5YWu5VZCtN.Kvud.aW/cxskmWqvBeJe.3VGdhN/U.kS/vQG','client@example.com','Yong','Yao Wen','f','2023-12-29 14:58:26','2024-02-17 15:58:37'),
-(3,'owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','owner@example.com','owner','owner','o','2023-12-29 14:59:49','2023-12-29 14:59:49');
+(3,'owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','owner@example.com','owner','owner','o','2023-12-29 14:59:49','2023-12-29 14:59:49'),
+(4,'lee_owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','leeowner','lee','owner','o','2024-02-21 20:34:27','2024-02-21 20:34:27'),
+(5,'yong','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','yong',NULL,NULL,'m','2024-02-21 20:35:01','2024-02-21 20:35:01');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
