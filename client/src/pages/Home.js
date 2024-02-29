@@ -34,7 +34,7 @@ const Home = () => {
         cards.push(
           <SalonCard
             key={i}
-            imageSrc="https://dummyimage.com/400X300/000/fff.png&text=++++image++++"
+            imageSrc="https://picsum.photos/400/300"
             cardText="Some quick example text to build on the card title and make up the bulk of the card's content"
             cardTitle={`Salon ${i + 1}`}
           />

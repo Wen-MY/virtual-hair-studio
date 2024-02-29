@@ -5,22 +5,31 @@ import { Routes, Route,  Navigate } from 'react-router-dom';
 import Loader from './components/loading-spinner';
 
 import SideNav from './components/side-navigation'
+
+import Guest from './pages/Guest';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 
 import Home from './pages/Home'
 import Account from './pages/Account'
+
 import Salon from './pages/Salon';
+import SalonDashboard from './pages/SalonDashboard';
 import SalonExplore from './pages/SalonExplore';
 import SalonManagement from './pages/SalonManagement';
-import Guest from './pages/Guest';
+
 import AppointmentsList from './pages/AppointmentsList';
 import AppointmentDetail from './pages/AppointmentDetail';
 import AppointmentCreation from './pages/AppointmentCreation'
 import AppointmentReschedule from './pages/AppointmentReschedule';
+
+import TryOn from './pages/TryOn';
+import TryOnHairstyle from './pages/TryOnHairstyle'
+
 import NotFound from './pages/NotFound';
 
 import config from './config';
+
 
 
 function App() {
@@ -89,6 +98,9 @@ function App() {
                 <Route path="/appointment/create" element={<AppointmentCreation />}/>
                 <Route path="/explore" element={<SalonExplore />}/>
                 <Route path="/appointment/reschedule" element={<AppointmentReschedule/>}/>
+                <Route path="/try-on" element={<TryOn />}/>
+                <Route path="/try-on/hairstyle" element={<TryOnHairstyle/>}/>
+                <Route path="/salon/dashboard" element ={<SalonDashboard/>}/>
               </>
               ):(
               <>
