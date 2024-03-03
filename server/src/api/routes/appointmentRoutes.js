@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
+const DateUtils = require('../../utils/sqlDateFormatter')
 
 router.get('/retrieve', async (req, res) => {
     try{     
@@ -15,7 +16,7 @@ router.get('/retrieve', async (req, res) => {
         if (userGroupId === 3 || userGroupId === 2) { //temp OR statment for development purpose
             // Customer
             baseQuery = `
-                SELECT appointments.*, services.service_name
+                SELECT appointments.*, services.service_name, services.duration
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 WHERE appointments.customer_id = ?`;
@@ -28,7 +29,7 @@ router.get('/retrieve', async (req, res) => {
         } else if (userGroupId === 4) {
             // Owner
             baseQuery = `
-                SELECT appointments.*, services.service_name
+                SELECT appointments.*, services.service_name, services.duration
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 WHERE services.salon_id = ?`;
@@ -43,7 +44,7 @@ router.get('/retrieve', async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized access' });
         }
         // Add filter conditions dynamically
-        const { status,searchTerm, limit = 10, currentPage = 1 } = req.query;
+        const { status,searchTerm, limit, currentPage, range} = req.query;
 
         if (status) {
             baseQuery += ' AND appointments.status = ?';
@@ -54,23 +55,21 @@ router.get('/retrieve', async (req, res) => {
             baseQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
             countQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
         }
-        /*
-        if (fromDate) {
-            baseQuery += ' AND appointments.booking_datetime >= ?';
-            queryParams.push(fromDate);
+        if(range) {
+            const startDate = range.split('_')[0];
+            const endDate = range.split('_')[1];
+            baseQuery += ' AND DATE(appointments.booking_datetime) BETWEEN ? AND ?';
+            countQuery += ' AND DATE(appointments.booking_datetime) BETWEEN ? AND ?';
+            queryParams.push(DateUtils.getDateOnly(startDate), DateUtils.getDateOnly(endDate));
         }
-
-        if (toDate) {
-            baseQuery += ' AND appointments.booking_datetime <= ?';
-            queryParams.push(toDate);
-        }
-        */
         // Query for count first to obtain total appointment
         const [countResult] = await database.poolInfo.execute(countQuery, queryParams);
         const totalResults = countResult[0].total;
 
         // Pagination query 
-        baseQuery += ` LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
+        if(limit && currentPage)
+            baseQuery += ` LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
+
         //queryParams.push(limit, ((currentPage) - 1) * limit);
         const [results, fields] = await database.poolInfo.execute(baseQuery, queryParams);
         if(results.length > 0){

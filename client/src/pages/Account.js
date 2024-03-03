@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Account = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [edit, setEdit] = useState(false);
     const [userData, setUserData] = useState({});
     const [formData, setFormData] = useState({
         username: '',
@@ -233,7 +234,7 @@ const Account = () => {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        readOnly
+                        disabled={!edit}
                     />
                 </div>
                 <div className="input-group mb-3">
@@ -244,6 +245,7 @@ const Account = () => {
                         name="first_name"
                         value={formData.first_name}
                         onChange={handleInputChange}
+                        disabled={!edit}
                     />
                 </div>
                 <div className="input-group mb-3">
@@ -254,6 +256,7 @@ const Account = () => {
                         name="last_name"
                         value={formData.last_name}
                         onChange={handleInputChange}
+                        disabled={!edit}
                     />
                 </div>
                 <div className="input-group mb-3">
@@ -266,6 +269,7 @@ const Account = () => {
                         name="gender"
                         value={formData.gender}
                         onChange={handleInputChange}
+                        disabled={!edit}
                     >
                         <option value="m">Male</option>
                         <option value="f">Female</option>
@@ -291,16 +295,19 @@ const Account = () => {
                             Edit
                         </button>
                     </div>
-                <button type="button" className="btn btn-primary" onClick={handleUpdate}>
-                    Update
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-secondary ms-2"
-                    onClick={() => navigate('/')}
-                >
-                    Cancel
-                </button>
+                    <button type="button" className={`btn btn-primary ${edit?'d-none':''}`} onClick={()=> setEdit(true)}>
+                        Edit Profile
+                    </button>
+                    <button type="button" className={`btn btn-primary ${edit?'':'d-none'}`} onClick={handleUpdate}>
+                        Update
+                    </button>
+                    <button
+                        type="button"
+                        className={`btn btn-secondary ms-2 ${edit?'':'d-none'}`}
+                        onClick={() => navigate('/')}
+                    >
+                        Cancel
+                    </button>
             </form>
             </FormBox>
             <ToastContainer 

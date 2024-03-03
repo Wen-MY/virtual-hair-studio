@@ -164,7 +164,7 @@ const SalonExplore = () => {
                                     <SalonCard
                                         key={salon.id}
                                         imageSrc="https://picsum.photos/400/300"
-                                        cardText={salon.average_rating?salon.average_rating:'No rating'}
+                                        rating={salon.average_rating}
                                         cardTitle={salon.name}
                                     />
                                     </div>

@@ -37,6 +37,7 @@ const Home = () => {
             imageSrc="https://picsum.photos/400/300"
             cardText="Some quick example text to build on the card title and make up the bulk of the card's content"
             cardTitle={`Salon ${i + 1}`}
+            rating={5}
           />
         );
       }
@@ -45,7 +46,7 @@ const Home = () => {
     };
     return(
       <div className='home '>
-        <div id='carousel-container' className='carousel slide mx-auto' data-bs-ride='carousel'> {
+        <div id='carousel-container' className='carousel slide mx-auto' data-bs-ride='true'> {
           //width 100 disable since auto resize problem (may fix later)
         }
         <div className="carousel-indicators ">
@@ -54,13 +55,13 @@ const Home = () => {
           <button type="button" data-bs-target="#carousel-container" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
         <div className="carousel-inner">
-          <div className="carousel-item active">
+          <div className="carousel-item active " data-bs-interval="2000">
             <img src={`${process.env.PUBLIC_URL}/sample-image/sample-banner-1.jpg`} className="d-block w-100" alt="Carousel Slide 1"></img>
           </div>
-          <div className="carousel-item">
+          <div className="carousel-item" data-bs-interval="2000">
             <img src={`${process.env.PUBLIC_URL}/sample-image/sample-banner-2.jpg`} className="d-block w-100" alt="Carousel Slide 2"></img>
           </div>
-          <div className="carousel-item">
+          <div className="carousel-item" data-bs-interval="2000">
             <img src={`${process.env.PUBLIC_URL}/sample-image/sample-banner-3.jpg`} className="d-block w-100" alt="Carousel Slide 3"></img>
           </div>
         </div>
