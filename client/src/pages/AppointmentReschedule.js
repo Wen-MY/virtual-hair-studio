@@ -84,7 +84,7 @@ const AppointmentReschedule = () => {
               defaultView={currentView}
               views={[currentView]}
               events={events}
-              style={{ height: 800 }}
+              style={{ height: 700 }}
               eventPropGetter={() => ({ className: 'event bg-success' })}
               step={15}
               onEventDrop={handleEventDrop}
@@ -96,14 +96,14 @@ const AppointmentReschedule = () => {
               defaultView="month"
               views={['week', 'month', 'agenda']}
               events={events}
-              style={{ height: 800 }}
+              style={{ height: 700 }}
               onRangeChange={handleRangeChange}
               eventPropGetter={() => ({ className: 'event bg-success' })}
               step={15}
             />
           )}
         </div>
-        <div className='mt-3'>
+        <div className={`mt-3 ${currentView === 'agenda'?'d-none':'d-block'}`}>
           {rescheduling?
           (
             <div>

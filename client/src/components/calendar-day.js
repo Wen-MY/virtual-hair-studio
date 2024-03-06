@@ -19,15 +19,16 @@ const CalendarDay = ({ today = false, day, month, weekday }) => {
   const currentMonthName = monthNames[month];
 
   return (
-    <div className="card" style={{ width: "200px",height: '230px'}}>
-      <div className="card-header bg-primary text-white text-center">
+    <div className="card rounded-4 w-100 h-100">
+      <div className="card-header bg-primary text-white text-center p-3">
         {currentMonthName}
       </div>
-      <div className="card-body text-center">
+      <div className="card-body d-flex flex-column justify-content-center align-items-center text-center ">
         <h1 className="display-1">{day}</h1>
+        <p>{weekday}</p>
       </div>
-      <div className="card-footer text-center">
-        {weekday}
+      <div className="card-footer text-center p-3">
+        Today
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ const SalonCard = ({ imageSrc, cardTitle, cardText, rating }) => {
         <div className="card-body">
           <h5 className="card-title">{cardTitle}</h5>
           <p className="card-text">{cardText}</p>
-          <p className="card-text float-end">
+          <p className={`card-text float-end ${rating === -1?'d-none':''}`}>
             <span>
               {rating ? rating.toFixed(1) + ' ' : 'No rating '}
               {rating ? <i className="bi bi-star-fill"></i> : ''}

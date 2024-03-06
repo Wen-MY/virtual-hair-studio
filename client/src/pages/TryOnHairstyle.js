@@ -7,6 +7,7 @@ import 'react-calendar/dist/Calendar.css';
 import 'react-time-picker/dist/TimePicker.css'
 import AsyncSelect from 'react-select/async';
 
+
 const TryOnHairstyle = () => {
   //---------------------------- state variable -------------------------------//
   const navigate = useNavigate();

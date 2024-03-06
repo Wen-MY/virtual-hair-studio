@@ -45,7 +45,7 @@ const Home = () => {
       return cards;
     };
     return(
-      <div className='home '>
+      <div className='home'>
         <div id='carousel-container' className='carousel slide mx-auto' data-bs-ride='true'> {
           //width 100 disable since auto resize problem (may fix later)
         }
