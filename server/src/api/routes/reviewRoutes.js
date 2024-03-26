@@ -17,10 +17,11 @@ router.get('/retrieve', async (req, res) => {
                 services AS s ON r.service_id = s.id
             WHERE 
                 s.salon_id = ? 
-            LIMIT 
-                ? OFFSET ?;
         `;
-        const [reviewResults, reviewFields] = await database.poolInfo.execute(reviewQuery, [salonId, limit, offset]);
+        if(limit && offset){
+            reviewQuery += ` LIMIT ${limit} OFFSET ${((offset) - 1) * limit}`
+        }
+        const [reviewResults, reviewFields] = await database.poolInfo.execute(reviewQuery, [salonId]);
 
         // Extract customer IDs from review results
         const customerIds = reviewResults.map(review => review.customer_id);
@@ -77,5 +78,6 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+
 
 module.exports = router;

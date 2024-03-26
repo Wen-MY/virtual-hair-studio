@@ -19,6 +19,8 @@ const SalonManagement = () => {
   const [services, setServices] = useState([]);
   const [hairstylists, setHairstylists] = useState([]);
   const [categories, setCategories] = useState([]);
+
+
   //----------------api-request-----------------------//
   useEffect(()=>{
     const fetchSalonId = async () => {
@@ -103,7 +105,7 @@ const SalonManagement = () => {
   }, [salonId]);
   // State for active tab index
   const [activeTab, setActiveTab] = useState(0);
-  const [newFormData, setNewFormData] = useState({
+  const [newServiceFormData, setNewServiceFormData] = useState({
     serviceName: '',
     categoryId: '',
     duration: null,
@@ -111,6 +113,12 @@ const SalonManagement = () => {
     desc: '',
   });
 
+  
+  const [newHairstylistFormData, setNewHairstylistFormData] = useState({
+    hairstylistName: '',
+    position: '',
+  });
+ 
   // Effect to set default active tab index to 0
   useEffect(() => {
     if(categories.length > 0){
@@ -122,16 +130,18 @@ const SalonManagement = () => {
     const firstTabPane = document.querySelector('.tab-pane');
     firstTabPane.classList.add('active', 'show');
   }}, [loading]);
-  //----------add service form change handling----------
-  const handleNewFormInputChange = (e) => {
-    setNewFormData({
-      ...newFormData,
+
+  //----------------------------------------- add service form change handling ----------
+
+  const handleNewServiceFormInputChange = (e) => {
+    setNewServiceFormData({
+      ...newServiceFormData,
       [e.target.name]: e.target.value,
     });
   };
-  const handleMultiSelectChange = (selectedOptions) => {
-    setNewFormData({
-      ...newFormData,
+  const handleNewServiceMultiSelectChange = (selectedOptions) => {
+    setNewServiceFormData({
+      ...newServiceFormData,
       hairstylists: selectedOptions,
     });
   };
@@ -141,6 +151,14 @@ const SalonManagement = () => {
         service.id === id ? { ...service, availability: !service.availability } : service
       )
     );
+  };
+  //----------------------------------------- add hairstylist form change handling ----------
+  
+  const handleNewHairstylistInputChange = (e) => {
+    setNewHairstylistFormData({
+      ...newHairstylistFormData,
+      [e.target.name]: e.target.value,
+    });
   };
   if (loading) {
     return (
@@ -184,7 +202,7 @@ const SalonManagement = () => {
                     .map(service => (
                       <li className={`list-group-item d-flex justify-content-between align-items-center p-3 ${service.availability ? `bg-white` : `bg-light`}`} key={service.id}>
                         <div className='service-thumbnail'>
-                          <img className='img-thumbnail rounded-circle' src='https://placekitten.com/100/100'></img>
+                          <img className='img-thumbnail rounded-circle' src='https://picsum.photos/100/100'></img>
                         </div>
                         <div className='service-info text-start flex-grow-1 ms-4'>
                           <strong className='fs-4'>{service.service_name}</strong>
@@ -192,14 +210,12 @@ const SalonManagement = () => {
                           <p className='fs-6'>{service.desc}</p>
                         </div>
                         <div className='tooltips row switch-container'>
-                          {/* pending 
-                        <button className='btn btn-outline-secondary mx-2 rounded-circle' data-bs-toggle="modal" data-bs-placement="top" title="Edit" data-bs-target="#updateServiceModal"><span className="bi-pencil"></span></button>
-                        */}
-                          <div class="col-auto">
+                          <div className="col-auto">
+                          <button className='btn btn-outline-secondary mx-2 rounded-circle' data-bs-toggle="modal" data-bs-placement="top" title="Edit" data-bs-target="#updateServiceModal"><span className="bi-pencil"></span></button>
                             <button className='btn btn-outline-danger rounded-circle' data-bs-toggle="modal" data-bs-placement="top" title="Delete" data-bs-target="#deleteServiceModal"><span className="bi-trash"></span></button>
                           </div>
-                          <div class="col-auto form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" checked={service.availability} onChange={() => handleServiceAvailability(service.id)} />
+                          <div className="col-auto form-check form-switch">
+                            <input className="form-check-input" type="checkbox" role="switch" checked={service.availability} onChange={() => handleServiceAvailability(service.id)} />
                           </div>
                         </div>
 
@@ -219,7 +235,7 @@ const SalonManagement = () => {
               <div className="card">
                 <div className="card-body text-start">
                   <div className='service-thumbnail float-start mx-4'>
-                    <img className='img-thumbnail rounded-circle' src='https://placekitten.com/100/100'></img>
+                    <img className='img-thumbnail rounded-circle' src='https://picsum.photos/100/100'></img>
                   </div>
                   <h5 className="card-title fw-bold mt-3">{hairstylist.name}</h5>
                   <p className="card-text mb-0">{hairstylist.position? hairstylist.position : 'Unassigned'}</p>
@@ -265,8 +281,8 @@ const SalonManagement = () => {
                       type="text"
                       className="form-control"
                       name="serviceName"
-                      value={newFormData.serviceName}
-                      onChange={handleNewFormInputChange}
+                      value={newServiceFormData.serviceName}
+                      onChange={handleNewServiceFormInputChange}
                       id="serviceName"
                       required
                     />
@@ -286,8 +302,8 @@ const SalonManagement = () => {
                           type="number"
                           className="form-control"
                           name="duration"
-                          value={newFormData.duration}
-                          onChange={handleNewFormInputChange}
+                          value={newServiceFormData.duration}
+                          onChange={handleNewServiceFormInputChange}
                           id="duration"
                         />
                       </div>
@@ -300,10 +316,10 @@ const SalonManagement = () => {
                     <Select
                       options={hairstylists}
                       name='hairstylist'
-                      value={newFormData.hairstylists}
+                      value={newServiceFormData.hairstylists}
                       isMulti
                       placeholder="Hairstylist"
-                      onChange={handleMultiSelectChange}
+                      onChange={handleNewServiceMultiSelectChange}
                     />
                   </div>
                   <div className="mb-3">
@@ -311,8 +327,8 @@ const SalonManagement = () => {
                     <textarea
                       className="form-control p-3"
                       name="desc"
-                      value={newFormData.desc}
-                      onChange={handleNewFormInputChange}
+                      value={newServiceFormData.desc}
+                      onChange={handleNewServiceFormInputChange}
                       id="desc"
                     />
                   </div>
@@ -325,10 +341,8 @@ const SalonManagement = () => {
             </div>
           </div>
         </div>
-
-        {/* Modal for update existing service
       <div className={`modal fade`} id="updateServiceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="updateServiceModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-xl">
+        <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
               <h4 className="modal-title fw-bold">Update Service</h4>
@@ -344,9 +358,8 @@ const SalonManagement = () => {
           </div>
         </div>
       </div>
-      */}
         {/* Modal for delete existing service */}
-        <div className={`modal fade`} id="deleteServiceModal" tabIndex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
+        <div className={`modal fade`} id="deleteServiceModal" tabIndex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true" >
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
@@ -364,7 +377,7 @@ const SalonManagement = () => {
           </div>
         </div>
         {/* Modal for add hairstylist */}
-        <div className="modal fade" id="addHairstylistModal" tabIndex="-1" aria-labelledby="addHairstylistModalLabel" aria-hidden="true">
+        <div className="modal fade" id="addHairstylistModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="addHairstylistModalLabel" aria-hidden="true" >
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
@@ -372,7 +385,32 @@ const SalonManagement = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div className="modal-body">
-              {/*form to add new hairstylist */}
+              <form className="w-100 text-start px-3">
+                    <div className="mb-3">
+                        <label htmlFor="hairstylistName" className='form-label fw-semibold'>Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="hairstylistName"
+                            value={newHairstylistFormData.name}
+                            onChange={handleNewHairstylistInputChange}
+                            id="hairstylistName"
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="position" className='form-label fw-semibold'>Position</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="position"
+                            value={newHairstylistFormData.position}
+                            onChange={handleNewHairstylistInputChange}
+                            id="position"
+                            required
+                        />
+                    </div>
+                </form>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-primary">Add</button>

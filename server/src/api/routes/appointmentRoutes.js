@@ -13,7 +13,7 @@ router.get('/retrieve', async (req, res) => {
         let countQuery;
         let queryParams = [];
 
-        if (userGroupId === 3 || userGroupId === 2) { //temp OR statment for development purpose
+        if (userGroupId === 3) { //temp OR statment for development purpose
             // Customer
             baseQuery = `
                 SELECT appointments.*, services.service_name, services.duration
@@ -26,7 +26,7 @@ router.get('/retrieve', async (req, res) => {
                 JOIN services ON appointments.service_id = services.id
                 WHERE appointments.customer_id = ?`;
             queryParams.push(req.userId);
-        } else if (userGroupId === 4) {
+        } else if (userGroupId === 4 || userGroupId === 2) {
             // Owner
             baseQuery = `
                 SELECT appointments.*, services.service_name, services.duration
@@ -71,6 +71,7 @@ router.get('/retrieve', async (req, res) => {
             baseQuery += ` LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
 
         //queryParams.push(limit, ((currentPage) - 1) * limit);
+        //console.log(baseQuery);
         const [results, fields] = await database.poolInfo.execute(baseQuery, queryParams);
         if (results.length > 0) {
             res.status(200).json({ message: 'User\'s appointment retrieve sucessfully', results: results, totalResults: totalResults });
@@ -98,7 +99,7 @@ router.post('/create', async (req, res) => {
                     'INSERT INTO appointments (customer_id, service_id,hairstylist_id, booking_datetime, status, remarks) VALUES (?,?,?,?,?,?)',
                     [req.userId, serviceId, hairstylistId, bookingDateTime, 'PENDING', remarks ? remarks : null]
                 );
-                console.log(result);
+                //console.log(result);
                 if (result[0].affectedRows > 0) {
                     // Appointment made successfully
                     res.status(200).json({ message: 'Appointment made successfully!' });
@@ -245,7 +246,7 @@ router.get('/timeslots', async (req, res) => {
             const endDateTime = new Date(startDateTime.getTime() + (appointment.duration * 60000)); // Convert duration to milliseconds
             occupiedTimeSlots.push({ start: startDateTime, end: endDateTime });
         });
-        console.log(occupiedTimeSlots);
+        //console.log(occupiedTimeSlots);
         // Generate unoccupied time slots based on salon business hours and occupied time slots
         const unoccupiedTimeSlots = [];
 

@@ -82,3 +82,12 @@ a:visited{
 .switch-container .btn {
   margin-right: 0.5rem; /* Adjust margin as needed */
 }
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
