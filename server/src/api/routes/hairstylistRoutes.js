@@ -9,10 +9,10 @@ router.get('/get/:salonId', async (req, res) => {
 
         // Query to retrieve all hairstylists by salonId
         const [hairstylists] = await database.poolInfo.execute(
-            'SELECT * FROM hairstylists WHERE salon_id = ?',
+            'SELECT * FROM hairstylists WHERE salon_id = ? AND deleted_at IS NULL',
             [salonId]
         );
-        res.status(200).json({ result : hairstylists });
+        res.status(200).json({ result: hairstylists });
     } catch (error) {
         console.error('Error fetching hairstylists:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
@@ -41,6 +41,25 @@ router.post('/add', async (req, res) => {
         }
     } catch (error) {
         console.error('Error adding hairstylist:', error);
+        res.status(500).json({ message: 'Internal Server Error.' });
+    }
+});
+
+router.delete('/delete/:hairstylistId', async (req, res) => {
+    try {
+        const { hairstylistId } = req.params;
+
+        const [result] = await database.poolInfo.execute(
+            `UPDATE hairstylists
+                SET deleted_at = CURRENT_TIMESTAMP
+                WHERE id = ?`
+            , [serviceId]);
+        if (result.affectedRows > 0)
+            res.status(200).json({ message: 'Hairstylist deleted successfully' });
+        else
+            res.status(404).json({ message: 'Hairstylist not found' });
+    } catch (error) {
+        console.error('Error during service deletion:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });

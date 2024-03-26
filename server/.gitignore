@@ -1,5 +1,6 @@
 ### Node ###
 server/firebase-config.js
+server/open-ai-config.js
 # Logs
 logs
 *.log

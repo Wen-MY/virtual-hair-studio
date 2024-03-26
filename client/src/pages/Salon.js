@@ -142,7 +142,7 @@ const Salon = () => {
           {/* Salon Name and Salon Picture */}
           <div className="row">
             <div className="col-12 p-3 pt-2">
-              <img src={'https://placekitten.com/700/500'} alt="Salon Profile Main" className="img-fluid rounded-4" />
+              <img src={'https://picsum.photos/700/500'} alt="Salon Profile Main" className="img-fluid rounded-4" />
             </div>
           </div>
           {/* Salon Name */}
@@ -234,7 +234,7 @@ const Salon = () => {
                 {hairstylists.map((hairstylist, index) => (
                   <div key={index} className="col mb-3">
                     <div className="card mx-auto border-dark text-start" style={{ width: '12rem' }}>
-                      <img src={'https://placekitten.com/120/100'} className="card-img-top" alt={hairstylist.name} />
+                      <img src={'https://picsum.photos/120/100'} className="card-img-top" alt={hairstylist.name} />
                       <div className="card-body">
                         <h5 className="card-title">{hairstylist.name}</h5>
                         <p className='card-text mb-0'>{hairstylist.position || 'Unassigned'}</p>

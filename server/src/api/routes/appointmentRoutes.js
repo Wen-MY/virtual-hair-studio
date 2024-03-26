@@ -4,7 +4,7 @@ const database = require('../../../db-config');
 const DateUtils = require('../../utils/sqlDateFormatter')
 
 router.get('/retrieve', async (req, res) => {
-    try{     
+    try {
         // check user role
         const [userGroup] = await database.poolUM.execute('SELECT group_id FROM user_group WHERE user_id = ?', [req.userId]);
         const userGroupId = userGroup.length > 0 ? userGroup[0].group_id : null;
@@ -44,7 +44,7 @@ router.get('/retrieve', async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized access' });
         }
         // Add filter conditions dynamically
-        const { status,searchTerm, limit, currentPage, range} = req.query;
+        const { status, searchTerm, limit, currentPage, range } = req.query;
 
         if (status) {
             baseQuery += ' AND appointments.status = ?';
@@ -55,7 +55,7 @@ router.get('/retrieve', async (req, res) => {
             baseQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
             countQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
         }
-        if(range) {
+        if (range) {
             const startDate = range.split('_')[0];
             const endDate = range.split('_')[1];
             baseQuery += ' AND DATE(appointments.booking_datetime) BETWEEN ? AND ?';
@@ -67,16 +67,16 @@ router.get('/retrieve', async (req, res) => {
         const totalResults = countResult[0].total;
 
         // Pagination query 
-        if(limit && currentPage)
+        if (limit && currentPage)
             baseQuery += ` LIMIT ${limit} OFFSET ${((currentPage) - 1) * limit}`;
 
         //queryParams.push(limit, ((currentPage) - 1) * limit);
         const [results, fields] = await database.poolInfo.execute(baseQuery, queryParams);
-        if(results.length > 0){
-            res.status(200).json({message: 'User\'s appointment retrieve sucessfully', results: results, totalResults: totalResults});
-        } 
+        if (results.length > 0) {
+            res.status(200).json({ message: 'User\'s appointment retrieve sucessfully', results: results, totalResults: totalResults });
+        }
         else {
-            res.status(200).json({message: 'User\'s appointment retrieve sucessfully, no result', totalResults: totalResults});
+            res.status(200).json({ message: 'User\'s appointment retrieve sucessfully, no result', totalResults: totalResults });
         }
     } catch (error) {
         console.error('Error during get user\'s appointment info:', error);
@@ -96,7 +96,7 @@ router.post('/create', async (req, res) => {
                 // Service is available, proceed with appointment creation
                 const result = await database.poolInfo.execute(
                     'INSERT INTO appointments (customer_id, service_id,hairstylist_id, booking_datetime, status, remarks) VALUES (?,?,?,?,?,?)',
-                    [req.userId, serviceId,hairstylistId,bookingDateTime, 'PENDING', remarks ? remarks : null]
+                    [req.userId, serviceId, hairstylistId, bookingDateTime, 'PENDING', remarks ? remarks : null]
                 );
                 console.log(result);
                 if (result[0].affectedRows > 0) {
@@ -125,7 +125,7 @@ router.get('/get/:id', async (req, res) => {
     try {
         const { id } = req.params;
         // Check if the appointment exists and belongs to the current user
-        if (checkAppointmentOwnership(req.userId,id)) {
+        if (checkAppointmentOwnership(req.userId, id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
                 `SELECT appointments.*, services.service_name, services.desc, services.duration ,hairstylists.name, salons.name, salons.address
@@ -146,7 +146,7 @@ router.get('/get/:id', async (req, res) => {
         }
     } catch (error) {
         console.error('Error during getting user\'s appointment info:', error);
-        res.status(500).json({ message: 'Internal Server Error.'});
+        res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
 router.post('/update/:id', async (req, res) => {
@@ -154,8 +154,7 @@ router.post('/update/:id', async (req, res) => {
         const { id } = req.params;
 
         // Check if the appointment exists and belongs to the current client or owner 
-        if (checkAppointmentOwnership(req.userId,id))
-            {
+        if (checkAppointmentOwnership(req.userId, id)) {
             // Build the base update query
             let updateQuery = 'UPDATE appointments SET ';
 
@@ -201,12 +200,12 @@ router.post('/update/:id', async (req, res) => {
     }
 });
 
-router.get('/timeslots', async (req,res)=>{
-    try{
-        const {serviceId, appointmentDate} = req.query;
-        if(!serviceId || !appointmentDate)
-            return res.status(400).json({ message: 'Bad request, service id , appointment date is not provided'});
-        
+router.get('/timeslots', async (req, res) => {
+    try {
+        const { serviceId, appointmentDate } = req.query;
+        if (!serviceId || !appointmentDate)
+            return res.status(400).json({ message: 'Bad request, service id , appointment date is not provided' });
+
         // Get salon id and duration of the service
         const [serviceInfo] = await database.poolInfo.execute('SELECT salon_id, duration FROM services WHERE id = ?', [serviceId]);
         if (serviceInfo.length === 0)
@@ -228,7 +227,7 @@ router.get('/timeslots', async (req,res)=>{
             return res.status(400).json({ message: 'Salon is closed on the selected day' });
         }
 
-         // Get appointments for the given salon and appointment date
+        // Get appointments for the given salon and appointment date
         const [appointmentResults] = await database.poolInfo.execute(
             `SELECT a.*, s.duration
             FROM appointments AS a
@@ -254,19 +253,19 @@ router.get('/timeslots', async (req,res)=>{
         const [businessStartHourInt, businessStartMinute] = businessStartHour.split(':').map(str => parseInt(str));
         const [businessEndHourInt, businessEndMinute] = businessEndHour.split(':').map(str => parseInt(str));
 
-        const businessStartTime = businessStartHourInt*60 + businessStartMinute;
-        const businessEndTime = businessEndHourInt*60 + businessEndMinute;
+        const businessStartTime = businessStartHourInt * 60 + businessStartMinute;
+        const businessEndTime = businessEndHourInt * 60 + businessEndMinute;
 
         //console.log(businessStartTime);
         //console.log(businessEndTime);
         // Iterate over each hour within the business hours
-        for (let slot = businessStartTime; slot <= businessEndTime; slot+=duration) {
+        for (let slot = businessStartTime; slot <= businessEndTime; slot += duration) {
             // Set start and end time for the current hour
             const startTime = new Date(appointmentDate);
-            startTime.setHours(Math.floor(slot/60),slot % 60, 0, 0);
-            
+            startTime.setHours(Math.floor(slot / 60), slot % 60, 0, 0);
+
             const endTime = new Date(appointmentDate);
-            endTime.setHours(Math.floor((slot + duration)/60), (slot + duration)% 60, 0, 0);
+            endTime.setHours(Math.floor((slot + duration) / 60), (slot + duration) % 60, 0, 0);
             //console.log(startTime , ' to ',endTime);
             // Check if the time slot is occupied
             const isOccupied = occupiedTimeSlots.some(slot_occupied => {
@@ -283,12 +282,80 @@ router.get('/timeslots', async (req,res)=>{
 
 
         res.json(unoccupiedTimeSlots);
-    }catch (error) {
+    } catch (error) {
         console.error('Error during retrive available timeslot:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-const checkAppointmentOwnership = async (userId,appointmentId) => { 
+
+//owner use only , client user will not get result
+router.get('/getNext', async (req, res) => {
+    try {
+        const userId = req.userId;
+        const appointmentResults = await database.poolInfo.execute(
+            `SELECT a.id, 
+            a.customer_id, 
+            TIME_FORMAT(a.booking_datetime, '%H:%i') AS booking_time, 
+            s.service_name
+            FROM appointments AS a
+            INNER JOIN services AS s ON a.service_id = s.id
+            INNER JOIN salons AS sl ON s.salon_id = sl.id
+            WHERE sl.user_id = ?
+            AND a.booking_datetime > CURRENT_TIMESTAMP
+            AND a.status NOT IN ('CANCELLED', 'COMPLETED')
+            ORDER BY a.booking_datetime
+            LIMIT 1`,  //select next upcoming appointment
+            [userId] // Pass userId as a bind parameter
+        );
+        if(appointmentResults){
+            const { id, customer_id, booking_datetime, service_name } = appointmentResults[0][0];
+            const customerName = await database.poolUM.execute(
+                `SELECT username , first_name , last_name 
+                FROM users 
+                WHERE id = ?`,
+                [customer_id]
+            );
+            if (appointmentResults) {
+                const results = [appointmentResults[0][0], customerName[0][0]];
+                return res.status(200).json(results);
+        }
+        } else
+            return res.status(404).json({ message: 'No upcoming appointment found.' })
+
+    } catch (error) {
+        console.error('Error during get upcoming appointment of current salon:', error);
+        return res.status(500).json({ message: 'Internal Server Error.' });
+    }
+});
+
+//owner use only , retrieve active appointment (confirmed , cancelled , pending)
+router.get('/getActive', async (req, res) => {
+    try {
+        const userId = req.userId;
+        const [appointmentResults] = await database.poolInfo.execute(
+            `SELECT a.*
+            FROM appointments AS a
+            INNER JOIN services AS s ON a.service_id = s.id
+            INNER JOIN salons AS sl ON s.salon_id = sl.id
+            WHERE sl.user_id = ?
+            AND a.booking_datetime > CURRENT_TIMESTAMP
+            AND a.status NOT IN ('COMPLETED')
+            ORDER BY a.booking_datetime`
+            ,  //select all active upcoming appointment
+            [userId]
+        );
+        if (appointmentResults.length > 0) {
+            return res.status(200).json(appointmentResults);
+        } else
+            return res.status(404).json({ message: 'No active upcoming appointment found.' })
+
+    } catch (error) {
+        console.error('Error during get active appointment of current salon:', error);
+        return res.status(500).json({ message: 'Internal Server Error.' });
+    }
+})
+
+const checkAppointmentOwnership = async (userId, appointmentId) => {
     const [ownershipCheckClient] = await database.poolInfo.execute(
         'SELECT customer_id FROM appointments WHERE id = ?',
         [appointmentId]
@@ -300,7 +367,7 @@ const checkAppointmentOwnership = async (userId,appointmentId) => {
         WHERE appointments.id = ?`,
         [appointmentId]
     );
-    return(
+    return (
         ownershipCheckClient.length > 0 && ownershipCheckClient[0].customer_id === userId
         ||
         ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].user_id === userId

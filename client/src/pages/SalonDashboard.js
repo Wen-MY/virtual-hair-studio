@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import config from '../config';
 import Chart from "chart.js/auto"; // Import Chart.js library
 import CalendarDay from "../components/calendar-day";
 import SalonCard from "../components/salon-card";
@@ -7,8 +8,12 @@ const SalonDashboard = () => {
     // Define state variables for dummy data
     const [appointmentsOverTimeData, setAppointmentsOverTimeData] = useState([]);
     const [appointmentStatusData, setAppointmentStatusData] = useState([]);
-    const [upcomingCustomer, setUpcomingCustomer] = useState(null);
-    const salonInfo = {
+    const [upcomingCustomer, setUpcomingCustomer] = useState({
+        name: 'No Upcoming Customer',
+        appointmentTime: null,
+        service: null
+    });
+    const [salonInfo, setSalonInfo] = useState({
         name: "Example Salon",
         address: "123 Main Street",
         city: "Cityville",
@@ -16,37 +21,138 @@ const SalonDashboard = () => {
         zipcode: "12345",
         phoneNumber: "123-456-7890",
         email: "info@example.com",
-        website: "www.example.com",
+        businessHour: '',
         overallRating: 4.5 // Example overall rating out of 5
-    };
+    });
 
     // Function to generate dummy data for appointments over time
-    const generateAppointmentsOverTimeData = () => {
+    const fetchAppointmentsOverTimeData = () => {
         // Generate dummy data here (e.g., for the last 7 days)
-        return [20, 25, 40, 35, 20 , 50];
+        return [20, 25, 40, 35, 20, 50];
     };
 
     // Function to generate dummy data for appointment status
-    const generateAppointmentStatusData = () => {
-        // Generate dummy data here (e.g., for confirmed, canceled, rescheduled)
-        return [20, 5, 3];
+    const fetchAppointmentStatusData = async () => {
+        try {
+            // Make HTTP GET request to the '/getActive' endpoint
+            const response = await fetch(config.serverUrl + '/appointment/getActive', {
+                credentials: 'include'
+            });
+    
+            // Check if the response is successful (status code 200)
+            if (response.ok) {
+                // Parse the JSON response
+                const appointmentData = await response.json();
+    
+                // Generate dummy data for confirmed, canceled, and pending appointments
+                // Count the number of appointments with each status
+                let confirmedCount = 0;
+                let canceledCount = 0;
+                let pendingCount = 0;
+    
+                appointmentData.forEach(appointment => {
+                    // Check the status of each appointment and increment the corresponding count
+                    switch (appointment.status) {
+                        case 'CONFIRMED':
+                            confirmedCount++;
+                            break;
+                        case 'CANCELLED':
+                            canceledCount++;
+                            break;
+                        case 'PENDING':
+                            pendingCount++;
+                            break;
+                        default:
+                            // Handle other status values if needed
+                            break;
+                    }
+                });
+    
+                // Set the appointment status data to state
+                setAppointmentStatusData([confirmedCount, canceledCount, pendingCount]);
+            } else {
+                console.error('Failed to fetch appointment status data:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching appointment status data:', error);
+        }
     };
+    
 
-    // Function to generate dummy data for upcoming customer
-    const generateUpcomingCustomer = () => {
-        // Generate dummy data here (e.g., name, appointment time, service)
-        return {
-            name: "John Doe",
-            appointmentTime: "12:00 PM",
-            service: "Haircut"
-        };
+    // Function to fetch upcoming customer data
+    const fetchUpcomingCustomer = async () => {
+        try {
+            const upcomingCustomerRes = await fetch(config.serverUrl + `/appointment/getNext`, {
+                credentials: 'include'
+            });
+
+            if (upcomingCustomerRes.ok) {
+                const upcomingCustomerData = await upcomingCustomerRes.json();
+                if (upcomingCustomerData[0]) { // Check if data exists
+                    const { username, first_name, last_name } = upcomingCustomerData[1];
+                    const { booking_time, service_name } = upcomingCustomerData[0];
+                    const customerName = (first_name && last_name) ? `${first_name} ${last_name}` : username;
+                    setUpcomingCustomer({
+                        name: customerName,
+                        appointmentTime: booking_time,
+                        service: service_name
+                    });
+                } else {
+                    // No upcoming appointment found
+                    setUpcomingCustomer({
+                        name: 'No Upcoming Customer',
+                        appointmentTime: null,
+                        service: null
+                    });
+                }
+            } else {
+                console.error('Error fetching upcoming customer data:', upcomingCustomerRes.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching upcoming customer data:', error);
+        }
+    };
+    const fetchSalonData = async () => {
+        try {
+            // Fetch salon ID
+            const salonIdRes = await fetch(config.serverUrl + '/salon/id', {
+                credentials: 'include'
+            });
+            const salonIdJson = await salonIdRes.json();
+            const salonId = salonIdJson.result.id;
+
+            // Fetch salon details using salon ID
+            const salonResponse = await fetch(config.serverUrl + `/salon/get/${salonId}`, {
+                credentials: 'include'
+            });
+
+            const salonData = await salonResponse.json();
+            if (salonResponse.ok) {
+                // Set salon information to state
+                setSalonInfo(prevState => ({
+                    ...prevState,
+                    name: salonData.result.name,
+                    address: salonData.result.address,
+                    city: salonData.result.city,
+                    state: salonData.result.state,
+                    zipcode: salonData.result.zipcode,
+                    phoneNumber: salonData.result.contact_number,
+                    businessHour: salonData.result.business_hour
+                }));
+            } else {
+                console.error('Failed to fetch salon information:', salonData.message);
+            }
+        } catch (error) {
+            console.error('Error fetching salon data:', error);
+        }
     };
 
     useEffect(() => {
         // Generate dummy data when the component mounts
-        setAppointmentsOverTimeData(generateAppointmentsOverTimeData());
-        setAppointmentStatusData(generateAppointmentStatusData());
-        setUpcomingCustomer(generateUpcomingCustomer());
+        setAppointmentsOverTimeData(fetchAppointmentsOverTimeData());
+        fetchAppointmentStatusData();
+        fetchUpcomingCustomer();
+        fetchSalonData();
     }, []);
 
     useEffect(() => {
@@ -133,11 +239,11 @@ const SalonDashboard = () => {
         const appointmentDistributionChart = new Chart(document.getElementById("appointmentDistributionChart"), {
             type: "line",
             data: {
-                labels: ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"],
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                 datasets: [
                     {
                         label: "Appointments Distribution",
-                        data: [10, 20, 30, 40, 50, 45, 40, 35, 30], // Dummy data for appointment distribution
+                        data: [10, 20, 30, 40, 50, 45, 40, 35, 30, 0, 0, 0], // Dummy data for appointment distribution
                         fill: false,
                         borderColor: "rgb(255, 159, 64)", // Bootstrap warning color
                         tension: 0.1,
@@ -155,7 +261,7 @@ const SalonDashboard = () => {
             appointmentDistributionChart.destroy();
         };
     }, [appointmentsOverTimeData, appointmentStatusData]);
-
+    //------------------------------api-request------------------------------//
     return (
         <div className="container-fluid my-3 full-width">
             <div className="row mb-3">
@@ -165,7 +271,7 @@ const SalonDashboard = () => {
                         <p><strong>Address:</strong> {salonInfo.address}, {salonInfo.city}, {salonInfo.state} {salonInfo.zipcode}</p>
                         <p><strong>Phone:</strong> {salonInfo.phoneNumber}</p>
                         <p><strong>Email:</strong> {salonInfo.email}</p>
-                        <p><strong>Website:</strong> {salonInfo.website}</p>
+                        <p><strong>Website:</strong> {salonInfo.businessHour}</p>
                         <p><strong>Overall Rating:</strong> {salonInfo.overallRating} <span className="bi bi-star"></span></p>
                     </div>
                 </div>

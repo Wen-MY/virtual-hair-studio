@@ -65,7 +65,9 @@ a:visited{
 .min-height{
   min-height: 50vh;
 }
-
+.fix-height{
+ height: 50vh;
+}
 .switch-container {
   display: flex;
   align-items: center;

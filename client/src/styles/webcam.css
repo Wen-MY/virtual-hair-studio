@@ -1,0 +1,21 @@
+.webcam-container {
+    position: relative;
+    width: 512px;
+    height: 512px;
+}
+
+.webcam-guide {
+    position: absolute;
+    z-index: 1; 
+
+}
+
+.guide-image {
+    width: 100%; /* Resize guide image to fit container */
+    height: 100%; /* Resize guide image to fit container */
+    opacity: 0.25; /* Adjust opacity as needed */
+}
+
+.webcam {
+    z-index: 0; /* Ensure webcam is below guide */
+}

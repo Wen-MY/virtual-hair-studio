@@ -13,7 +13,7 @@ router.get('/all/:salonId', async (req, res) => {
             return res.status(400).json({ message: 'Bad request, salon Id not provided' });
         }
 
-        let sqlQuery = 'SELECT services.*, categories.name AS category FROM services JOIN categories ON services.category_id = categories.id WHERE salon_id = ?';
+        let sqlQuery = 'SELECT services.*, categories.name AS category FROM services JOIN categories ON services.category_id = categories.id WHERE salon_id = ? AND services.deleted_at IS NULL';
         const sqlParams = [salonId];
 
         if (status !== undefined) {
@@ -142,7 +142,11 @@ router.delete('/delete/:serviceId',async(req,res)=>{
             return res.status(400).json({ message: 'Service is still in use and cannot be deleted.' });
         }
         else{
-            const [result] = await database.poolInfo.execute('DELETE FROM services WHERE id = ?', [serviceId]);
+            const [result] = await database.poolInfo.execute(
+                `UPDATE services
+                SET deleted_at = CURRENT_TIMESTAMP
+                WHERE id = ?`
+                , [serviceId]);
             if(result.affectedRows > 0)
                 res.status(200).json({message: 'Service deleted successfully'});
             else
