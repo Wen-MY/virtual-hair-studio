@@ -5,15 +5,23 @@ const database = require('../../../db-config');
 
 //by salon id
 router.get('/all/:salonId', async (req, res) => {
+    const { salonId } = req.params;
     try {
-        const { salonId } = req.params;
+
         const { status } = req.query;
 
         if (!salonId) {
             return res.status(400).json({ message: 'Bad request, salon Id not provided' });
         }
 
-        let sqlQuery = 'SELECT services.*, categories.name AS category FROM services JOIN categories ON services.category_id = categories.id WHERE salon_id = ? AND services.deleted_at IS NULL';
+        let sqlQuery = `SELECT services.*, 
+                        categories.name AS category,
+                        GROUP_CONCAT(hairstylist_scopes.hairstylist_id) AS hairstylists
+                        FROM services 
+                        JOIN categories ON services.category_id = categories.id 
+                        JOIN hairstylist_scopes ON services.id = hairstylist_scopes.service_id
+                        WHERE salon_id = ? AND services.deleted_at IS NULL
+                        `;
         const sqlParams = [salonId];
 
         if (status !== undefined) {
@@ -23,7 +31,7 @@ router.get('/all/:salonId', async (req, res) => {
             sqlQuery += ' AND availability = ?';
             sqlParams.push(status);
         }
-
+        sqlQuery += "GROUP BY services.id"
         const [serviceResults] = await database.poolInfo.execute(sqlQuery, sqlParams);
 
         if (serviceResults.length > 0) {
@@ -80,15 +88,15 @@ router.get('/get/:serviceId', async (req, res) => {
 });
 
 
-router.post('/add:salonId', async (req,res) =>{
-    try{
-        const {salonId} = req.params;
-        if(!salonId)
-            return res.status(400).json({message: 'Bad request , salon Id not provided'})
-        const {serviceName, categoryId, duration,hairstylists, desc} = req.body;
-        if(!serviceName || !categoryId || !duration)
-            return res.status(400).json({ message: 'Bad request, service name , category or duration is not provided'});
-        
+router.post('/add/:salonId', async (req, res) => {
+    try {
+        const { salonId } = req.params;
+        if (!salonId)
+            return res.status(400).json({ message: 'Bad request , salon Id not provided' })
+        const { serviceName, categoryId, duration, hairstylists, desc } = req.body;
+        if (!serviceName || !categoryId || !duration)
+            return res.status(400).json({ message: 'Bad request, service name , category or duration is not provided' });
+
         //check salon ownership
         const [ownershipResults] = await database.poolInfo.execute(
             'SELECT user_id FROM salons WHERE id = ?', [salonId]
@@ -96,41 +104,41 @@ router.post('/add:salonId', async (req,res) =>{
         const userIds = ownershipResults.map(result => result.user_id);
         const userExists = userIds.some(id => id === req.userId);
 
-        if(userExists){
-            const [serviceCreation] = await database.poolInfo.execute('INSERT INTO services (salon_id,service_name,category_id,duration,desc) VALUES(?,?,?,?,?)',[salonId,serviceName,categoryId,duration,desc]);
+        if (userExists) {
+            const [serviceCreation] = await database.poolInfo.execute('INSERT INTO services (salon_id,service_name,category_id,duration,`desc`) VALUES(?,?,?,?,?)', [salonId, serviceName, categoryId, duration, desc]);
 
-            
+
             if (serviceCreation.affectedRows > 0) {
                 // Extract the new service ID
                 const newServiceId = serviceCreation.insertId;
-    
+
                 // Insert records into hairstylist_scope table for each hairstylist
                 if (hairstylists && Array.isArray(hairstylists) && hairstylists.length > 0) {
                     for (const hairstylistId of hairstylists) {
                         await database.poolInfo.execute(
-                            'INSERT INTO hairstylist_scope (hairstylist_id, service_id) VALUES (?, ?)',
+                            'INSERT INTO hairstylist_scopes (hairstylist_id, service_id) VALUES (?, ?)',
                             [hairstylistId, newServiceId]
                         );
                     }
                 }
-    
+
                 res.status(201).json({ message: 'Service added successfully.' });
             } else {
                 res.status(500).json({ message: 'Failed to create service.' });
             }
-        }else{
-            return res.status(401).json({message: 'Unauthorized, the user did not own the salon'});
+        } else {
+            return res.status(401).json({ message: 'Unauthorized, the user did not own the salon' });
         }
-    }catch{
-        console.error('Error during service addition: ' ,error);
+    } catch(error) {
+        console.error('Error during service addition: ', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
 
 // delete service 
-router.delete('/delete/:serviceId',async(req,res)=>{
-    try{
-        const {serviceId} = req.params;
+router.delete('/delete/:serviceId', async (req, res) => {
+    try {
+        const { serviceId } = req.params;
 
         //check for usage 
         const [appointmentResult] = await database.poolInfo.execute(
@@ -141,18 +149,18 @@ router.delete('/delete/:serviceId',async(req,res)=>{
             // Service is still in use in active appointments, cannot be deleted
             return res.status(400).json({ message: 'Service is still in use and cannot be deleted.' });
         }
-        else{
+        else {
             const [result] = await database.poolInfo.execute(
                 `UPDATE services
                 SET deleted_at = CURRENT_TIMESTAMP
                 WHERE id = ?`
                 , [serviceId]);
-            if(result.affectedRows > 0)
-                res.status(200).json({message: 'Service deleted successfully'});
+            if (result.affectedRows > 0)
+                res.status(200).json({ message: 'Service deleted successfully' });
             else
-                res.status(404).json({message: 'Service not found'});
+                res.status(404).json({ message: 'Service not found' });
         }
-    }catch (error) {
+    } catch (error) {
         console.error('Error during service deletion:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
@@ -163,7 +171,7 @@ router.put('/update/:serviceId', async (req, res) => {
     try {
         const { serviceId } = req.params;
         const { serviceName, categoryId, duration, desc, availability, hairstylists } = req.body;
-        
+
         // Initialize SQL query and parameters array
         let sqlQuery = 'UPDATE services SET ';
         const params = [];
@@ -181,14 +189,14 @@ router.put('/update/:serviceId', async (req, res) => {
             params.push(duration);
         }
         if (desc) {
-            sqlQuery += 'desc = ?, ';
+            sqlQuery += '`desc` = ?, ';
             params.push(desc);
         }
         if (availability !== undefined && availability !== null) {
             sqlQuery += 'availability = ?, ';
             params.push(availability);
         }
-        
+
         // Remove the trailing comma and space
         sqlQuery = sqlQuery.slice(0, -2);
 
@@ -197,16 +205,15 @@ router.put('/update/:serviceId', async (req, res) => {
 
         const [results] = await database.poolInfo.execute(sqlQuery, params);
 
-        if (results.affectedRows > 0) {
-            //update scope 
-            if (hairstylists && Array.isArray(hairstylists) && hairstylists.length > 0) {
-                const deleteQuery = 'DELETE FROM hairstylist_scope WHERE service_id = ?';
-                await database.poolInfo.execute(deleteQuery, [serviceId]); // Delete existing records
-                
-                const insertQuery = 'INSERT INTO hairstylist_scope (hairstylist_id, service_id) VALUES (?, ?)';
-                for (const hairstylistId of hairstylists) {
-                    await database.poolInfo.execute(insertQuery, [hairstylistId, serviceId]);
-                }
+
+        //update scope 
+        if (hairstylists && Array.isArray(hairstylists) && hairstylists.length > 0) {
+            const deleteQuery = 'DELETE FROM hairstylist_scopes WHERE service_id = ?';
+            await database.poolInfo.execute(deleteQuery, [serviceId]); // Delete existing records
+
+            const insertQuery = 'INSERT INTO hairstylist_scopes (hairstylist_id, service_id) VALUES (?, ?)';
+            for (const hairstylistId of hairstylists) {
+                await database.poolInfo.execute(insertQuery, [hairstylistId, serviceId]);
             }
             res.status(200).json({ message: 'Service updated successfully.' });
         } else {
@@ -218,15 +225,15 @@ router.put('/update/:serviceId', async (req, res) => {
     }
 });
 
-router.get('/categories', async (req,res) => {
-    try{
-        const [results] = await database.poolInfo.execute('SELECT * FROM categories',[]);
-        if(results.length > 0){
-            res.status(200).json({ message: 'Service categories retrieve successfully', result: results});
-        }else{
-            res.status(404).json({ message: 'Not service categories found'});
+router.get('/categories', async (req, res) => {
+    try {
+        const [results] = await database.poolInfo.execute('SELECT * FROM categories', []);
+        if (results.length > 0) {
+            res.status(200).json({ message: 'Service categories retrieve successfully', result: results });
+        } else {
+            res.status(404).json({ message: 'Not service categories found' });
         }
-    }catch( error) {
+    } catch (error) {
         console.error('Error retriving service categories:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }

@@ -19,9 +19,10 @@ router.get('/get/:salonId', async (req, res) => {
     }
 });
 
-router.post('/add', async (req, res) => {
+router.post('/add/:salonId', async (req, res) => {
     try {
-        const { name, salonId, position } = req.body;
+        const { salonId } = req.params;
+        const { name, position } = req.body;
 
         // Check if all required fields are provided
         if (!name || !salonId || !position) {

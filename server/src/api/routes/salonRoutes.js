@@ -113,7 +113,7 @@ router.put('/update/:salonId', async (req, res) => {
         }
 
         // Check if required fields are provided
-        if (!name || !address || !state || !business_hour) {
+        if (!name || !address || !business_hour) {
             return res.status(400).json({ message: 'Name, address, state, and business_hour are required fields.' });
         }
 

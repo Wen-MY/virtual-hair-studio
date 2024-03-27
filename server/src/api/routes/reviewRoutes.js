@@ -8,7 +8,7 @@ router.get('/retrieve', async (req, res) => {
         const { salonId, limit, offset } = req.query;
         
         // Query to retrieve reviews from poolInfo database
-        const reviewQuery = `
+        let reviewQuery = `
             SELECT 
                 r.*, s.*
             FROM 
@@ -19,7 +19,7 @@ router.get('/retrieve', async (req, res) => {
                 s.salon_id = ? 
         `;
         if(limit && offset){
-            reviewQuery += ` LIMIT ${limit} OFFSET ${((offset) - 1) * limit}`
+            reviewQuery += ` LIMIT ${limit} OFFSET ${((offset)) * limit}`
         }
         const [reviewResults, reviewFields] = await database.poolInfo.execute(reviewQuery, [salonId]);
 

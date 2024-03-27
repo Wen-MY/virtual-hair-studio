@@ -60,7 +60,7 @@ const Salon = () => {
           console.error('Failed to fetch salon information:', hairstylistsData.message);
         }
 
-        const reviewsResponse = await fetch(config.serverUrl + `/review/retrieve?salonId=${salonId}&limit=2&offset=0`, {
+        const reviewsResponse = await fetch(config.serverUrl + `/review/retrieve?salonId=${salonId}&limit=2&offset=${reviews.length}`, {
           credentials: 'include',
         });
         const reviewsData = await reviewsResponse.json();
