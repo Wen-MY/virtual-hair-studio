@@ -7,7 +7,7 @@ const connectionConfig = {
   host: 'localhost',
   user: 'root',
   password: 'root',
-  port: 3305,
+  port: 3306,
   multipleStatements: true,
 };
 

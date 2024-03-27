@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import WebcamWithGuide from '../components/webcam-with-guide';
 import FaceDetection from '../components/face-detection';
 import 'react-calendar/dist/Calendar.css';
-import 'react-time-picker/dist/TimePicker.css'
 
 
 
