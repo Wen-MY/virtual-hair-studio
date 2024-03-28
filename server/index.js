@@ -11,6 +11,7 @@ const serviceRoutes = require('./src/api/routes/serviceRoutes');
 const salonRoutes= require('./src/api/routes/salonRoutes')
 const hairstylistRoutes = require('./src/api/routes/hairstylistRoutes');
 const reviewRoutes= require('./src/api/routes/reviewRoutes')
+const tryonRoutes = require('./src/api/routes/tryonRoutes')
 const app = express();
 
 app.use(bodyParser.json());
@@ -43,6 +44,7 @@ app.use('/service',serviceRoutes);
 app.use('/salon',salonRoutes)
 app.use('/hairstylist',hairstylistRoutes);
 app.use('/review',reviewRoutes);
+app.use('/try-on',tryonRoutes);
 
 const port = 4000;
 const server = app.listen(port, () => {

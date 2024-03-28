@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import '../styles/webcam.css'; // Import CSS file for styling
-const WebcamWithGuide = ({webcamRef}) => {
+const WebcamWithGuide = ({ webcamRef }) => {
     const guideImageSrc = `${process.env.PUBLIC_URL}/person-guide-black.png`;
     const guideImageInverseSrc = `${process.env.PUBLIC_URL}/person-guide-black-inverse.png`;
     const [accessDenied, setAccessDenied] = useState(false);
-
+    const handleRevokePermissionTutorial = () => {
+        window.open('https://support.google.com/chrome/answer/2693767?hl=en&co=GENIE.Platform%3DDesktop&oco=0', '_blank');
+    };
     useEffect(() => {
         const checkUserMediaAccess = async () => {
             try {
@@ -23,7 +25,15 @@ const WebcamWithGuide = ({webcamRef}) => {
     }, []);
 
     if (accessDenied) {
-        return <div>Error: Access to webcam denied.</div>;
+        return (
+            <div className='webcam-container'>
+                <div className='d-flex justify-content-center h-100'>
+                <button onClick={handleRevokePermissionTutorial} className="btn btn-secondary w-100">
+                    Webcam Access Permission Denied , Open Your Setting to Enable It
+                </button>
+                </div>
+            </div>
+        );
     }
     return (
         <div className='webcam-container'>
@@ -42,7 +52,7 @@ const WebcamWithGuide = ({webcamRef}) => {
                         facingMode: 'user' // 'environment' for back camera
                     }}
                 />
-              </div>
+            </div>
         </div>
     );
 }

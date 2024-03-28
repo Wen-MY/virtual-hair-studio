@@ -1,10 +1,10 @@
 // Salon.js
 import React, { useState, useEffect } from 'react';
-import config from '../config';
-import Loader from '../components/loading-spinner';
+import config from '../../config';
+import Loader from '../../components/loading-spinner';
 import { Link, useParams } from 'react-router-dom';
-import { formatContactNumber,formatTime,formatBusinessHour } from '../utils/salonInformationFormatter';
-import NotFound from './NotFound';
+import { formatContactNumber,formatTime,formatBusinessHour } from '../../utils/salonInformationFormatter';
+import NotFound from '../NotFound';
 
 const Salon = () => {
 
@@ -40,7 +40,7 @@ const Salon = () => {
           return;
         }
 
-        const servicesResponse = await fetch(config.serverUrl + `/service/all/${salonId}`, {
+        const servicesResponse = await fetch(config.serverUrl + `/service/all/${salonId}?status=1`, {
           credentials: 'include'
         });
         const servicesData = await servicesResponse.json();
@@ -133,8 +133,9 @@ const Salon = () => {
             <div className="col border border-2 rounded-4 p-5 bg-white pt-4">
               <h2 className='section-title text-start mb-4'>Services Provided</h2>
               <ul className="nav nav-tabs" id="services-tabs">
+            
                 {/* Since services is now an array of service objects, we need to group them by category */}
-                {Array.from(new Set(services.map(service => service.category))).map((category, index) => {
+                { services && services.length > 0 && Array.from(new Set(services.map(service => service.category))).map((category, index) => {
                   // Sanitize category name to make it a valid selector
                   const sanitizedCategory = category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   return (
@@ -156,7 +157,7 @@ const Salon = () => {
               </ul>
               <div className="tab-content">
                 {/* Render service items grouped by category */}
-                {Array.from(new Set(services.map(service => service.category))).map((category, index) => {
+                { services && services.length > 0 ? (Array.from(new Set(services.map(service => service.category))).map((category, index) => {
                   // Sanitize category name to make it a valid selector
                   const sanitizedCategory = category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   return (
@@ -180,7 +181,9 @@ const Salon = () => {
                       </ul>
                     </div>
                   );
-                })}
+                })):(
+                  <li className="list-group-item text-center"><p className='fs-4 fw-semibold m-3 mt-5'>No Service Available</p></li>
+                )}
               </div>
             </div>
           </div>
@@ -189,7 +192,7 @@ const Salon = () => {
             <div className="col border border-2 rounded-4 p-5 bg-white pt-4">
               <h2 className='section-title mb-5 text-start py-0'>Hairstylists Available</h2>
               <div className="row">
-                {hairstylists.map((hairstylist, index) => (
+                {hairstylists.length?(hairstylists.map((hairstylist, index) => (
                   <div key={index} className="col mb-3">
                     <div className="card mx-auto border-dark text-start" style={{ width: '12rem' }}>
                       <img src={'https://picsum.photos/120/100'} className="card-img-top" alt={hairstylist.name} />
@@ -207,7 +210,9 @@ const Salon = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                ))):(
+                  <div className="text-center"><p className='fs-4 fw-semibold m-3'>No Hairstylist Available</p></div>
+                )}
               </div>
             </div>
           </div>

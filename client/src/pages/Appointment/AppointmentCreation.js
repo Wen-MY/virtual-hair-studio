@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import config from '../config';
+import config from '../../config';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import Calendar from 'react-calendar';

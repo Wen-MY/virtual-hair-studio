@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/form-box.css'
-import config from '../config';
-import FormBox from '../components/form-box';
+import '../../styles/form-box.css'
+import config from '../../config';
+import FormBox from '../../components/form-box';
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);

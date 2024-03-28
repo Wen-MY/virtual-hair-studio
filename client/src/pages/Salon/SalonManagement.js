@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import Loader from '../components/loading-spinner';
-import config from '../config';
+import Loader from '../../components/loading-spinner';
+import config from '../../config';
 import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select'
 

@@ -1,7 +1,7 @@
 const checkSessionExpiration = (req, res, next) => {
 
     //console.log('session checked\n')
-    const whitelist = ['/auth'];
+    const whitelist = ['/auth','/try-on'];
 
     const skipSessionCheck = whitelist.some(route => req.path.startsWith(route));
 

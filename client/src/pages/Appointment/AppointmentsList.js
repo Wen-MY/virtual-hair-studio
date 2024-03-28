@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate} from 'react-router-dom';
-import { formatDate,formatTime } from '../utils/datetimeFormatter';
-import config from '../config';
-import StatusBadge from '../components/status-pill';
+import { formatDate,formatTime } from '../../utils/datetimeFormatter';
+import config from '../../config';
+import StatusBadge from '../../components/status-pill';
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
-import '../styles/dateRangePicker.css';
+import '../../styles/dateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
 const AppointmentsList = () => {

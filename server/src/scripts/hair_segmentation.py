@@ -15,7 +15,7 @@ def save_image(image, filename):
 
 def process_image(input_path, output_path):
     # Create the options that will be used for ImageSegmenter
-    base_options = python.BaseOptions(model_asset_path='../models/hair_segmenter.tflite')
+    base_options = python.BaseOptions(model_asset_path='src/models/hair_segmenter.tflite')
     options = vision.ImageSegmenterOptions(base_options=base_options, output_category_mask=True)
 
     # Create the image segmenter
@@ -41,7 +41,7 @@ def process_image(input_path, output_path):
         bg_image[:] = bg_color
 
         condition = np.stack((category_mask.numpy_view(),) * 4, axis=-1) > 0.2
-        output_image = np.where(condition, image_data, bg_image)
+        output_image = np.where(condition, bg_image, image_data)
 
         # Save the output image
         save_image(output_image, output_path)
@@ -49,7 +49,7 @@ def process_image(input_path, output_path):
 # Process the image when executed as a script
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python image_processing.py <input_image_path> <output_image_path>")
+        print("Usage: python hair_segmentation.py <input_image_path> <output_image_path>")
         sys.exit(1)
     
     input_path = sys.argv[1]

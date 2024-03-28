@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import config from "../config";
+import config from "../../config";
 import Chart from "chart.js/auto"; // Import Chart.js library
-import CalendarDay from "../components/calendar-day";
-import SalonCard from "../components/salon-card";
+import CalendarDay from "../../components/calendar-day";
+import SalonCard from "../../components/salon-card";
 import {
     formatContactNumber,
     formatBusinessHour,
-} from "../utils/salonInformationFormatter";
+} from "../../utils/salonInformationFormatter";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

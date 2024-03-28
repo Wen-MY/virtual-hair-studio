@@ -7,24 +7,24 @@ import Loader from './components/loading-spinner';
 import SideNav from './components/side-navigation'
 
 import Guest from './pages/Guest';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
+import Login from './pages/Auth/Login';
+import SignUp from './pages/Auth/SignUp';
 
 import Home from './pages/Home'
-import Account from './pages/Account'
+import Account from './pages/Account/Account'
 
-import Salon from './pages/Salon';
-import SalonDashboard from './pages/SalonDashboard';
-import SalonExplore from './pages/SalonExplore';
-import SalonManagement from './pages/SalonManagement';
+import Salon from './pages/Salon/Salon';
+import SalonDashboard from './pages/Salon/SalonDashboard';
+import SalonExplore from './pages/Salon/SalonExplore';
+import SalonManagement from './pages/Salon/SalonManagement';
 
-import AppointmentsList from './pages/AppointmentsList';
-import AppointmentDetail from './pages/AppointmentDetail';
-import AppointmentCreation from './pages/AppointmentCreation'
-import AppointmentReschedule from './pages/AppointmentReschedule';
+import AppointmentsList from './pages/Appointment/AppointmentsList';
+import AppointmentDetail from './pages/Appointment/AppointmentDetail';
+import AppointmentCreation from './pages/Appointment/AppointmentCreation'
+import AppointmentReschedule from './pages/Appointment/AppointmentReschedule';
 
-import TryOn from './pages/TryOn';
-import TryOnHairstyle from './pages/TryOnHairstyle'
+import TryOn from './pages/Try-on/TryOn';
+import TryOnHairstyle from './pages/Try-on/TryOnHairstyle'
 
 import NotFound from './pages/NotFound';
 

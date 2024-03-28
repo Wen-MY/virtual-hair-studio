@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { formatDate, formatTime } from '../utils/datetimeFormatter';
-import config from '../config';
-import StatusBadge from '../components/status-pill';
+import { formatDate, formatTime } from '../../utils/datetimeFormatter';
+import config from '../../config';
+import StatusBadge from '../../components/status-pill';
 
 const AppointmentDetail = () => {
   const { state } = useLocation();

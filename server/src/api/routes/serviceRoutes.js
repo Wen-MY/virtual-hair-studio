@@ -28,10 +28,10 @@ router.get('/all/:salonId', async (req, res) => {
             if (status !== '0' && status !== '1') {
                 return res.status(400).json({ message: 'Bad request, status should be 0 or 1' });
             }
-            sqlQuery += ' AND availability = ?';
+            sqlQuery += `AND availability = ? `;
             sqlParams.push(status);
         }
-        sqlQuery += "GROUP BY services.id"
+        sqlQuery += `GROUP BY services.id`;
         const [serviceResults] = await database.poolInfo.execute(sqlQuery, sqlParams);
 
         if (serviceResults.length > 0) {
@@ -40,7 +40,7 @@ router.get('/all/:salonId', async (req, res) => {
                 result: serviceResults
             });
         } else {
-            return res.status(200).json({
+            return res.status(404).json({
                 message: 'No services found in salon',
             });
         }

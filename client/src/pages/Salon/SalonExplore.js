@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
-import SalonCard from '../components/salon-card';
-import config from '../config';
+import SalonCard from '../../components/salon-card';
+import config from '../../config';
 const SalonExplore = () => {
     //------------------------------state-variable------------------------------//
     const [salons, setSalons] = useState([]);

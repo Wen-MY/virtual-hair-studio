@@ -91,3 +91,23 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
+.icon-xl {
+  font-size: 12em;
+}
+.icon-lg {
+  font-size: 9em;
+}
+.icon-md {
+  font-size: 6em;
+}
+.icon-sm {
+  font-size: 3em;
+}
+
+.responsive-tab:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Change background color on hover */
+  transform: scale(1.1); /* Scale up on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Add smooth transition */
+}
+

@@ -22,7 +22,18 @@ const poolInfo = mysql.createPool({
     port: 3305
 });
 
+// Create a pool for vhm_info table
+const poolTryOn = mysql.createPool({
+    connectionLimit: 10,
+    host: 'localhost',
+    user: user,
+    password: pass,
+    database: 'vhs_tryon',
+    port: 3305
+});
+
 module.exports = {
     poolUM: poolUM,
-    poolInfo: poolInfo
+    poolInfo: poolInfo,
+    poolTryOn: poolTryOn
 };
