@@ -14,7 +14,11 @@ const TryOnHairstyle = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceDetector, setFaceDetector] = useState(new FaceDetection(setFaceDetected));
+
+  //for hairstyle options customization
+  const [customize, setCustomize] = useState(false);
   const webcamRef = useRef(null);
+  
   const totalSteps = 5;
   useEffect(() =>{
     faceDetector.initializeFaceDetector("IMAGE");
@@ -58,6 +62,11 @@ const TryOnHairstyle = () => {
       //setLoading(false);
     }
   }
+  useEffect(()=>{
+    if(customize){
+      fetchTryOnData();
+    }
+  },[customize])
   //---------------------------- remote api request submit image and prompt -------------------------------//
   const generateResult = async () => {
     
@@ -234,7 +243,7 @@ const TryOnHairstyle = () => {
                 <h2 className='text-start'>Virtual Hairstyle</h2>
                 <div className='step-content d-flex justify-content-center'>
                 <div className='col-5 mb-5'>
-                    <FormBox className={'responsive-tab'}>
+                    <FormBox className={'responsive-tab'} onClick={() => {handleNextStep(); setCustomize(false);}}>
                       <div className='p-5'>
                       <span className='bi bi-rocket-fill px-5 icon-xl text-success '></span>
                       <p className='fs-4 text-secondary fw-semibold'>Select Recommended Hairstyle</p>
@@ -242,7 +251,7 @@ const TryOnHairstyle = () => {
                     </FormBox>
                   </div>
                   <div className='col-5'>
-                  <FormBox className={'responsive-tab'}>
+                  <FormBox className={'responsive-tab'} onClick={() => {handleNextStep(); setCustomize(true);}}>
                       <div className='p-5'>
                       <span className='bi bi-palette-fill px-5 icon-xl text-warning'></span>
                       <p className='fs-4 text-secondary fw-semibold'>Customize Your Own Hairstyle</p>
@@ -253,10 +262,18 @@ const TryOnHairstyle = () => {
               </div>
             )}
             {/* Step 4 content */}
-            {currentStep === 4 && (
+            {currentStep === 4 && !customize && (
+              <div>
+                <h2 className='text-start'>Trends Hairstyles</h2>
+                <div className='step-content d-flex justify-content-center mt-5'>
+                </div>
+              </div>
+            )}
+            {currentStep === 4 && customize && (
               <div>
                 <h2 className='text-start'>Custom Hairstyle Options</h2>
                 <div className='step-content d-flex justify-content-center mt-5'>
+                
                 </div>
               </div>
             )}
@@ -288,14 +305,12 @@ const TryOnHairstyle = () => {
         </div>
         {currentStep <= totalSteps && currentStep > 2 && (
           <div className={`d-flex justify-content-between`}>
-            {/* Prev button */}
             <button className="btn btn-lg btn-secondary me-3" onClick={handlePrevStep}>Prev Step</button>
-            {/* Next/Complete button */}
-            {currentStep !== totalSteps ? (
+            {/*currentStep !== totalSteps ? (
               <button className="btn btn-lg btn-primary" onClick={handleNextStep}>Next Step</button>
             ) : (
               <button className="btn btn-lg btn-success" onClick={handleComplete}>Complete</button>
-            )}
+            )*/}
           </div>
         )}
       </div>

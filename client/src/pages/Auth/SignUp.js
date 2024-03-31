@@ -6,10 +6,11 @@ import FormBox from '../../components/form-box';
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [type,setType] = useState(1);
   const handleSubmit = async (event) => {
     event.preventDefault();
     const type = event.target.elements.type.value;
+    const salonName = event.target.elements.salonName.value;
     const email = event.target.elements.email.value;
     const password = event.target.elements.password.value;
     const password2 = event.target.elements.password2.value;
@@ -27,19 +28,24 @@ const SignUp = () => {
 
           if (validateData.valid) {
             const createResponse = await fetch(apiUrl + 'create', {
+              credentials: 'include',
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ type, email, password }),
+              body: JSON.stringify({ type,salonName, email, password }),
             });
 
             if (createResponse.ok) {
               const createData = await createResponse.json();
               console.log('User created successfully:', createData.message);
-              // Handle successful user creation, e.g., redirect with timeout and show success message 
-              // Redirect to the login page
-              window.location.href= '/account/sign-in';
+              if(type == 2){
+                console.log('Creating owner salon...')
+                await handleSalonCreation(salonName);
+              }else{
+                // Redirect to the login page
+                window.location.href= '/account';
+              }
             } else {
               const createErrorData = await createResponse.json();
               console.error('User creation failed:', createErrorData.message);
@@ -64,9 +70,33 @@ const SignUp = () => {
     console.log("Password not Same");
   }
   };
-
+  const handleSalonCreation = async (salonName) => {
+    try{
+    const createResponse = await fetch(config.serverUrl + '/salon/create', {
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name : salonName}),
+    });
+    if (createResponse.ok) {
+      const createData = await createResponse.json();
+      console.log('Salon created successfully:', createData.message);
+      window.location.href= '/account';
+    } else {
+      const createErrorData = await createResponse.json();
+      console.error('Salon creation failed:', createErrorData.message);
+      // Handle user creation failure, e.g., display an error message
+    }}catch (error) {
+      console.error('Error during salon creation:', error);
+    } 
+  }
+  const handleTypeChange = (event) => {
+    setType(parseInt(event.target.value));
+  };
   return (
-    <FormBox>
+    <FormBox className={``}>
     <form onSubmit={handleSubmit}>
       <h3 className="mb-3" >Sign Up</h3>
       <div className="mb-3 ">
@@ -78,6 +108,7 @@ const SignUp = () => {
             name="type"
             defaultChecked
             value={1}
+            onChange={handleTypeChange}
           />
           <label className="btn btn-outline-success" htmlFor="salonClient">
             Salon Client
@@ -90,13 +121,27 @@ const SignUp = () => {
             id="salonOwner"
             name="type"
             value={2}
+            onChange={handleTypeChange}
           />
           <label className="btn btn-outline-primary" htmlFor="salonOwner">
             Salon Owner
           </label>
         </div>
       </div>
-  
+    
+      <div className={`mb-3 form-floating ${type === 1? 'd-none ':'d-block transition'}`}>
+        <input
+          type="text"
+          className="form-control"
+          id="salonName"
+          placeholder="Enter salon name"
+          name="salonName"
+        />
+        <label htmlFor="salonName">
+          Salon name
+        </label>
+      </div>
+
       <div className="mb-3 form-floating">
         <input
           type="email"

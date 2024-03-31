@@ -22,10 +22,10 @@ const SalonDashboard = () => {
     });
     const [salonInfo, setSalonInfo] = useState({
         name: "Example Salon",
-        address: "123 Main Street",
-        state: "State",
-        phoneNumber: "123-456-7890",
-        businessHour: "1-6/10:30-9:30",
+        address: "",
+        state: "",
+        phoneNumber: "",
+        businessHour: "1-6/10:30-18:30",
         image: null,
     });
     const [customerRating, setCustomerRating] = useState([0, 0, 0, 0, 0]);
@@ -98,17 +98,6 @@ const SalonDashboard = () => {
     };
 
     //------------------------------useEffect update state------------------------------//
-    useEffect(() => {
-        // Calculate the average rating
-        const totalRating = customerRating.reduce((acc, curr) => acc + curr, 0);
-        const averageRating = totalRating / customerRating.length;
-
-        // Update salonInfo state with the calculated overall rating
-        setSalonInfo((prevSalonInfo) => ({
-            ...prevSalonInfo,
-            overallRating: averageRating,
-        }));
-    }, [customerRating]);
 
     useEffect(() => {
         if (salonId) {
@@ -516,11 +505,11 @@ const SalonDashboard = () => {
                 // Set salon information to state
                 setSalonInfo((prevState) => ({
                     ...prevState,
-                    name: salonData.result.name,
-                    address: salonData.result.address,
-                    state: salonData.result.state,
-                    phoneNumber: salonData.result.contact_number,
-                    businessHour: salonData.result.business_hour,
+                    name: salonData.result.name || prevState.name,
+                    address: salonData.result.address || prevState.address,
+                    state: salonData.result.state || prevState.state,
+                    phoneNumber: salonData.result.contact_number || prevState.phoneNumber,
+                    businessHour: salonData.result.business_hour || prevState.businessHour,
                 }));
             } else {
                 console.error("Failed to fetch salon information:", salonData.message);

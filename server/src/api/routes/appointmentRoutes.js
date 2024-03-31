@@ -74,7 +74,10 @@ router.get('/retrieve', async (req, res) => {
         //console.log(baseQuery);
         const [results, fields] = await database.poolInfo.execute(baseQuery, queryParams);
         if (results.length > 0) {
-            res.status(200).json({ message: 'User\'s appointment retrieve sucessfully', results: results, totalResults: totalResults });
+            const appointmentIdList = results.map(appointment => appointment.id);
+            const updatedAppointments = await UpdateAppointmentStatus(appointmentIdList);
+            const [updatedResults, fields] = await database.poolInfo.execute(baseQuery, queryParams); //requery the updated data
+            res.status(200).json({ message: 'User\'s appointment retrieve sucessfully', results: updatedResults, totalResults: totalResults });
         }
         else {
             res.status(200).json({ message: 'User\'s appointment retrieve sucessfully, no result', totalResults: totalResults });
@@ -164,7 +167,7 @@ router.post('/update/:id', async (req, res) => {
 
             // Check for fields in the request body and add them to the query dynamically
             if (req.body.bookingDateTime) {
-                updateQuery += 'bookingDateTime = ?, ';
+                updateQuery += 'booking_datetime = ?, ';
                 queryParams.push(req.body.bookingDateTime);
             }
 
@@ -308,7 +311,7 @@ router.get('/getNext', async (req, res) => {
             LIMIT 1`,  //select next upcoming appointment
             [userId] // Pass userId as a bind parameter
         );
-        if(appointmentResults){
+        if(appointmentResults[0].length > 0){
             const { id, customer_id, booking_datetime, service_name } = appointmentResults[0][0];
             const customerName = await database.poolUM.execute(
                 `SELECT username , first_name , last_name 
@@ -373,5 +376,28 @@ const checkAppointmentOwnership = async (userId, appointmentId) => {
         ||
         ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].user_id === userId
     )
+}
+
+// Function to update appointment statuses
+const UpdateAppointmentStatus = async (appointmentIdList) => {
+    try {
+        const overdueDate = new Date();
+        overdueDate.setDate(overdueDate.getDate() - 1);
+        const appointmentIds = appointmentIdList.join(',');
+        // Update appointment statuses for confirmed appointments
+        const updateQuery = `
+            UPDATE appointments
+            SET status = 'COMPLETED'
+            WHERE id IN (${appointmentIds}) 
+            AND status = 'CONFIRMED' 
+            AND DATE(booking_datetime) <= ?`;
+        
+        const [updateResult] = await database.poolInfo.execute(updateQuery, [overdueDate]);
+        // Return the updated appointments or any other necessary data
+        return updateResult;
+    } catch (error) {
+        console.error('Error updating appointment statuses:', error);
+        throw error;
+    }
 }
 module.exports = router;

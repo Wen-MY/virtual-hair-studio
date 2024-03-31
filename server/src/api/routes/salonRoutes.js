@@ -138,21 +138,21 @@ router.put('/update/:salonId', async (req, res) => {
 router.post('/create', async (req, res) => {
     try {
         const userId = req.userId;
-        const { name, address, state, contact_number, business_hour } = req.body;
+        const { name } = req.body;
 
         // Check if required fields are provided
-        if (!name || !address || !state || !business_hour) {
-            return res.status(400).json({ message: 'Name, address, state, and business_hour are required fields.' });
+        if (!name) {
+            return res.status(400).json({ message: 'Salon Name are required fields.' });
         }
 
         // Create new salon
         const [createResult] = await database.poolInfo.execute(
-            `INSERT INTO salons (user_id, name, address, state, contact_number, business_hour) VALUES (?, ?, ?, ?, ?, ?)`,
-            [userId, name, address, state, contact_number, business_hour]
+            `INSERT INTO salons (user_id, name) VALUES (?, ?)`,
+            [userId, name]
         );
 
         if (createResult.affectedRows > 0) {
-            res.status(200).json({ message: 'Salon created successfully!' });
+            res.status(201).json({ message: 'Salon created successfully!' });
         } else {
             res.status(500).json({ message: 'Failed to create salon.' });
         }

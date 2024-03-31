@@ -22,7 +22,7 @@ router.get('/retrieve', async (req, res) => {
             reviewQuery += ` LIMIT ${limit} OFFSET ${((offset)) * limit}`
         }
         const [reviewResults, reviewFields] = await database.poolInfo.execute(reviewQuery, [salonId]);
-
+        if(reviewResults.length > 0){
         // Extract customer IDs from review results
         const customerIds = reviewResults.map(review => review.customer_id);
 
@@ -50,6 +50,9 @@ router.get('/retrieve', async (req, res) => {
         }));
 
         res.status(200).json({ message: 'Reviews retrieved successfully', results: reviewsWithUsernames });
+    } else {
+        res.status(404).json({message : 'No review found for the salon'})
+    }
     } catch (error) {
         console.error('Error retrieving reviews:', error);
         res.status(500).json({ message: 'Internal Server Error.' });

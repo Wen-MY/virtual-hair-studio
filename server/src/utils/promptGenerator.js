@@ -40,7 +40,8 @@ const promptGeneratorUtils = {
             default:
                 return Error('No Such Complexity Found');
         }
-        
+        //prompt to not generate any texts and watermarks
+        prompt += 'no text and no watermark.'
         return prompt.trim();
     },
 };

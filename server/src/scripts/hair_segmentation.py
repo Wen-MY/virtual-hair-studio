@@ -40,7 +40,11 @@ def process_image(input_path, output_path):
         bg_image = np.zeros(image_data.shape, dtype=np.uint8)
         bg_image[:] = bg_color
 
-        condition = np.stack((category_mask.numpy_view(),) * 4, axis=-1) > 0.2
+        # Dilate the mask to enlarge the hair segment area
+        kernel = np.ones((5,5),np.uint8) # step of enlargement (height , width) in pixels
+        dilated_mask = cv2.dilate(category_mask.numpy_view(), kernel, iterations=4) #iterations to enlarge the masking area
+
+        condition = np.stack((dilated_mask,) * 4, axis=-1) > 0.1
         output_image = np.where(condition, bg_image, image_data)
 
         # Save the output image

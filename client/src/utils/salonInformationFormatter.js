@@ -25,6 +25,7 @@ const formatBusinessHour = (businessHour) => {
   };
 
   const formatContactNumber = (contact_number) => {
+    if(!contact_number) return;
     // Remove any non-digit characters
     const cleanedNumber = contact_number.replace(/\D/g, '');
 

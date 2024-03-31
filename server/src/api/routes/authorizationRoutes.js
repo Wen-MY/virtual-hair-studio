@@ -93,12 +93,11 @@ router.get('/validate/username/:username', async (req, res) => {
 // Create User
 router.post('/create', async (req, res) => {
     try {
-        const { type ,email, password} = req.body;
+        const { type , email, password} = req.body;
 
         if (!email || !password || !type) {
             return res.status(400).json({ message: 'Username/Email and password are required.' });
         }
-
         // Hash the password before storing it in the database
         const hash = await bcrypt.hash(password, 10);
         //insert new user into user table
@@ -107,14 +106,21 @@ router.post('/create', async (req, res) => {
         const userId = rows.insertId;
         //insert user to user_group table to assign authorities
         const [result,values] = await database.poolUM.execute('INSERT INTO user_group (user_id,group_id) VALUES (?,?)',[userId,type=="1"?3:4]);
-        
-        if(result)
+        //create respective default salon for the owner type user
+        if(result){
+            const userData = {
+                id: userId,
+                email: email,
+            };
+            req.session.user = userData;
+            console.log('userid :' , req.session.user.id);
             res.status(201).json({ message: 'User created successfully!' });
+        }
         else
             res.status(400).json({ message: 'Failed to create user.' });
     } catch (error) {
         console.error('Error during user creation:', error);
-        res.status(500).json({ message: 'Internal Server Error.' });
+        return res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
 

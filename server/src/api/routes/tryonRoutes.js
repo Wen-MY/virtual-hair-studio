@@ -50,7 +50,7 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         console.log(processedImagePath);
         //----------------------- Prompt Processing ----------------------- 
 
-        const prompt = promptGeneratorUtils.generate('simple', options);
+        const prompt = promptGeneratorUtils.generate('enhanced', options);
         console.log('Prompt Generated :' + prompt);
         //----------------------- to OpenAPI endpoint -----------------------
          console.log("Sending image to open ai dalle 2 endpoint");
@@ -95,7 +95,7 @@ router.get('/options',async (req,res) => {
     const {enabled,categoryId} = req.query;
     try{
         const sqlParams = []
-        let sqlQuery = `SELECT id, name, category_id from options`;
+        let sqlQuery = `SELECT id, name, category_id, remarks from options`;
         if(enabled){
             sqlQuery+= ` WHERE enabled = ?`
             sqlParams.push(enabled);
@@ -123,7 +123,7 @@ router.get('/options',async (req,res) => {
 
 router.get('/categories',async (req,res) => {
     try {
-        const [results] = await database.poolInfo.execute('SELECT * FROM options_categories', []);
+        const [results] = await database.poolTryOn.execute('SELECT * FROM options_categories', []);
         if (results.length > 0) {
             res.status(200).json({ message: 'Option categories retrieve successfully', result: results });
         } else {

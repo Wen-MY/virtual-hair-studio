@@ -1,5 +1,4 @@
 const checkSessionExpiration = (req, res, next) => {
-
     //console.log('session checked\n')
     const whitelist = ['/auth','/try-on'];
 
