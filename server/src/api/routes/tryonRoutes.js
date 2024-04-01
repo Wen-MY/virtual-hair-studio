@@ -125,13 +125,33 @@ router.get('/categories',async (req,res) => {
     try {
         const [results] = await database.poolTryOn.execute('SELECT * FROM options_categories', []);
         if (results.length > 0) {
-            res.status(200).json({ message: 'Option categories retrieve successfully', result: results });
+            return res.status(200).json({ message: 'Option categories retrieve successfully', result: results });
         } else {
-            res.status(404).json({ message: 'Not option categories found' });
+            return res.status(404).json({ message: 'Not option categories found' });
         }
     } catch (error) {
         console.error('Error retriving service categories:', error);
-        res.status(500).json({ message: 'Internal server error.' });
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 })
+
+// Route to save the user's acceptance of terms and conditions
+router.post('/term/accept', (req, res) => {
+    // Save user's acceptance status in session or cookies
+    req.session.acceptedTerms = true; // Example: Storing in session
+
+    return res.status(200).send('Terms and conditions accepted successfully.');
+});
+
+// Route to check if the user has accepted the terms and conditions
+router.get('/term/check', (req, res) => {
+    // Check if the user has accepted terms and conditions
+    const hasAcceptedTerms = req.session.acceptedTerms || false; // Example: Retrieving from session
+
+    if (hasAcceptedTerms) {
+        return res.status(200).send('User has accepted terms and conditions.');
+    } else {
+        return res.status(403).send('User has not accepted terms and conditions.');
+    }
+});
 module.exports = router;

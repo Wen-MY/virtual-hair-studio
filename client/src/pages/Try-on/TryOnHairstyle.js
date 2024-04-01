@@ -4,7 +4,7 @@ import WebcamWithGuide from '../../components/webcam-with-guide';
 import FaceDetection from '../../components/face-detection';
 import 'react-calendar/dist/Calendar.css';
 import FormBox from '../../components/form-box';
-
+import OptionsSections from '../../components/options-section';
 
 
 const TryOnHairstyle = () => {
@@ -17,15 +17,20 @@ const TryOnHairstyle = () => {
 
   //for hairstyle options customization
   const [customize, setCustomize] = useState(false);
+  const [optionShow, setOptionShow] = useState(false);
+  const [optionSelected, setOptionSelected] = useState({
+    haircut : null,
+    color: null,
+  })
   const webcamRef = useRef(null);
-  
+
   const totalSteps = 5;
-  useEffect(() =>{
+  useEffect(() => {
     faceDetector.initializeFaceDetector("IMAGE");
-  },[])
+  }, [])
   //---------------------------- options for hairstyle customization -------------------------------//
   const [tryOnOptionCategories, setTryOnOptionCategories] = useState([]);
-  const [tryOnOptions,setTryOnOptions] = useState([]);
+  const [tryOnOptions, setTryOnOptions] = useState([]);
 
   //---------------------------- remote option api request -------------------------------//
   const fetchTryOnData = async () => {
@@ -62,17 +67,17 @@ const TryOnHairstyle = () => {
       //setLoading(false);
     }
   }
-  useEffect(()=>{
-    if(customize){
+  useEffect(() => {
+    if (customize) {
       fetchTryOnData();
     }
-  },[customize])
+  }, [customize])
   //---------------------------- remote api request submit image and prompt -------------------------------//
   const generateResult = async () => {
-    
+
   }
-  
-  
+
+
   //---------------------------- user interaction handling -------------------------------//
   const handlePrevStep = () => {
     setCurrentStep(currentStep - 1);
@@ -111,7 +116,7 @@ const TryOnHairstyle = () => {
     setSelectedImage(null);
     setFaceDetected(false);
   }
-  
+
   // handle drag and drop OR file upload
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -127,40 +132,40 @@ const TryOnHairstyle = () => {
 
     // Check file type
     if (!validTypes.includes(file.type)) {
-        alert('Please upload a PNG, JPG, or JPEG image file only.');
-        return;
+      alert('Please upload a PNG, JPG, or JPEG image file only.');
+      return;
     }
 
     // Check file size
     const maxSize = 1024 * 1024 * 5; // 5MB
     if (file.size > maxSize) {
-        alert('File size exceeds the limit of 1MB. Please upload a smaller image.');
-        return;
+      alert('File size exceeds the limit of 1MB. Please upload a smaller image.');
+      return;
     }
 
     // Resize image to 512x512
     const resizeImage = (image) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 512;
-        canvas.height = 512;
-        ctx.drawImage(image, 0, 0, 512, 512);
-        return canvas.toDataURL('image/jpeg');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 512;
+      canvas.height = 512;
+      ctx.drawImage(image, 0, 0, 512, 512);
+      return canvas.toDataURL('image/jpeg');
     };
 
     const reader = new FileReader();
     reader.onload = () => {
-        const img = new Image();
-        img.onload = async () => {
-            const resizedDataURL = resizeImage(img);
-            setSelectedImage(resizedDataURL);
-            setFaceDetected(await faceDetector.imageDetection(resizedDataURL));
-            handleNextStep();
-        };
-        img.src = reader.result;
+      const img = new Image();
+      img.onload = async () => {
+        const resizedDataURL = resizeImage(img);
+        setSelectedImage(resizedDataURL);
+        setFaceDetected(await faceDetector.imageDetection(resizedDataURL));
+        handleNextStep();
+      };
+      img.src = reader.result;
     };
     reader.readAsDataURL(file);
-};
+  };
 
 
   //button to replace input elememt
@@ -169,6 +174,7 @@ const TryOnHairstyle = () => {
   const handleFileUpload = () => {
     fileInputRef.current.click();
   };
+
   //---------------------------- helper and formatting method -------------------------------//
 
   //---------------------------- html -------------------------------//
@@ -189,19 +195,19 @@ const TryOnHairstyle = () => {
                   <div className='col-5'>
                     <FormBox className={'responsive-tab'} onClick={handleFileUpload}>
                       <div className='p-5' onDrop={handleDrop} onDragOver={handleDragOver}>
-                      <span className='bi bi-image px-5 icon-xl text-secondary '></span>
-                      <p className='fs-4 text-secondary fw-semibold'>Drag and drop image file</p>
-                      <input type='file' accept='.png,.jpg,.jpeg' className='form-control d-none' ref={fileInputRef} onChange={(e) => handleFiles(e.target.files)} />
-                      <button className='btn btn-lg btn-secondary' onClick={handleFileUpload}><span className='bi bi-upload me-2'></span> Choose File</button>
+                        <span className='bi bi-image px-5 icon-xl text-secondary '></span>
+                        <p className='fs-4 text-secondary fw-semibold'>Drag and drop image</p>
+                        <input type='file' accept='.png,.jpg,.jpeg' className='form-control d-none' ref={fileInputRef} onChange={(e) => handleFiles(e.target.files)} />
+                        <button className='btn btn-lg btn-secondary' onClick={handleFileUpload}><span className='bi bi-upload me-2'></span> Choose File</button>
                       </div>
                     </FormBox>
                   </div>
                   <div className='col-5'>
-                  <FormBox className={'responsive-tab'} onClick={handleNextStep}>
+                    <FormBox className={'responsive-tab'} onClick={handleNextStep}>
                       <div className='p-5'>
-                      <span className='bi bi-camera px-5 icon-xl text-primary'></span>
-                      <p className='fs-4 text-secondary fw-semibold'>Take a Selfie</p>
-                      <button className='btn btn-lg btn-primary' onClick={handleNextStep}><span className='bi bi-camera-video me-2'></span> Take Image</button>
+                        <span className='bi bi-camera px-5 icon-xl text-primary'></span>
+                        <p className='fs-4 text-secondary fw-semibold'>Take a Selfie</p>
+                        <button className='btn btn-lg btn-primary' onClick={handleNextStep}><span className='bi bi-camera-video me-2'></span> Take Image</button>
                       </div>
                     </FormBox>
                   </div>
@@ -212,24 +218,24 @@ const TryOnHairstyle = () => {
             {currentStep === 2 && (
               <div>
                 {selectedImage ?
-                <h2 className='text-start'>Capturing Image using Webcam</h2>
-                :
-                <h2 className='text-start'>Image Preview</h2>
+                  <h2 className='text-start'>Capturing Image using Webcam</h2>
+                  :
+                  <h2 className='text-start'>Image Preview</h2>
                 }
                 <div className='step-content d-flex justify-content-center mt-5'>
                   {selectedImage ? (
-                    <div className={`border border-5 p-3 ${faceDetected?'border-success': 'border-danger'}`}>
-                      <h3 className={`${faceDetected?'text-dark': 'text-danger'}`}>{faceDetected?'Preview':'No Face Detected In The Image'} </h3>
+                    <div className={`border border-5 p-3 ${faceDetected ? 'border-success' : 'border-danger'}`}>
+                      <h3 className={`${faceDetected ? 'text-dark' : 'text-danger'}`}>{faceDetected ? 'Preview' : 'No Face Detected In The Image'} </h3>
                       <img src={selectedImage} alt="Selected" className="selected-image" />
                       <div className="mt-4">
                         <button onClick={() => { resetSelectedImage(); handlePrevStep(); }} className='btn btn-lg btn-primary me-4'>Retake Image</button>
-                        <button onClick={handleNextStep} className={`btn btn-lg ${faceDetected?'btn-success':'btn-secondary'}`} disabled={!faceDetected}>Use This Image</button>
+                        <button onClick={handleNextStep} className={`btn btn-lg ${faceDetected ? 'btn-success' : 'btn-secondary'}`} disabled={!faceDetected}>Use This Image</button>
                       </div>
                     </div>
                   )
-                    :(
+                    : (
                       <div className={`border border-5 p-3`}>
-                        <WebcamWithGuide webcamRef={webcamRef}/>
+                        <WebcamWithGuide webcamRef={webcamRef} />
                         <button onClick={captureImage} className='btn btn-lg btn-primary mt-4'>Capture Image</button>
                       </div>
                     )
@@ -242,19 +248,19 @@ const TryOnHairstyle = () => {
               <div>
                 <h2 className='text-start'>Virtual Hairstyle</h2>
                 <div className='step-content d-flex justify-content-center'>
-                <div className='col-5 mb-5'>
-                    <FormBox className={'responsive-tab'} onClick={() => {handleNextStep(); setCustomize(false);}}>
+                  <div className='col-5 mb-5'>
+                    <FormBox className={'responsive-tab'} onClick={() => { handleNextStep(); setCustomize(false); }}>
                       <div className='p-5'>
-                      <span className='bi bi-rocket-fill px-5 icon-xl text-success '></span>
-                      <p className='fs-4 text-secondary fw-semibold'>Select Recommended Hairstyle</p>
+                        <span className='bi bi-rocket-fill px-5 icon-xl text-success '></span>
+                        <p className='fs-4 text-secondary fw-semibold'>Select Recommended Hairstyle</p>
                       </div>
                     </FormBox>
                   </div>
                   <div className='col-5'>
-                  <FormBox className={'responsive-tab'} onClick={() => {handleNextStep(); setCustomize(true);}}>
+                    <FormBox className={'responsive-tab'} onClick={() => { handleNextStep(); setCustomize(true); }}>
                       <div className='p-5'>
-                      <span className='bi bi-palette-fill px-5 icon-xl text-warning'></span>
-                      <p className='fs-4 text-secondary fw-semibold'>Customize Your Own Hairstyle</p>
+                        <span className='bi bi-palette-fill px-5 icon-xl text-warning'></span>
+                        <p className='fs-4 text-secondary fw-semibold'>Customize Your Own Hairstyle</p>
                       </div>
                     </FormBox>
                   </div>
@@ -272,10 +278,50 @@ const TryOnHairstyle = () => {
             {currentStep === 4 && customize && (
               <div>
                 <h2 className='text-start'>Custom Hairstyle Options</h2>
-                <div className='step-content d-flex justify-content-center mt-5'>
-                
+                <div className='step-content d-flex justify-content-center mt-4'>
+                  <div className='row border border-1 border-primary rounded-4 w-100 text-start'>
+                    <div className='normalOptions pt-3 px-4'>
+                    <OptionsSections 
+                        categoryIDs={[5]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.haircut}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'haircut'}
+                        subSection={false}
+                      />
+                      <OptionsSections 
+                        categoryIDs={[2,3]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.color}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'color'}
+                        title={'Hair Color'}
+                        subSection={true}
+                      />
+                    </div>
+                    <div className='advancedOptions collapse px-4'>
+                    <OptionsSections 
+                        categoryIDs={[6]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.haircut}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'haircut'}
+                        subSection={false}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* Expandable button */}
+                <div className="text-center mb-5 btn btn-outline-primary rounded-bottom-5 border-top-0">
+                  <span className="px-5 pb-3 fs-4 icon-link icon-link-hover " data-bs-toggle="collapse" href=".collapse" onClick={() => setOptionShow(!optionShow)}>
+                    {optionShow ? <span className='bi bi-chevron-up'></span> : <span className='bi bi-chevron-down'></span>}
+                  </span>
                 </div>
               </div>
+
             )}
             {/* Step 5 content */}
             {currentStep === 5 && (

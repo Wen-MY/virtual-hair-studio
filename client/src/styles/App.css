@@ -110,3 +110,11 @@ input[type="number"] {
   transform: scale(1.1); /* Scale up on hover */
   transition: background-color 0.3s ease, transform 0.3s ease; /* Add smooth transition */
 }
+
+.icon-link:hover .bi-chevron-up {
+  transform: translateY(-20%);
+}
+
+.icon-link:hover .bi-chevron-down {
+  transform: translateY(20%);
+}

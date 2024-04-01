@@ -18,6 +18,7 @@ const AppointmentReschedule = () => {
   const [rescheduling, setRescheduling] = useState(false);
   const DnDCalendar = withDragAndDrop(Calendar)
   const [rescheduledAppointment, setRescheduledAppointment] = useState([]);
+  const [temp,setTemp] = useState([]);
   const fetchData = async (startDate, endDate) => {
     try {
       const response = await fetch(`${config.serverUrl}/appointment/retrieve?status=CONFIRMED&range=${startDate}_${endDate}`, {
@@ -45,7 +46,7 @@ const AppointmentReschedule = () => {
     if (view) setCurrentView(view);
     
     //console.log(crView);
-    console.log(range);
+    //console.log(range);
     
     const today = new Date();
     let start, end;
@@ -65,7 +66,13 @@ const AppointmentReschedule = () => {
 
   }, [currentView]);
   const handleRescheduling = (status) => {
+    if(status){
+      setTemp(events);
+    }
     setRescheduling(status);
+  }
+  const returnOriginalEvent = () => {
+    setEvents(temp);
   }
   const handleEventDrop = useCallback(({ event, start, end }) => {
     try {
@@ -80,9 +87,6 @@ const AppointmentReschedule = () => {
     }
   }, [setEvents, setRescheduledAppointment]);
 
-  useEffect(()=>{
-console.log(currentDate);
-  },[currentDate])
   const handleSaveRescheduledEvent = async () => {
     try {
       // Call API to update each rescheduled event
@@ -191,7 +195,7 @@ console.log(currentDate);
               (
                 <div>
                   <button className='btn btn-primary btn-lg me-3' onClick={() => handleSaveRescheduledEvent()}>Confirm</button>
-                  <button className='btn btn-secondary btn-lg' onClick={() => handleRescheduling(false)}>Cancel</button>
+                  <button className='btn btn-secondary btn-lg' onClick={() => {handleRescheduling(false); returnOriginalEvent();}}>Cancel</button>
                 </div>
               ) : (
                 <div>

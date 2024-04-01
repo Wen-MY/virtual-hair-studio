@@ -99,7 +99,9 @@ const executeSqlStatement = async (databaseName, schemaPath) => {
 // Initialize databases and execute SQL statements sequentially
 createDatabaseAndInitialize('vhs_info', './resources/vhs_info/V1_0_0__DDL_baseline.sql')
   .then(() => createDatabaseAndInitialize('vhs_um', './resources/vhs_um/V1_0_0__DDL_baseline.sql'))
+  .then(() => createDatabaseAndInitialize('vhs_tryon', './resources/vhs_tryon/V1_0_0__DDL_baseline.sql'))
   .then(() => executeSqlStatement('vhs_um', './resources/vhs_um/V1_0_1__DML_preset.sql'))
   .then(() => executeSqlStatement('vhs_info','./resources/vhs_info/V1_0_1__DML_preset.sql'))
+  .then(() => executeSqlStatement('vhs_tryon','./resources/vhs_tryon/V1_0_1__DML_preset.sql'))
   //.then(() => ) for more execution
   .catch((error) => console.error('Error:', error));

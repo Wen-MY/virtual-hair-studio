@@ -374,16 +374,17 @@ const SalonDashboard = () => {
 
                 // Calculate the total appointments for each day (Monday to Friday)
                 // Initialize with zeros for Monday to Friday
+                if(responseData.totalResults > 0){
+                    appointments.forEach((appointment) => {
+                        const appointmentDate = new Date(appointment.booking_datetime);
+                        const dayOfWeek = appointmentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
 
-                appointments.forEach((appointment) => {
-                    const appointmentDate = new Date(appointment.booking_datetime);
-                    const dayOfWeek = appointmentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
-
-                    // Increment the count for the corresponding day (Monday to Friday)
-                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                        appointmentsCount[dayOfWeek - 1]++;
-                    }
-                });
+                        // Increment the count for the corresponding day (Monday to Friday)
+                        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                            appointmentsCount[dayOfWeek - 1]++;
+                        }
+                    });
+                }
             } else {
                 console.error(
                     "Failed to fetch appointments over time data:",
