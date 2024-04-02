@@ -5,12 +5,13 @@ import FaceDetection from '../../components/face-detection';
 import 'react-calendar/dist/Calendar.css';
 import FormBox from '../../components/form-box';
 import OptionsSections from '../../components/options-section';
-
+import Loader from '../../components/loading-spinner';
 
 const TryOnHairstyle = () => {
   //---------------------------- state variable -------------------------------//
   const [currentStep, setCurrentStep] = useState(1);
   const [creationStatus, setCreationStatus] = useState(true); //temp
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceDetector, setFaceDetector] = useState(new FaceDetection(setFaceDetected));
@@ -19,9 +20,17 @@ const TryOnHairstyle = () => {
   const [customize, setCustomize] = useState(false);
   const [optionShow, setOptionShow] = useState(false);
   const [optionSelected, setOptionSelected] = useState({
-    haircut : null,
+    haircut: null,
     color: null,
+    texture: null,
+    attire: null,
+    highlight: null,
+    parting: null,
+    volume: null,
+    accessories: null,
+    styling: null,
   })
+  const [feedbackOptions, setFeedbackOptions] = useState([]);
   const webcamRef = useRef(null);
 
   const totalSteps = 5;
@@ -31,6 +40,7 @@ const TryOnHairstyle = () => {
   //---------------------------- options for hairstyle customization -------------------------------//
   const [tryOnOptionCategories, setTryOnOptionCategories] = useState([]);
   const [tryOnOptions, setTryOnOptions] = useState([]);
+  const [tryOnLoading, setLoading] = useState(true);
 
   //---------------------------- remote option api request -------------------------------//
   const fetchTryOnData = async () => {
@@ -61,7 +71,15 @@ const TryOnHairstyle = () => {
       } else {
         console.error('Failed to fetch try-on category information:', categoriesData.message);
       }
-
+      const feedbackOptionsResponse = await fetch(config.serverUrl + `/try-on/feedback/options`, {
+        credentials: 'include'
+      });
+      const feedbackOptionsData = await feedbackOptionsResponse.json();
+      if (feedbackOptionsResponse.ok) {
+        setFeedbackOptions(feedbackOptionsData.result);
+      } else {
+        console.error('Failed to fetch try-on category information:', categoriesData.message);
+      }
     } catch (error) {
       console.error('Error fetching salon data:', error);
       //setLoading(false);
@@ -73,10 +91,57 @@ const TryOnHairstyle = () => {
     }
   }, [customize])
   //---------------------------- remote api request submit image and prompt -------------------------------//
-  const generateResult = async () => {
+  const [tryOnResult, setTryOnResult] = useState([]);
+  const [feedback, setFeedback] = useState(null);
 
+  const generateTryOnResult = async () => {
+    try {
+      // Create a new FormData object
+      const formData = new FormData();
+
+      // Append the selected options to the FormData object
+      formData.append('options', JSON.stringify(optionSelected));
+
+      // Append the selected image to the FormData object
+      formData.append('tryOnImage', selectedImageFile);
+
+      let url = config.serverUrl + '/try-on/generate';
+      if (feedback !== null) {
+        url += `?feedbackId=${feedback}`;
+      }
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+        redirect: "follow"
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setTryOnResult(data.result);
+        setLoading(false);
+        console.log('Generated result images:', data.result);
+      } else {
+        console.error('Failed to generate result images:', data.message);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error generating result images:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleRegenerateTryOnResult = async () => {
+    if (feedback !== null) {
+      setTryOnResult([]);
+      generateTryOnResult();
+      setFeedback(null);
+    }
   }
-
+  useEffect(() => {
+    if (currentStep === 5 && Object.values(optionSelected).some(value => value !== null)) {
+      generateTryOnResult();
+    }
+  }, [currentStep])
 
   //---------------------------- user interaction handling -------------------------------//
   const handlePrevStep = () => {
@@ -84,22 +149,7 @@ const TryOnHairstyle = () => {
   };
 
   const handleNextStep = () => {
-    switch (currentStep) {
-      case 1:
-        setCurrentStep(currentStep + 1);
-        break;
-      case 2:
-        setCurrentStep(currentStep + 1);
-        break;
-      case 3:
-        setCurrentStep(currentStep + 1);
-        break;
-      case 4:
-        setCurrentStep(currentStep + 1);
-        break;
-      default:
-        setCurrentStep(currentStep + 1);
-    }
+    setCurrentStep(currentStep + 1);
   };
 
   const handleComplete = async () => {
@@ -109,11 +159,15 @@ const TryOnHairstyle = () => {
   const captureImage = async () => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedImage(imageSrc);
+    const blob = await fetch(imageSrc).then((res) => res.blob());
+    const file = new File([blob], 'screenshot.png', { type: 'image/png' });
+    setSelectedImageFile(file);
     setFaceDetected(await faceDetector.imageDetection(imageSrc));
   };
 
   const resetSelectedImage = () => {
     setSelectedImage(null);
+    setSelectedImageFile(null);
     setFaceDetected(false);
   }
 
@@ -126,7 +180,7 @@ const TryOnHairstyle = () => {
     const files = event.dataTransfer.files;
     handleFiles(files);
   };
-  const handleFiles = (files) => {
+  const handleFiles = async (files) => {
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     const file = files[0];
 
@@ -137,12 +191,12 @@ const TryOnHairstyle = () => {
     }
 
     // Check file size
-    const maxSize = 1024 * 1024 * 5; // 5MB
+    const maxSize = 1024 * 1024 * 4; // 5MB
     if (file.size > maxSize) {
-      alert('File size exceeds the limit of 1MB. Please upload a smaller image.');
+      alert('File size exceeds the limit of 4MB. Please upload a smaller image.');
       return;
     }
-
+    setSelectedImageFile(file);
     // Resize image to 512x512
     const resizeImage = (image) => {
       const canvas = document.createElement('canvas');
@@ -150,16 +204,22 @@ const TryOnHairstyle = () => {
       canvas.width = 512;
       canvas.height = 512;
       ctx.drawImage(image, 0, 0, 512, 512);
-      return canvas.toDataURL('image/jpeg');
+      return canvas.toDataURL('image/jpeg'); // Converted to JPEG for resizing
     };
 
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const img = new Image();
       img.onload = async () => {
         const resizedDataURL = resizeImage(img);
+
+        // Set the selected image data URL to the state variable
         setSelectedImage(resizedDataURL);
+
+        // Perform face detection
         setFaceDetected(await faceDetector.imageDetection(resizedDataURL));
+
+        // Proceed to the next step
         handleNextStep();
       };
       img.src = reader.result;
@@ -168,15 +228,27 @@ const TryOnHairstyle = () => {
   };
 
 
+
   //button to replace input elememt
   const fileInputRef = useRef(null);
 
   const handleFileUpload = () => {
     fileInputRef.current.click();
   };
-
-  //---------------------------- helper and formatting method -------------------------------//
-
+  const saveImageToDevice = (imageUrl, imageName) => {
+    fetch(imageUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', imageName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => console.error('Error downloading image:', error));
+  };
   //---------------------------- html -------------------------------//
   return (
     <div className="container-fluid my-3 full-width">
@@ -198,7 +270,7 @@ const TryOnHairstyle = () => {
                         <span className='bi bi-image px-5 icon-xl text-secondary '></span>
                         <p className='fs-4 text-secondary fw-semibold'>Drag and drop image</p>
                         <input type='file' accept='.png,.jpg,.jpeg' className='form-control d-none' ref={fileInputRef} onChange={(e) => handleFiles(e.target.files)} />
-                        <button className='btn btn-lg btn-secondary' onClick={handleFileUpload}><span className='bi bi-upload me-2'></span> Choose File</button>
+                        <button className='btn btn-lg btn-secondary'><span className='bi bi-upload me-2'></span> Choose File</button>
                       </div>
                     </FormBox>
                   </div>
@@ -279,10 +351,10 @@ const TryOnHairstyle = () => {
               <div>
                 <h2 className='text-start'>Custom Hairstyle Options</h2>
                 <div className='step-content d-flex justify-content-center mt-4'>
-                  <div className='row border border-1 border-primary rounded-4 w-100 text-start'>
-                    <div className='normalOptions pt-3 px-4'>
-                    <OptionsSections 
-                        categoryIDs={[5]}
+                  <div className='row w-100 text-start'>
+                    <div className='normalOptions'>
+                      <OptionsSections
+                        categoryIDs={[4]}
                         tryOnOptionCategories={tryOnOptionCategories}
                         tryOnOptions={tryOnOptions}
                         optionSelected={optionSelected.haircut}
@@ -290,8 +362,8 @@ const TryOnHairstyle = () => {
                         optionProperty={'haircut'}
                         subSection={false}
                       />
-                      <OptionsSections 
-                        categoryIDs={[2,3]}
+                      <OptionsSections
+                        categoryIDs={[2, 3]}
                         tryOnOptionCategories={tryOnOptionCategories}
                         tryOnOptions={tryOnOptions}
                         optionSelected={optionSelected.color}
@@ -299,24 +371,83 @@ const TryOnHairstyle = () => {
                         optionProperty={'color'}
                         title={'Hair Color'}
                         subSection={true}
+                        useIcon={true}
                       />
-                    </div>
-                    <div className='advancedOptions collapse px-4'>
-                    <OptionsSections 
+                      <OptionsSections
+                        categoryIDs={[5]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.texture}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'texture'}
+                        subSection={false}
+                      />
+                      <OptionsSections
                         categoryIDs={[6]}
                         tryOnOptionCategories={tryOnOptionCategories}
                         tryOnOptions={tryOnOptions}
-                        optionSelected={optionSelected.haircut}
+                        optionSelected={optionSelected.attire}
                         setOptionSelected={setOptionSelected}
-                        optionProperty={'haircut'}
+                        optionProperty={'attire'}
                         subSection={false}
                       />
+                    </div>
+                    <div className='advancedOptions collapse'>
+                      <h2 className='mt-5'>Advanced Customization</h2>
+                      <OptionsSections
+                        categoryIDs={[2, 3]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.highlight}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'highlight'}
+                        title={'Hair Highlights'}
+                        subSection={true}
+                        useIcon={true}
+                      />
+                      <OptionsSections
+                        categoryIDs={[7]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.parting}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'parting'}
+                        subSection={false}
+                      />
+                      <OptionsSections
+                        categoryIDs={[8]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.styling}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'styling'}
+                        subSection={false}
+                      />
+                      <OptionsSections
+                        categoryIDs={[9]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.volume}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'volume'}
+                        subSection={false}
+                      />
+                      <OptionsSections
+                        categoryIDs={[10]}
+                        tryOnOptionCategories={tryOnOptionCategories}
+                        tryOnOptions={tryOnOptions}
+                        optionSelected={optionSelected.accessories}
+                        setOptionSelected={setOptionSelected}
+                        optionProperty={'accessories'}
+                        subSection={false}
+                      />
+
                     </div>
                   </div>
                 </div>
                 {/* Expandable button */}
-                <div className="text-center mb-5 btn btn-outline-primary rounded-bottom-5 border-top-0">
-                  <span className="px-5 pb-3 fs-4 icon-link icon-link-hover " data-bs-toggle="collapse" href=".collapse" onClick={() => setOptionShow(!optionShow)}>
+                <div className="text-center mb-5 btn btn-outline-primary rounded-bottom-5 border-top-0" onClick={() => setOptionShow(!optionShow)} data-bs-toggle="collapse" href=".collapse">
+                  <span className="px-5 fs-4 icon-link icon-link-hover " >
                     {optionShow ? <span className='bi bi-chevron-up'></span> : <span className='bi bi-chevron-down'></span>}
                   </span>
                 </div>
@@ -326,11 +457,38 @@ const TryOnHairstyle = () => {
             {/* Step 5 content */}
             {currentStep === 5 && (
               <div>
-                <h2 className='text-start'>Result Showing</h2>
-                <div className='step-content d-flex justify-content-center mt-5'>
+                <h2 className='text-start'></h2>
+                <div className='step-content d-flex justify-content-center mt-3'>
+                  {!tryOnLoading ? (
+                    tryOnResult.length > 0 ? (
+                      <div className='row'>
+                        {tryOnResult.map((image, index) => (
+                          <div key={index} className='col-auto'>
+                            <FormBox>
+                              <img src={image.url} alt={`result-${index}`} style={{ aspectRatio: '1/1', width: '21em' }} />
+                              <button
+                                className='btn btn-lg btn-outline-success mt-3'
+                                onClick={() => saveImageToDevice(image.url, `result-${index}.jpg`)}
+                              >
+                                Save Image
+                              </button>
+                            </FormBox>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div><p>Failed to generate image. Please try again later.</p></div>
+                    )
+                  ) : (
+                    <div style={{ maxHeight: '60vh' }}>
+                      <p className='fs-4 fw-semibold'>Please wait for image results to generate. This may take some time.</p>
+                      <Loader />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
+
             {/* Complete content */}
             {currentStep > totalSteps && creationStatus && (
               <div>
@@ -349,16 +507,60 @@ const TryOnHairstyle = () => {
             )}
           </div>
         </div>
-        {currentStep <= totalSteps && currentStep > 2 && (
+        {(currentStep < totalSteps && currentStep > 2) && (
           <div className={`d-flex justify-content-between`}>
             <button className="btn btn-lg btn-secondary me-3" onClick={handlePrevStep}>Prev Step</button>
-            {/*currentStep !== totalSteps ? (
-              <button className="btn btn-lg btn-primary" onClick={handleNextStep}>Next Step</button>
-            ) : (
-              <button className="btn btn-lg btn-success" onClick={handleComplete}>Complete</button>
-            )*/}
+            {(Object.values(optionSelected).some(value => value !== null) && currentStep != 3) && (
+              <div>
+                {currentStep !== totalSteps ? (
+                  <button className="btn btn-lg btn-primary" onClick={() => handleNextStep()}>Generate</button>
+                ) : (
+                  <button className="btn btn-lg btn-success" onClick={() => handleComplete()}>Complete</button>
+                )}
+              </div>
+            )}
           </div>
         )}
+        {currentStep === 5 && tryOnResult.length > 0 && (
+          <div className={`d-flex justify-content-center`}>
+            <button className="btn btn-lg btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#regenerateFeedbackModal" >Regenerate</button>
+            <button className="btn btn-lg btn-success" onClick={handleComplete}>Complete</button>
+          </div>
+        )}
+
+      </div>
+      <div className="modal fade left-indent" id="regenerateFeedbackModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="regenerateFeedbackModalLabel" aria-hidden="true" >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="regenerateFeedbackModalLabel">Feedback for enhancement</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <div className="w-100 text-start px-3">
+                {feedbackOptions.length > 0 && feedbackOptions.map((feedbackType) => (
+                  <div className="form-check" key={feedbackType.id}>
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="feedback"
+                      id={`feedback-${feedbackType.id}`}
+                      checked={feedbackType.id === feedback}
+                      onChange={() => setFeedback(feedbackType.id)}
+                    />
+                    <label className="form-check-label" htmlFor={`feedback-${feedbackType.id}`}>
+                      {feedbackType.description}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="modal-footer d-flex justify-content-center">
+              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" disabled={feedback === null}>Send</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setFeedback(null)}>Close</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

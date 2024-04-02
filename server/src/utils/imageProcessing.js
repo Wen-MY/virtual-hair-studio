@@ -3,12 +3,14 @@ const fs = require('fs');
 const path = require('path');
 
 const imageProcessingUtils = {
-    hairSegmenter: (inputFileName, outputFileName) => {
+    hairSegmenter: (inputFileName, outputFileName, iteration) => {
         return new Promise((resolve, reject) => {
             const pythonProcess = spawn('python', 
             ['../server/src/scripts/hair_segmentation.py', 
             `../server/src/resources/temp/${inputFileName}`,
-            `../server/src/resources/temp/${outputFileName}`]);
+            `../server/src/resources/temp/${outputFileName}`,
+            `${iteration}` //dilate_iterations
+            ]);
 
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);

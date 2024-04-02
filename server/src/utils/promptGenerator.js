@@ -1,6 +1,6 @@
 const promptGeneratorUtils = {
     generate: (complexity, options) => {
-        const { color, highlight, haircut, texture, volume, styling, parting, accessory } = options;
+        const { color, highlight, haircut, texture, volume, styling, parting, accessory,attire } = options;
         let prompt = '';
 
         switch (complexity) {
@@ -13,6 +13,7 @@ const promptGeneratorUtils = {
                 prompt += styling ? `Style the hair using ${styling} techniques. ` : '';
                 prompt += parting ? `Part the hair with a ${parting} style. ` : '';
                 prompt += accessory ? `Add ${accessory} as an accessory. ` : '';
+                prompt += attire ? `Make the hairstyle for ${attire} purpose`: '';
                 break;
 
             case 'enhanced':
@@ -24,6 +25,7 @@ const promptGeneratorUtils = {
                 prompt += styling ? `Utilize ${styling} techniques to style the hair. ` : '';
                 prompt += parting ? `Create a precise ${parting} part. ` : '';
                 prompt += accessory ? `Enhance the look with stylish ${accessory}. ` : '';
+                prompt += attire ? `The hairstyle should fit for ${attire} purpose`: '';
                 break;
 
             case 'complex':
@@ -35,13 +37,14 @@ const promptGeneratorUtils = {
                 prompt += styling ? `Employ advanced twisting techniques to ${styling} style the hair. ` : '';
                 prompt += parting ? `Achieve a precise ${parting} part. ` : '';
                 prompt += accessory ? `Integrate a variety of stylish ${accessory} for a sophisticated finish. ` : '';
+                prompt += attire ? `The hairstyle should fit for ${attire} purpose`: '';
                 break;
 
             default:
                 return Error('No Such Complexity Found');
         }
         //prompt to not generate any texts and watermarks
-        prompt += 'no text and no watermark.'
+        prompt += 'no text and no watermark. The hair generated should in high realistic since it is real image'
         return prompt.trim();
     },
 };

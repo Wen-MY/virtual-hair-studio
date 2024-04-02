@@ -1,4 +1,5 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const database = require('../../../db-config');
 const multer = require('multer');
@@ -15,10 +16,17 @@ const upload = multer({
 
 router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
     try {
-
+        const transactionId = uuidv4();
         // Check if a file is provided in the request
         if (!req.file) {
             return res.status(400).json({ message: 'No image file provided' });
+        }
+        const feedbackId = req.query.feedbackId || null;
+        if(feedbackId){
+            const [feedbackResult] = await database.poolTryOn.execute('INSERT INTO feedbacks (feedback_type,user_id,transaction_id) VALUES (?,?,?)',[feedbackId,req.userId,transactionId]);
+            if(!feedbackResult.affectedRows > 0){
+                return res.status(500).json({ message: 'Failed to regenerate result.' });
+            }
         }
         // extract options from request body
         const options = JSON.parse(req.body.options);
@@ -37,8 +45,10 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         // Define the processed image file name
         const processedImageName = `output_${Date.now()}.png`;
         const processedImagePath = path.join(__dirname, '../../', 'resources', 'temp', processedImageName);
+
+        const defaultIteration = 3;
         //Image Processing : Hair Segmentation
-        await imageProcessingUtils.hairSegmenter(originalImageName, processedImageName, (error, message) => {
+        await imageProcessingUtils.hairSegmenter(originalImageName, processedImageName, defaultIteration, (error, message) => {
             if (error) {
                 console.error(error.message);
                 return res.status(500).json({ message: 'Image processing Error' });
@@ -59,8 +69,8 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         form.append('mask', fs.createReadStream(processedImagePath), { contentType: 'image/png' }),
         form.append('model', 'dall-e-2');
         form.append('prompt', prompt);
-        form.append('n', '1');
-        form.append('size', '1024x1024');
+        form.append('n', '3');
+        form.append('size', '512x512');
         const response = await fetch('https://api.openai.com/v1/images/edits', {
             method: 'POST',
             headers: {
@@ -74,17 +84,18 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
 
         const responseData = await response.json();
         console.log(responseData);
-        const image_url = responseData.data[0].url;
-        imageProcessingUtils.saveUrlImageToTemp(1,1,image_url,(error, message) => {
+        const images_url = responseData.data;
+        images_url.map(image =>
+        imageProcessingUtils.saveUrlImageToTemp(1,1,image.url,(error, message) => {
             if (error) {
                 console.error(error.message);
                 return res.status(500).json({ message: 'Image processing Error' });
             } else {
                 console.log(message);
             }
-        });
+        }));
         // Send the image path to the frontend
-        return res.json({ result: image_url });
+        return res.json({ result: images_url });
     } catch (error) {
         console.error('Error generate try on:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
@@ -154,4 +165,18 @@ router.get('/term/check', (req, res) => {
         return res.status(403).send('User has not accepted terms and conditions.');
     }
 });
+
+router.get('/feedback/options',async (req,res)=> {
+    try {
+        const [results] = await database.poolTryOn.execute('SELECT * FROM feedback_types', []);
+        if (results.length > 0) {
+            return res.status(200).json({ message: 'Option for feedback retrieve successfully', result: results });
+        } else {
+            return res.status(404).json({ message: 'Not feedback option found' });
+        }
+    } catch (error) {
+        console.error('Error retriving feedback options:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+})
 module.exports = router;

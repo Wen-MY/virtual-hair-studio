@@ -5,7 +5,7 @@ const Loader = () => {
         <div className='loading'>
             <SyncLoader
             color="#36d7b7"
-            margin={3}
+            margin={2}
             speedMultiplier={1}
             />
         </div>

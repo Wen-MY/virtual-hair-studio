@@ -13,7 +13,7 @@ from mediapipe.tasks.python import vision
 def save_image(image, filename):
     cv2.imwrite(filename, cv2.cvtColor(image, cv2.COLOR_RGBA2BGRA))
 
-def process_image(input_path, output_path):
+def process_image(input_path, output_path, dilate_iteration):
     # Create the options that will be used for ImageSegmenter
     base_options = python.BaseOptions(model_asset_path='src/models/hair_segmenter.tflite')
     options = vision.ImageSegmenterOptions(base_options=base_options, output_category_mask=True)
@@ -42,7 +42,7 @@ def process_image(input_path, output_path):
 
         # Dilate the mask to enlarge the hair segment area
         kernel = np.ones((5,5),np.uint8) # step of enlargement (height , width) in pixels
-        dilated_mask = cv2.dilate(category_mask.numpy_view(), kernel, iterations=4) #iterations to enlarge the masking area
+        dilated_mask = cv2.dilate(category_mask.numpy_view(), kernel, iterations=int(dilate_iteration)) #iterations to enlarge the masking area
 
         condition = np.stack((dilated_mask,) * 4, axis=-1) > 0.1
         output_image = np.where(condition, bg_image, image_data)
@@ -52,10 +52,11 @@ def process_image(input_path, output_path):
 
 # Process the image when executed as a script
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python hair_segmentation.py <input_image_path> <output_image_path>")
+    if len(sys.argv) != 4:
+        print("Usage: python hair_segmentation.py <input_image_path> <output_image_path> <dilate_iterations:int>")
         sys.exit(1)
     
     input_path = sys.argv[1]
     output_path = sys.argv[2]
-    process_image(input_path, output_path)
+    dilate_iteration = sys.argv[3]
+    process_image(input_path, output_path, dilate_iteration)
