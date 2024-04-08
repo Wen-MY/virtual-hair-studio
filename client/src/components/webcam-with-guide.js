@@ -43,12 +43,13 @@ const WebcamWithGuide = ({ webcamRef }) => {
             <div className='webcam'>
                 <Webcam
                     height={512}
+                    width={512}
                     audio={false}
                     ref={webcamRef}
-                    screenshotFormat="image/jpeg"
+                    screenshotFormat="image/png"
                     videoConstraints={{
-                        width: 512, // Set width to 512 pixels
-                        height: 512, // Set height to 512 pixels
+                        width: 1024, // Set width to 512 pixels
+                        height: 1024, // Set height to 512 pixels
                         facingMode: 'user' // 'environment' for back camera
                     }}
                 />

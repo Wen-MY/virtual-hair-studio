@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
-
+const {getSalonThumbnail , saveSalonThumbnail} = require('../firestore/salonCollections');
+const multer = require('multer');
+const upload = multer({
+    storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
+  });
 router.get('/id',async (req,res) => {
     const userId = req.userId;
     try{
@@ -85,7 +89,7 @@ router.get('/get/:salonId',async (req,res) => {
         if(!salonId){
             return res.status(400).json({message: 'Invalid request, salon id required'});
         }
-        const [salonResult] = await database.poolInfo.execute(`SELECT salons.id,salons.name,salons.address, salons.state,salons.contact_number,salons.business_hour FROM salons WHERE id = ?`,[salonId]);
+        const [salonResult] = await database.poolInfo.execute(`SELECT salons.id,salons.name,salons.address, salons.state,salons.contact_number,salons.business_hour,salons.image_url FROM salons WHERE id = ?`,[salonId]);
         console.log(salonId ,':' ,salonResult);
         if(salonResult.length > 0){
             res.status(200).json({ message: 'Salon details queried successfully!' , result: salonResult[0]})
@@ -161,5 +165,26 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
+router.post('/update-salon-image', upload.single('salonImage'), async (req, res) => {
+    try {
+  
+      if (!req.file) {
+        return res.status(400).json({ message: 'No salon Image file provided' });
+      }
+  
+      const fileBuffer = req.file.buffer;
+  
+      const salonImageUrl = await saveSalonThumbnail(req.userId, fileBuffer);
+      const [results, fields] = await database.poolInfo.execute(
+        'UPDATE salons SET image_url = ? WHERE user_id = ?', [salonImageUrl, req.userId]);
+      if (results.affectedRows > 0) {
+        return res.status(200).json({ message: 'Salon image updated successfully', results: { salonImageUrl } });
+      } else {
+        return res.status(500).json({ message: 'Failed to update salon image' });
+      }
+    } catch (error) {
+      console.error('Error updating salon image:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
 module.exports = router;

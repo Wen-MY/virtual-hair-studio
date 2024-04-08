@@ -1,7 +1,7 @@
 //salonCollections.js
 const { storage, firestore } = require('../../../firebase-config');
 
-const getSalonThumnail = async (salonId) => {
+const getSalonThumbnail = async (salonId) => {
     try {
       const thumbnailRef = firestore.ref(storage,`/salons/${salonId}/media/profile/thumbnail.jpg`);
       if(thumbnailRef){
@@ -14,7 +14,7 @@ const getSalonThumnail = async (salonId) => {
     }
 };
 
-const saveSalonThumnail = async (salonId, fileBuffer) => {
+const saveSalonThumbnail = async (salonId, fileBuffer) => {
     try {
       const thumbnailRef = firestore.ref(storage,`/salons/${salonId}/media/profile/thumbnail.jpg`);
       console.log(`Uploading a salon thumbnail picture to /salons/${salonId}/media/profile/thumbnail.jpg`);
@@ -34,4 +34,4 @@ const saveSalonThumnail = async (salonId, fileBuffer) => {
     }
 };
 
-module.exports = { getSalonThumnail, saveSalonThumnail };
+module.exports = { getSalonThumbnail, saveSalonThumbnail };

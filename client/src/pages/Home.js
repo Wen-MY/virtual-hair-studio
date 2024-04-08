@@ -1,8 +1,13 @@
 // Home.js
 import React, { useEffect, useState }  from 'react';
+import {useNavigate} from 'react-router-dom';
 import SalonCard from '../components/salon-card';
+import config from '../config';
 const Home = () => {
   const [contentWidth, setContentWidth] = useState(0);
+  const [salons,setSalons] = useState([]);
+  const maxSalonCard = 10;
+  const navigate = useNavigate();
   useEffect(() => {
     const getContentWidth = () => {
       const contentElement = document.querySelector('.content');
@@ -28,22 +33,50 @@ const Home = () => {
 
     const generateSalonCards = () => {
       const numberOfCardsInRow = calculateNumberOfCardsInRow();
-      const cards = [];
+      let cards = [];
+      
       //API request here to obtain random salon profile
-      for (let i = 0; i < numberOfCardsInRow; i++) {
+      for (let i = 0; i < Math.min(salons.length, numberOfCardsInRow, 10); i++) {
+        const salon = salons[i];
         cards.push(
-          <SalonCard
-            key={i}
-            imageSrc="https://picsum.photos/400/300"
-            cardText="Some quick example text to build on the card title and make up the bulk of the card's content"
-            cardTitle={`Salon ${i + 1}`}
-            rating={5}
-          />
+          <div className="col mb-4" key={salon.id} onClick={() => handleRowClick(salon.id)}>
+            <SalonCard
+              key={salon.id}
+              imageSrc={salon.image_url ? salon.image_url : `https://picsum.photos/400/300?random=${salon.id}`}
+              rating={salon.average_rating}
+              cardTitle={salon.name}
+            />
+          </div>
         );
       }
-
+    
       return cards;
     };
+    
+    const fetchSalons = async () => {
+      try{
+      const response = await fetch(`${config.serverUrl}/salon/retrieve?&limit=${maxSalonCard}&currentPage=${1}`,{
+          method: 'GET',
+          credentials: 'include'
+        });
+        const data = await response.json();
+    
+        if (data.results) {
+          setSalons(data.results);
+        }else{
+          setSalons([]);
+        }
+      }catch (error) {
+          console.error('Error fetching salons data:', error);
+          //setLoading(false);
+      }
+  }
+  const handleRowClick = (id) => {
+    navigate(`/salon/${id}`);
+  };
+  useEffect(()=>{
+    fetchSalons();
+  },[])
     return(
       <div className='home'>
         <div id='carousel-container' className='carousel slide mx-auto' data-bs-ride='true'> {
@@ -65,7 +98,6 @@ const Home = () => {
             <img src={`${process.env.PUBLIC_URL}/sample-image/sample-banner-3.jpg`} className="d-block w-100" alt="Carousel Slide 3"></img>
           </div>
         </div>
-        {/* temporary hide the button
         <button className="carousel-control-prev" type="button" data-bs-target="#carousel-container" data-bs-slide="prev">
           <span className="carousel-control-prev-icon" aria-hidden="true"></span>
           <span className="visually-hidden">Previous</span>
@@ -74,8 +106,6 @@ const Home = () => {
           <span className="carousel-control-next-icon" aria-hidden="true"></span>
           <span className="visually-hidden">Next</span>
         </button>
-        */
-        }   
         </div>
         <div className="row mt-4 card-wrapper">
           {generateSalonCards()}

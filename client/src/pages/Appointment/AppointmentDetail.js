@@ -5,13 +5,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import { formatDate, formatTime } from '../../utils/datetimeFormatter';
 import config from '../../config';
 import StatusBadge from '../../components/status-pill';
+import Loader from '../../components/loading-spinner';
 
 const AppointmentDetail = () => {
   const { state } = useLocation();
   const appointmentId = state.id;
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [updateEnable, setUpdateEnable] = useState(false);
-
+  const genderMap = {
+    'm': 'Male',
+    'f': 'Female',
+    'o': 'Other'
+};
   useEffect(() => {
     if (appointmentId) {
       fetchAppointmentDetails();
@@ -80,30 +85,126 @@ const AppointmentDetail = () => {
     }
   }
   return (
-    <div className="container border border-2 rounded-4 p-4 bg-white mt-4">
-      <h1 className="text-start mb-4">Appointment Details</h1>
+    <div>
+      <div className="container px-1">
+        <div className='border border-2 rounded-4 p-4 bg-white mt-4'>
+          <h1 className="text-start">Appointment Details
+            <span className='ms-4 fs-4 align-middle'>
+              {appointmentDetails ?
+                <StatusBadge status={appointmentDetails.status} />
+                :
+                <span className="badge rounded-pill text-bg-primary">
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="sr-only"></span>
+                  </div>
+                </span>
+              }
+            </span>
+          </h1>
+        </div>
+      </div>
       {appointmentDetails ? (
-        <div>
-          <div className='text-start'>
-            <h4 className='border-bottom'>Service Information</h4>
-            <p><strong>Service Name:</strong> {appointmentDetails.service_name}</p>
-            <p><strong>Service Description:</strong> {appointmentDetails.desc}</p>
-            <p><strong>Service Duration:</strong> {appointmentDetails.duration} minutes</p>
-
-            <h4 className='border-bottom'>Appointment Information</h4>
-            <p><strong>Date:</strong> {formatDate(appointmentDetails.booking_datetime)}</p>
-            <p><strong>Time:</strong> {formatTime(appointmentDetails.booking_datetime)}</p>
-            <p><strong>Remarks:</strong> {appointmentDetails.remarks}</p>
-
-            <h4 className='border-bottom'>Salon Information</h4>
-            <p><strong>Salon Name:</strong> {appointmentDetails.name}</p>
-            <p><strong>Salon Location:</strong> {appointmentDetails.address}</p>
-
-            <h4 className='border-bottom'>Status</h4>
-            <p className='pt-1'><StatusBadge status={appointmentDetails.status} /></p>
-
+        <div className='container mt-2'>
+          <div className='row'>
+            {setUpdateEnable ?
+              <div className='col-md-3 bg-white rounded-4 p-4 border border-2'>
+                <h4 className='border-bottom pb-1'>Customer</h4>
+                <div className='text-start px-3 mt-4'>
+                  <div className='row'>
+                    <div className='col-12'>
+                      <img src={appointmentDetails.customer_image_url ?? process.env.PUBLIC_URL + '/sample-image/person_thumbnail.png'} alt='customer-image' className='image-square-large image-cover rounded mx-auto d-block mb-3'></img>
+                    </div>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Name :</label>
+                    <p className='col-8' >{(appointmentDetails.customer_first_name && appointmentDetails.customer_last_name) ? appointmentDetails.customer_first_name + " " + appointmentDetails.customer_last_name : appointmentDetails.customer_username}</p>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Email :</label>
+                    <p className='col-8' >{appointmentDetails.customer_email ?? 'null'}</p>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Gender :</label>
+                    <p className='col-8' >{genderMap[appointmentDetails.customer_gender] || 'null'}</p>
+                  </div>
+                </div>
+              </div>
+              :
+              <div className='col-md-3 bg-white rounded-4 p-4 border border-2'>
+                <h4 className='border-bottom pb-1'>Salon</h4>
+                <div className='text-start mt-4'>
+                  <div className='row'>
+                    <div className='col-12'>
+                      <img src={appointmentDetails.salon_image ?? process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'} alt='salon-image' className='image-square-large image-cover rounded mx-auto d-block mb-3'></img>
+                    </div>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Name :</label>
+                    <p className='col-8' >{appointmentDetails.name}</p>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Location :</label>
+                    <p className='col-8' >{appointmentDetails.address ? appointmentDetails.address : 'null'}</p>
+                  </div>
+                </div>
+              </div>
+            }
+            <div className='col-md-6 px-2'>
+              <div className='bg-white rounded-4 p-4 border border-2'>
+                <h4 className='border-bottom pb-1'>Appointment</h4>
+                <div className='text-start px-3 mt-4'>
+                  <div className='row'>
+                    <label htmlFor='date' className='fw-bold col-4'>Date :</label>
+                    <p className='col-8' id='date'>{formatDate(appointmentDetails.booking_datetime)}</p>
+                  </div>
+                  <div className='row'>
+                    <label htmlFor='time' className='fw-bold col-4'>Time :</label>
+                    <p className='col-8' id='time'>{formatTime(appointmentDetails.booking_datetime)}</p>
+                  </div>
+                  <div className='row'>
+                    <label htmlFor='remarks' className='fw-bold col-4'>Remarks :</label>
+                    <p className='col-8' id='remarks'>{appointmentDetails.remarks ?? "No remarks"}</p>
+                  </div>
+                </div>
+              </div>
+              <div className='bg-white rounded-4 p-4 border border-2 mt-2'>
+                <h4 className='border-bottom pb-1'>Service</h4>
+                <div className='text-start px-3 mt-4'>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Service Name :</label>
+                    <p className='col-8' >{appointmentDetails.service_name}</p>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Service Description :</label>
+                    <p className='col-8' >{appointmentDetails.desc}</p>
+                  </div>
+                  <div className='row'>
+                    <label className='fw-bold col-4'>Service Duration :</label>
+                    <p className='col-8' > {appointmentDetails.duration} minutes</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='col-md-3 bg-white rounded-4 p-4 border border-2'>
+              <h4 className='border-bottom pb-1'>Hairstylist</h4>
+              <div className='text-start mt-4'>
+                <div className='row'>
+                  <div className='col-12'>
+                    <img src={appointmentDetails.hairstylist_image ? appointmentDetails.hairstylist_image : process.env.PUBLIC_URL + '/sample-image/person_thumbnail.png'} alt='hairstylist-image' className='image-square-large image-cover rounded mx-auto d-block mb-3'></img>
+                  </div>
+                </div>
+                <div className='row'>
+                  <label className='fw-bold col-4'>Name :</label>
+                  <p className='col-8' >{appointmentDetails.hairstylist_name}</p>
+                </div>
+                <div className='row'>
+                  <label className='fw-bold col-4'>Position :</label>
+                  <p className='col-8' >{appointmentDetails.hairstylist_position ? appointmentDetails.hairstylist_position : 'null'}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          {appointmentDetails.status !== 'COMPLETED' && appointmentDetails.status !== 'CANCELLED' && appointmentDetails.status !== 'IN PROGRESS' && (<div className='mt-3 border-top pt-3 d-flex justify-content-end'>
+          {appointmentDetails.status !== 'COMPLETED' && appointmentDetails.status !== 'CANCELLED' && appointmentDetails.status !== 'IN PROGRESS' && (<div className='mt-3 border-top pt-3 d-flex justify-content-center'>
             {(updateEnable && appointmentDetails.status === 'PENDING') ? (
               <div>
                 <button className='btn btn-success me-3' onClick={() => handleUpdateAppointmentStatus('CONFIRMED')}>Accept Appointment</button>
@@ -116,27 +217,31 @@ const AppointmentDetail = () => {
             )}
           </div>)}
         </div>
+        
       ) : (
-        <p>Loading appointment details...</p>
+        <div style={{ maxHeight: '60vh' }}>
+          <p className='fs-4 fw-semibold'>Loading Appointemnt Details. </p>
+          <Loader />
+        </div>
       )
       }
 
       <ToastContainer
         position='top-center'
       />
-      <div class="modal fade" id="cancelAppointmentConfirmationModal" aria-hidden="true" aria-labelledby="cancelAppointmentConfirmationModalLabel" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="cancelAppointmentConfirmationModalLabel">Confirmation of Cancellation</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div className="modal fade" id="cancelAppointmentConfirmationModal" aria-hidden="true" aria-labelledby="cancelAppointmentConfirmationModalLabel" tabIndex="-1">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="cancelAppointmentConfirmationModalLabel">Confirmation of Cancellation</h1>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div className="modal-body">
               Confirm to Cancel this Appointment?<br></br> This action is not able to undo.
             </div>
-            <div class="modal-footer ">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onClick={()=> handleUpdateAppointmentStatus('CANCELLED')}>Confirm</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div className="modal-footer ">
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => handleUpdateAppointmentStatus('CANCELLED')}>Confirm</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>

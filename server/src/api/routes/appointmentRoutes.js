@@ -16,9 +16,10 @@ router.get('/retrieve', async (req, res) => {
         if (userGroupId === 3) { //temp OR statment for development purpose
             // Customer
             baseQuery = `
-                SELECT appointments.*, services.service_name, services.duration
+                SELECT appointments.*, services.service_name, services.duration , salons.name
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
+                JOIN salons ON services.salon_id = salons.id
                 WHERE appointments.customer_id = ?`;
             countQuery = `
                 SELECT COUNT(appointments.id) as total
@@ -77,6 +78,21 @@ router.get('/retrieve', async (req, res) => {
             const appointmentIdList = results.map(appointment => appointment.id);
             const updatedAppointments = await UpdateAppointmentStatus(appointmentIdList);
             const [updatedResults, fields] = await database.poolInfo.execute(baseQuery, queryParams); //requery the updated data
+            const customerIds = updatedResults.map(result => result.customer_id);
+
+            if (userGroupId === 4 || userGroupId === 2) {
+                const customerData = await getAppointmentCustomer(customerIds);
+                // Append customer information to the appointment results
+                updatedResults.forEach(appointment => {
+                    const customer = customerData.find(customer => customer.id === appointment.customer_id);
+                    if (customer) {
+                        appointment.customer_username = customer.username;
+                        appointment.customer_first_name = customer.first_name;
+                        appointment.customer_last_name = customer.last_name;
+                        appointment.customer_image_url = customer.image_url;
+                    }
+                });
+            }
             res.status(200).json({ message: 'User\'s appointment retrieve sucessfully', results: updatedResults, totalResults: totalResults });
         }
         else {
@@ -132,7 +148,11 @@ router.get('/get/:id', async (req, res) => {
         if (checkAppointmentOwnership(req.userId, id)) {
             // Build the base update query
             const [appointmentResults] = await database.poolInfo.execute(
-                `SELECT appointments.*, services.service_name, services.desc, services.duration ,hairstylists.name, salons.name, salons.address
+                `SELECT 
+                appointments.*, 
+                services.service_name, services.desc, services.duration ,
+                hairstylists.name as hairstylist_name,hairstylists.position as hairstylist_position,hairstylists.image_url as hairstylist_image,
+                salons.name, salons.address, salons.image_url as salon_image
                     FROM appointments
                     JOIN services ON appointments.service_id = services.id
                     JOIN hairstylists ON appointments.hairstylist_id = hairstylists.id
@@ -140,8 +160,25 @@ router.get('/get/:id', async (req, res) => {
                     WHERE appointments.id = ?`,
                 [id]
             );
+            const customerData = await getAppointmentCustomer([appointmentResults[0].customer_id]);
+            // Assuming getAppointmentCustomer returns an array of customers
+            const appointment = appointmentResults[0];
+
+            // Check if customerData has at least one customer
+            if (customerData.length > 0) {
+                const customer = customerData.find(customer => customer.id === appointment.customer_id);
+                if (customer) {
+                    // Update appointment properties
+                    appointment.customer_username = customer.username;
+                    appointment.customer_first_name = customer.first_name;
+                    appointment.customer_last_name = customer.last_name;
+                    appointment.customer_image_url = customer.image_url;
+                    appointment.customer_email = customer.email;
+                    appointment.customer_gender = customer.gender;
+                }
+            }
             if (appointmentResults.length > 0) {
-                res.status(200).json({ message: 'Appointment details queried successfully!', result: appointmentResults[0] });
+                res.status(200).json({ message: 'Appointment details queried successfully!', result: appointment });
             } else {
                 res.status(404).json({ message: 'Failed to retrieve appointment details. Appointment not found' });
             }
@@ -311,7 +348,7 @@ router.get('/getNext', async (req, res) => {
             LIMIT 1`,  //select next upcoming appointment
             [userId] // Pass userId as a bind parameter
         );
-        if(appointmentResults[0].length > 0){
+        if (appointmentResults[0].length > 0) {
             const { id, customer_id, booking_datetime, service_name } = appointmentResults[0][0];
             const customerName = await database.poolUM.execute(
                 `SELECT username , first_name , last_name 
@@ -322,7 +359,7 @@ router.get('/getNext', async (req, res) => {
             if (appointmentResults) {
                 const results = [appointmentResults[0][0], customerName[0][0]];
                 return res.status(200).json(results);
-        }
+            }
         } else
             return res.status(404).json({ message: 'No upcoming appointment found.' })
 
@@ -391,12 +428,27 @@ const UpdateAppointmentStatus = async (appointmentIdList) => {
             WHERE id IN (${appointmentIds}) 
             AND status = 'CONFIRMED' 
             AND DATE(booking_datetime) <= ?`;
-        
+
         const [updateResult] = await database.poolInfo.execute(updateQuery, [overdueDate]);
         // Return the updated appointments or any other necessary data
         return updateResult;
     } catch (error) {
         console.error('Error updating appointment statuses:', error);
+        throw error;
+    }
+}
+
+const getAppointmentCustomer = async (customerIds) => {
+    const uniqueCustomerIds = [...new Set(customerIds)];
+    const query = `
+            SELECT id , username, first_name, email , last_name , image_url , gender FROM users WHERE id IN (${uniqueCustomerIds.join(', ')})`;
+    //console.log(query);
+    try {
+        const [result] = await database.poolUM.execute(query);
+        return result;
+    }
+    catch (error) {
+        console.error('Error getting customer name : ', error);
         throw error;
     }
 }

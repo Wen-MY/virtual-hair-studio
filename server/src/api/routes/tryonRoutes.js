@@ -46,7 +46,7 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         const processedImageName = `output_${Date.now()}.png`;
         const processedImagePath = path.join(__dirname, '../../', 'resources', 'temp', processedImageName);
 
-        const defaultIteration = 3;
+        const defaultIteration = 6;
         //Image Processing : Hair Segmentation
         await imageProcessingUtils.hairSegmenter(originalImageName, processedImageName, defaultIteration, (error, message) => {
             if (error) {
@@ -61,6 +61,7 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         //----------------------- Prompt Processing ----------------------- 
 
         const prompt = promptGeneratorUtils.generate('enhanced', options);
+        //const prompt = `Generate a realistic image edit of a person with a short bob haircut. fully dyed in a only dark natural black hair color. with defined Straight hair texture.  no text and no watermark. Ensure the edited hair aligns with the given options accurately. Pay attention to details and produce a seamless integration of the specified features into the image's hair region. Your output should reflect the chosen haircut, color, texture, styling, volume, parting, and highlight/lowlight colors. Aim for a realistic and visually appealing transformation`
         console.log('Prompt Generated :' + prompt);
         //----------------------- to OpenAPI endpoint -----------------------
          console.log("Sending image to open ai dalle 2 endpoint");

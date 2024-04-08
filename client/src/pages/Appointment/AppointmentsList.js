@@ -82,7 +82,7 @@ const AppointmentsList = () => {
 
         <thead>
           <tr>
-            <th>Salon</th>
+            <th>{appointments[0]?.name ? 'Salon' : 'Customer'}</th>
             <th>Service Name</th>
             <th>Date</th>
             <th>Time</th>
@@ -96,11 +96,11 @@ const AppointmentsList = () => {
               key={appointment.id}
               onClick={() => handleRowClick(appointment.id)}
             >
-              <td className="col-md-2 text-center align-middle"><i className='bi bi-person-circle user-icon mx-3 text-center align-middle'></i>{appointment.salon_name}</td>
-              <td className="col-md-2 text-center align-middle">{appointment.service_name}</td>
-              <td className="col-md-2 text-center align-middle">{formatDate(appointment.booking_datetime)}</td>
-              <td className="col-md-2 text-center align-middle">{formatTime(appointment.booking_datetime)}</td>
-              <td className="col-md-2 text-center align-middle"><StatusBadge status={appointment.status}/></td>
+              <td className="col-md-2 text-center align-middle p-4">{appointment.name? appointment.name :appointment.customer_first_name? `${appointment.customer_first_name} ${appointment.customer_last_name}`:appointment.customer_username}</td>
+              <td className="col-md-2 text-center align-middle p-4">{appointment.service_name}</td>
+              <td className="col-md-2 text-center align-middle p-4">{formatDate(appointment.booking_datetime)}</td>
+              <td className="col-md-2 text-center align-middle p-4">{formatTime(appointment.booking_datetime)}</td>
+              <td className="col-md-2 text-center align-middle p-4"><StatusBadge status={appointment.status}/></td>
             </tr>
           ))}
         </tbody>

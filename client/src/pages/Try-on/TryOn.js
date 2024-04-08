@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import TryOnTermPopUp from './TryOnTerm';
 import config from '../../config';
-
+import Section from '../../components/section';
 const TryOn = () => {
     const navigate = useNavigate();
     const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -12,7 +12,7 @@ const TryOn = () => {
         const checkTermsAcceptance = async () => {
             try {
                 // Make a GET request to the server to check if user has accepted terms
-                const response = await fetch(config.serverUrl + '/try-on/term/check',{
+                const response = await fetch(config.serverUrl + '/try-on/term/check', {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -48,19 +48,50 @@ const TryOn = () => {
         }
     };
     return (
-        <div className="container-fluid my-3 full-width">
-            <div className='border border-2 rounded-4 p-4 ps-5 bg-white min-height mb-4 align-items-center justify-content-center d-flex'>
-                {!acceptedTerms ? (
-                    <React.Fragment>
-                        <TryOnTermPopUp onAgree={handleAgreement} />
-                        <button type='button' className='btn btn-primary' data-bs-toggle="modal" data-bs-target="#termModal" >Try On</button>
-                    </React.Fragment>
-                ) : (
-                    <div>
-                        <Link to="/try-on/hairstyle">Try On</Link>
-                    </div>
-                )}
-            </div>
+        <div>
+
+            <Section
+                background="#f8f9fa"
+                title="Virtual Try On"
+                paragraph="Discover the AI powered of virtual hairstyles!"
+            >
+                <div>
+                    {!acceptedTerms ? (
+                        <React.Fragment>
+                            <TryOnTermPopUp onAgree={handleAgreement} />
+                            <button type='button' className='btn btn-primary' data-bs-toggle="modal" data-bs-target="#termModal" >Try On</button>
+                        </React.Fragment>
+                    ) : (
+                        <div>
+                            <Link to="/try-on/hairstyle">Try On</Link>
+                        </div>
+                    )}
+                </div>
+            </Section>
+
+            <Section
+                background="#e9ecef"
+                title="High Customization"
+                paragraph="Discover a variety of options for your hair needs."
+            />
+
+            <Section
+                background="#dee2e6"
+                title="Thousands of Combinations"
+                paragraph="Make your favorite hairstyles and color hassle-free."
+            />
+
+            <Section
+                background="#ced4da"
+                title="Hairstyle Recommendation"
+                paragraph="Find your perfect look with current trends."
+            />
+
+            <Section
+                background="#adb5bd"
+                title="And More!"
+                paragraph="Explore even more exciting features of Virtual Hair Studio."
+            />
         </div>
     );
 }

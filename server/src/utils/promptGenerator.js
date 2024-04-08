@@ -2,7 +2,16 @@ const promptGeneratorUtils = {
     generate: (complexity, options) => {
         const { color, highlight, haircut, texture, volume, styling, parting, accessory,attire } = options;
         let prompt = '';
-
+        const convertStringsToLowerCase = obj => {
+            for (let key in obj) {
+              if (typeof obj[key] === 'string') {
+                obj[key] = obj[key].toLowerCase();
+              }
+            }
+          };
+          
+        // Call the function to convert string properties to lowercase
+        convertStringsToLowerCase(options);
         switch (complexity) {
             case 'simple':
                 prompt += color ? `Change the hair color to ${color}. ` : '';
@@ -17,11 +26,12 @@ const promptGeneratorUtils = {
                 break;
 
             case 'enhanced':
-                prompt += color ? `Alter the hairstyle to have ${color} hair. ` : '';
-                prompt += highlight ? `Opt for vibrant ${highlight} highlights. ` : '';
-                prompt += haircut ? `Choose an ${haircut} haircut ` : '';
-                prompt += texture ? `with defined ${texture} texture. ` : '';
-                prompt += volume ? `Achieve a ${volume} volume. ` : '';
+                prompt += `Generate a realistic image edit of a person `
+                prompt += haircut ? `with a short haircut. ` : '';
+                prompt += color ? `fully dyed in a only vibrant ${color} hair color. ` : '';
+                prompt += highlight ? `Apply highlights in ${highlight} shade. `: '';
+                prompt += texture ? `with defined ${texture} hair texture. ` : '';
+                prompt += volume ? `Achieve a ${volume} volume of hair. ` : '';
                 prompt += styling ? `Utilize ${styling} techniques to style the hair. ` : '';
                 prompt += parting ? `Create a precise ${parting} part. ` : '';
                 prompt += accessory ? `Enhance the look with stylish ${accessory}. ` : '';
@@ -29,7 +39,7 @@ const promptGeneratorUtils = {
                 break;
 
             case 'complex':
-                prompt += color ? `Transform the hair color to a rich shade of ${color}. ` : '';
+                prompt += color ? `Transform the whole hair color to a fully rich shade of ${color}. ` : '';
                 prompt += highlight ? `Craft bright ${highlight} highlights. ` : '';
                 prompt += haircut ? `Craft an intricate ${haircut} haircut. ` : '';
                 prompt += texture ? `with voluminous ${texture} texture ` : '';
@@ -44,7 +54,7 @@ const promptGeneratorUtils = {
                 return Error('No Such Complexity Found');
         }
         //prompt to not generate any texts and watermarks
-        prompt += 'no text and no watermark. The hair generated should in high realistic since it is real image'
+        prompt += " no text and no watermark. Ensure the edited hair aligns with the given options accurately. Pay attention to details and produce a seamless integration of the specified features into the image's hair region. Your output should reflect the chosen haircut, color, texture, styling, volume, parting, and highlight/lowlight colors. Aim for a realistic and visually appealing transformation";
         return prompt.trim();
     },
 };

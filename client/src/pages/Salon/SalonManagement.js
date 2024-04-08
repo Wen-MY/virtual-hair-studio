@@ -33,6 +33,7 @@ const SalonManagement = () => {
   const [newHairstylistFormData, setNewHairstylistFormData] = useState({
     name: '',
     position: '',
+    image: null
   });
   //updating services
   const [selectedService, setSelectedService] = useState(null);
@@ -139,7 +140,7 @@ const SalonManagement = () => {
   };
   const updateSelectedService = async (service) => {
     //
-    const serviceToUpdate = service? service:selectedService;
+    const serviceToUpdate = service ? service : selectedService;
     try {
       // Fetch salon details using salon ID
       const updateResponse = await fetch(
@@ -172,7 +173,7 @@ const SalonManagement = () => {
   }
   const addNewService = async () => {
     //
-    const serviceToAdd =  newServiceFormData;
+    const serviceToAdd = newServiceFormData;
     console.log(serviceToAdd);
     try {
       // Fetch salon details using salon ID
@@ -204,9 +205,9 @@ const SalonManagement = () => {
     }
     clearNewServiceForm();
   }
-  const deleteSelectedService = async (service) =>{
+  const deleteSelectedService = async (service) => {
     //
-    const serviceToDelete = service? service:selectedService;
+    const serviceToDelete = service ? service : selectedService;
     try {
       // Fetch salon details using salon ID
       const deleteResponse = await fetch(
@@ -233,20 +234,19 @@ const SalonManagement = () => {
   }
   const addNewHairstylist = async () => {
     //
-    const hairstylistToAdd =  newHairstylistFormData;
+    const hairstylistToAdd = newHairstylistFormData;
     try {
+      const formData = new FormData();
+      formData.append('name', hairstylistToAdd.name);
+      formData.append('position', hairstylistToAdd.position);
+      formData.append('image', hairstylistToAdd.image);
       // Fetch salon details using salon ID
       const createResponse = await fetch(
         config.serverUrl + `/hairstylist/add/${salonId}`,
         {
           method: 'POST',
           credentials: "include",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(
-            hairstylistToAdd
-          ),
+          body: formData,
         }
       );
 
@@ -262,7 +262,7 @@ const SalonManagement = () => {
     } catch (error) {
       console.error("Error fetching salon data:", error);
     }
-    clearNewServiceForm();
+    clearNewHairstylistForm();
   }
   //----------------------------------------- add service form change handling ----------
   const handleNewServiceFormInputChange = (e) => {
@@ -270,13 +270,13 @@ const SalonManagement = () => {
       ...newServiceFormData,
       [e.target.name]: e.target.value,
     });
-  }; 
+  };
   const handleNewServiceFormSelectChange = (selectedOption) => {
     setNewServiceFormData({
       ...newServiceFormData,
-      categoryId : selectedOption.value,
+      categoryId: selectedOption.value,
     });
-  }; 
+  };
   const handleNewServiceMultiSelectChange = (selectedOptions) => {
     setNewServiceFormData({
       ...newServiceFormData,
@@ -336,8 +336,14 @@ const SalonManagement = () => {
     setNewHairstylistFormData({
       hairstylistName: '',
       position: '',
+      image: null
     }) //clear new form data
   }
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    // Handle file upload logic here
+    setNewHairstylistFormData({ image: file });
+  };
   if (loading) {
     return (
       <Loader />
@@ -346,8 +352,8 @@ const SalonManagement = () => {
   return (
     <div className="container-fluid my-3 full-width">
       <ToastContainer
-                position='top-center'
-            />
+        position='top-center'
+      />
       <div className='border border-2 rounded-4 p-4 ps-5 bg-white min-height mb-4'>
         <h1 className="text-start mb-3">Services Management</h1>
         <button className="btn btn-primary mb-3 float-end" data-bs-toggle="modal" data-bs-target="#addServiceModal">Add New Service</button>
@@ -381,10 +387,12 @@ const SalonManagement = () => {
                   {services
                     .filter(service => service.category_id === category.value)
                     .map(service => (
-                      <li className={`list-group-item d-flex justify-content-between align-items-center p-3 ${service.availability ? `bg-white` : `bg-light`}`} key={service.id}>
+                      <li className={`list-group-item d-flex justify-content-between align-items-center p-4 ${service.availability ? `bg-white` : `bg-light`}`} key={service.id}>
+                        {/*
                         <div className='service-thumbnail'>
                           <img className='img-thumbnail rounded-circle' src='https://picsum.photos/100/100'></img>
                         </div>
+                      */}
                         <div className='service-info text-start flex-grow-1 ms-4'>
                           <strong className='fs-4'>{service.service_name}</strong>
                           <span className={`badge ${service.availability ? `bg-success` : `bg-danger`} border border-light rounded-circle p-2 ms-2 align-text-center`}> </span>
@@ -416,7 +424,7 @@ const SalonManagement = () => {
               <div className="card">
                 <div className="card-body text-start">
                   <div className='service-thumbnail float-start mx-4'>
-                    <img className='img-thumbnail rounded-circle' src='https://picsum.photos/100/100'></img>
+                    <img className='img-thumbnail rounded-circle image-square-medium' src={hairstylist.image_url?hairstylist.image_url:`https://picsum.photos/100/100?random=${hairstylist.id}`}></img>
                   </div>
                   <h5 className="card-title fw-bold mt-3">{hairstylist.name}</h5>
                   <p className="card-text mb-0">{hairstylist.position ? hairstylist.position : 'Unassigned'}</p>
@@ -475,8 +483,8 @@ const SalonManagement = () => {
                     name='categoryId'
                     placeholder='Category'
                     onChange={handleNewServiceFormSelectChange}
-                   />
-                    
+                  />
+
                 </div>
                 <div className="mb-3">
                   <label htmlFor="duration" className='form-label fw-semibold'>Service Duration</label>
@@ -633,10 +641,31 @@ const SalonManagement = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="addHairstylistModalLabel">Add Hairstylist</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={()=>clearNewHairstylistForm()}></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewHairstylistForm()}></button>
             </div>
             <div className="modal-body">
               <form className="w-100 text-start px-3">
+                <div className="mb-3">
+                  {/* Hidden file input */}
+                  <div className="d-flex justify-content-center">
+                    <input
+                      type="file"
+                      id="imageUpload"
+                      accept="image/*"
+                      className="d-none"
+                      onChange={handleImageUpload}
+                    />
+                    {/* Clickable image */}
+                    <label htmlFor="imageUpload" className="cursor-pointer">
+                      <img
+                        src={newHairstylistFormData.image ? URL.createObjectURL(newHairstylistFormData.image) : process.env.PUBLIC_URL + '/sample-image/person_thumbnail.png'}
+                        alt="Salon"
+                        className="img rounded-circle image-square-large"
+                        required
+                      />
+                    </label>
+                  </div>
+                </div>
                 <div className="mb-3">
                   <label htmlFor="hairstylistName" className='form-label fw-semibold'>Name</label>
                   <input
@@ -664,8 +693,8 @@ const SalonManagement = () => {
               </form>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={()=>addNewHairstylist()}>Add</button>
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={()=>clearNewHairstylistForm()}>Close</button>
+              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => addNewHairstylist()}>Add</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => clearNewHairstylistForm()}>Close</button>
             </div>
           </div>
         </div>

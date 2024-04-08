@@ -29,7 +29,7 @@ router.get('/retrieve', async (req, res) => {
         // Query to retrieve usernames from poolUM database
         const userQuery = `
             SELECT 
-                id, username
+                id, username, image_url
             FROM 
                 users
             WHERE

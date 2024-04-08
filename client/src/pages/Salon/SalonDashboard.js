@@ -11,7 +11,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const SalonDashboard = () => {
-    // Define state variables for dummy data
     const [salonId, setSalonId] = useState(null);
     const [appointmentsOverTimeData, setAppointmentsOverTimeData] = useState([]);
     const [appointmentStatusData, setAppointmentStatusData] = useState([]);
@@ -26,12 +25,29 @@ const SalonDashboard = () => {
         state: "",
         phoneNumber: "",
         businessHour: "1-6/10:30-18:30",
-        image: null,
+        image_url: null,
     });
+    const states = [
+      'Johor',
+      'Kedah',
+      'Kelantan',
+      'Melaka',
+      'Negeri Sembilan',
+      'Pahang',
+      'Perak',
+      'Perlis',
+      'Penang',
+      'Sabah',
+      'Sarawak',
+      'Selangor',
+      'Terengganu',
+      'Kuala Lumpur',
+      'Labuan',
+      'Putrajaya'
+    ];
     const [customerRating, setCustomerRating] = useState([0, 0, 0, 0, 0]);
-
     const [isEditing, setIsEditing] = useState(false);
-
+    const [salonImageFile, setSalonImageFile] = useState(null);
     //------------------------------handling method------------------------------//
     const handleEditClick = () => {
         setIsEditing(true);
@@ -40,6 +56,7 @@ const SalonDashboard = () => {
     const handleSaveClick = async () => {
         // Add logic to save the updated salon information (newSalonInfo)
         updateSalonData();
+        updateSalonImage();
         setIsEditing(false);
     };
 
@@ -52,11 +69,10 @@ const SalonDashboard = () => {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         // Handle file upload logic here
-        const formData = new FormData();
-        formData.append("image", file);
-        setSalonInfo({ ...salonInfo, image: formData });
+        setSalonImageFile(file);
+        setSalonInfo({ ...salonInfo, image_url: URL.createObjectURL(file)});
     };
-
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setSalonInfo((prevSalonInfo) => ({
@@ -96,6 +112,14 @@ const SalonDashboard = () => {
             businessHour: newBusinessHour
         }));
     };
+    const handleOptionSelectChange = (e) => {
+        const { name, value } = e.target;
+        console.log(value);
+        setSalonInfo((prevSalonInfo) => ({
+            ...prevSalonInfo,
+            state: value
+        }));
+      }; 
 
     //------------------------------useEffect update state------------------------------//
 
@@ -374,7 +398,7 @@ const SalonDashboard = () => {
 
                 // Calculate the total appointments for each day (Monday to Friday)
                 // Initialize with zeros for Monday to Friday
-                if(responseData.totalResults > 0){
+                if (responseData.totalResults > 0) {
                     appointments.forEach((appointment) => {
                         const appointmentDate = new Date(appointment.booking_datetime);
                         const dayOfWeek = appointmentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
@@ -511,6 +535,7 @@ const SalonDashboard = () => {
                     state: salonData.result.state || prevState.state,
                     phoneNumber: salonData.result.contact_number || prevState.phoneNumber,
                     businessHour: salonData.result.business_hour || prevState.businessHour,
+                    image_url : salonData.result.image_url || prevState.image_url
                 }));
             } else {
                 console.error("Failed to fetch salon information:", salonData.message);
@@ -578,6 +603,34 @@ const SalonDashboard = () => {
             console.error("Error fetching salon data:", error);
         }
     }
+    const updateSalonImage = async () => {
+        try {
+            if (salonImageFile) {
+                // Upload new profile picture
+                const formData = new FormData();
+                formData.append('salonImage', salonImageFile);
+
+                const response = await fetch(`${config.serverUrl}/salon/update-salon-image`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Salon image updated successfully:', data.message);
+                    toast.success('Salon image updated successfully', { autoClose: 3000 });
+                } else {
+                    console.error('Error updating salon image:', data.message);
+                    toast.warning(data.message, { autoClose: 3000 });
+                }
+            }
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            toast.error(error.message, { autoClose: 3000 });
+        }
+    };
     //------------------------------utils------------------------------//
     // Function to format date as YYYY-MM-DD (required by the backend API)
     const formatDate = (date) => {
@@ -630,10 +683,28 @@ const SalonDashboard = () => {
                                                 id="address"
                                                 name="address"
                                                 value={salonInfo.address}
-                                                style={{ resize: "none" }}
+                                                style={{ resize: "none", height: '12px' }}
                                                 disabled={!isEditing}
                                                 onChange={handleChange}
                                             ></textarea>
+                                        </div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <label
+                                            htmlFor="state"
+                                            className="col-md-4 col-form-label fw-bold"
+                                        >
+                                            State
+                                        </label>
+                                        <div className="col-md-8">
+                                            <select className="form-select" value={salonInfo.state} name='state' onChange={handleOptionSelectChange} disabled={!isEditing}>
+                                            <option value="">Select a state</option>
+                                            {states.map((state, index) => (
+                                                <option key={index} value={state} >
+                                                {state}
+                                                </option>
+                                            ))}
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row mb-2">
@@ -744,13 +815,15 @@ const SalonDashboard = () => {
                                         accept="image/*"
                                         className="d-none"
                                         onChange={handleImageUpload}
+                                        disabled={!isEditing}
                                     />
                                     {/* Clickable image */}
                                     <label htmlFor="imageUpload" className="cursor-pointer">
                                         <img
-                                            src="https://picsum.photos/400/285"
+                                            src={salonInfo.image_url?salonInfo.image_url:process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'}
                                             alt="Salon"
                                             className="img-fluid rounded-5"
+                                            style={{width:400,height:285}}
                                         />
                                     </label>
                                 </div>
@@ -762,14 +835,14 @@ const SalonDashboard = () => {
                     <SalonCard
                         imageSrc="https://picsum.photos/400/300"
                         cardText={`Upcoming Appointment: ${upcomingCustomer
-                                ? upcomingCustomer.appointmentTime +
-                                "\nAppointment Service: " +
-                                upcomingCustomer.service
-                                : ""
+                            ? (upcomingCustomer.appointmentTime?upcomingCustomer.appointmentTime:"00:00") +
+                            "\nAppointment Service: " +
+                            (upcomingCustomer.service?upcomingCustomer.service:'')
+                            : ""
                             } `}
                         cardTitle={
                             upcomingCustomer
-                                ? upcomingCustomer.name
+                                ? `${upcomingCustomer.name}`
                                 : "No Upcoming Appointment"
                         }
                         rating={-1}
