@@ -59,11 +59,11 @@ const TryOn = () => {
                     {!acceptedTerms ? (
                         <React.Fragment>
                             <TryOnTermPopUp onAgree={handleAgreement} />
-                            <button type='button' className='btn btn-primary' data-bs-toggle="modal" data-bs-target="#termModal" >Try On</button>
+                            <button type='button' className='btn btn-outline-primary' data-bs-toggle="modal" data-bs-target="#termModal" >Try On</button>
                         </React.Fragment>
                     ) : (
                         <div>
-                            <Link to="/try-on/hairstyle">Try On</Link>
+                            <Link to="/try-on/hairstyle" className='btn btn-outline-secondary'>Try On</Link>
                         </div>
                     )}
                 </div>

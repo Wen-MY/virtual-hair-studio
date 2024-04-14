@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt'); // for password hashing
 router.get('/', async (req,res) =>{
     try {
         if (req.session.user) {
-            const [role] = await database.poolUM.execute('SELECT groups.name FROM `groups` JOIN user_group ON user_group.group_id = groups.id WHERE user_group.user_id = ?',[req.session.user.id]);
+            const [role] = await database.poolUM.execute('SELECT groups.id FROM `groups` JOIN user_group ON user_group.group_id = groups.id WHERE user_group.user_id = ?',[req.session.user.id]);
             res.status(200).json({ login: true, message: 'Logged in', role: role[0] });
         } else {
             res.status(200).json({ login: false, message: 'Not logged in' });

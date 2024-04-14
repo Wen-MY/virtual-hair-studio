@@ -13,34 +13,45 @@ const { promptGeneratorUtils } = require('../../utils/promptGenerator');
 const upload = multer({
     storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
   });
-
 router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
     try {
         const transactionId = uuidv4();
+        const userId = req.userId;
         // Check if a file is provided in the request
         if (!req.file) {
             return res.status(400).json({ message: 'No image file provided' });
         }
-        const feedbackId = req.query.feedbackId || null;
+        const feedbackId = req.query.feedbackId ?? null;
+        let feedbackPrompt = null;
         if(feedbackId){
             const [feedbackResult] = await database.poolTryOn.execute('INSERT INTO feedbacks (feedback_type,user_id,transaction_id) VALUES (?,?,?)',[feedbackId,req.userId,transactionId]);
             if(!feedbackResult.affectedRows > 0){
                 return res.status(500).json({ message: 'Failed to regenerate result.' });
             }
+            const [feedback] = await database.poolTryOn.execute('SELECT improvement FROM feedback_types WHERE id = ?',[feedbackId]);
+            if(feedback.length > 0) 
+            {
+                feedbackPrompt = feedback[0].improvement;
+            }
         }
         // extract options from request body
-        const options = JSON.parse(req.body.options);
+        let options;
+        if(req.body.options){
+            options = JSON.parse(req.body.options);
+        }
+        const preset_id = req.query.presetId ?? null;
         //console.log(options);
         //----------------------- Image Processing -----------------------
         // Crop image file received if neccesary , target : 1024 x 1024 / 512 x 512
         const originalImage = req.file;
+        const originalImageProcessed = await imageProcessingUtils.imageResize(originalImage);
         //here cropping it
 
         // Save the original image file
         const originalImageName = `input_${Date.now()}.png`;
         const originalImagePath = path.join(__dirname, '../../', 'resources', 'temp', originalImageName);
-        fs.writeFileSync(originalImagePath, originalImage.buffer);
-        console.log('Original Image size:', originalImage.buffer.length / (1024 * 1024), 'MB');
+        fs.writeFileSync(originalImagePath, originalImageProcessed.buffer);
+        console.log('Original Image size:', originalImageProcessed.buffer.length / (1024 * 1024), 'MB');
 
         // Define the processed image file name
         const processedImageName = `output_${Date.now()}.png`;
@@ -59,9 +70,17 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         console.log(originalImagePath);
         console.log(processedImagePath);
         //----------------------- Prompt Processing ----------------------- 
-
-        const prompt = promptGeneratorUtils.generate('enhanced', options);
-        //const prompt = `Generate a realistic image edit of a person with a short bob haircut. fully dyed in a only dark natural black hair color. with defined Straight hair texture.  no text and no watermark. Ensure the edited hair aligns with the given options accurately. Pay attention to details and produce a seamless integration of the specified features into the image's hair region. Your output should reflect the chosen haircut, color, texture, styling, volume, parting, and highlight/lowlight colors. Aim for a realistic and visually appealing transformation`
+        let prompt;
+        let prompt_generated;
+        if(!preset_id){
+            prompt_generated = await promptGeneratorUtils.generate_with_GPT(options);
+            prompt = prompt_generated.prompt + feedbackPrompt??"";
+        }
+        else{
+            const [recommendation] = await database.poolTryOn.execute('SELECT * FROM prompt_presets WHERE id = ?',[preset_id]);
+            prompt = recommendation[0].prompt;
+        }
+        //const prompt = `Transform the subject's hair in the image to a blonde color with the specific tone of a natural blonde. Ensure the hairstyle is a bowl cut : A bowl cut is a simple haircut where the front hair is cut with a straight fringe and the rest of the hair is left longer, the same length all the way around, or else the sides and back are cut to the same short length., a simple and casual style that curves around the shape of the head. The hair should be straight in texture for a sleek and smooth finish. It should have a middle parting which is a classic style where the hair is divided in the center of the forehead. Please take note that the integration of these changes must be executed realistically - as if the subject is naturally having this hairstyle and hair color in both appearance and texture.`
         console.log('Prompt Generated :' + prompt);
         //----------------------- to OpenAPI endpoint -----------------------
          console.log("Sending image to open ai dalle 2 endpoint");
@@ -86,17 +105,35 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         const responseData = await response.json();
         console.log(responseData);
         const images_url = responseData.data;
-        images_url.map(image =>
-        imageProcessingUtils.saveUrlImageToTemp(1,1,image.url,(error, message) => {
-            if (error) {
+        //saving to server local and firestore
+        const saveImagePromises = images_url.map(async (image, index) => {
+            try {
+                const message = await imageProcessingUtils.saveUrlImageToTemp(transactionId, index, image.url);
+                return message;
+            } catch (error) {
                 console.error(error.message);
-                return res.status(500).json({ message: 'Image processing Error' });
-            } else {
-                console.log(message);
+                throw new Error('Image processing Error');
             }
-        }));
+        });
+        try {
+            const mediaURLsArray = await Promise.all(saveImagePromises);
+            const mediaURLs = mediaURLsArray.join(',');
+            const [result] = await database.poolTryOn.execute('INSERT INTO `try-on_attempts` (transaction_id,user_id,media_URLS,prompt,sample_id) VALUES (?,?,?,?,?)',[transactionId,userId,mediaURLs,prompt,preset_id?null:prompt_generated.sample_id]);
+            if(result.affectedRows <= 0){
+                console.error('Error saving try-on attempts to database');
+            }
+            const promptId = result.insertId;
+            return res.json({ result:{
+                'images_url' : images_url,
+                'prompt_id' : promptId 
+            }});
+        } catch (error) {
+            console.error(error.message);
+            throw new Error('Image processing Error');
+        }
+        
         // Send the image path to the frontend
-        return res.json({ result: images_url });
+        
     } catch (error) {
         console.error('Error generate try on:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
@@ -146,7 +183,26 @@ router.get('/categories',async (req,res) => {
         return res.status(500).json({ message: 'Internal server error.' });
     }
 })
-
+router.get('/recommendation',async (req,res) => {
+    try{
+        const sqlParams = []
+        let sqlQuery = `SELECT * from prompt_presets LIMIT 4`;
+        const [recommendationResults] = await database.poolTryOn.execute(sqlQuery,sqlParams);
+        if(recommendationResults.length > 0) {
+            return res.status(200).json({
+                message: 'Recommendation of try-on retrieved successfully',
+                result: recommendationResults
+            });
+        }else {
+            return res.status(404).json({
+                message: 'No recommendation found for try on',
+            });
+        }
+    }catch(error){
+        console.error(`Error retrieving try-on recommendations`, error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+})
 // Route to save the user's acceptance of terms and conditions
 router.post('/term/accept', (req, res) => {
     // Save user's acceptance status in session or cookies
@@ -175,6 +231,21 @@ router.get('/feedback/options',async (req,res)=> {
         } else {
             return res.status(404).json({ message: 'Not feedback option found' });
         }
+    } catch (error) {
+        console.error('Error retriving feedback options:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+})
+
+router.post('/rate',async (req,res)=> {
+    try {
+        const {rating, try_on_id} = req.body;
+        const [sampleId] = await database.poolTryOn.execute('SELECT sample_id FROM `try-on_attempts` WHERE id = ?',[try_on_id]);
+        if(sampleId.length > 0)
+        {
+            const [updateSamplePrompt] = await database.poolTryOn.execute('UPDATE `try-on_attempts` SET score = score + ? WHERE id = ?', [rating,sampleId[0]]);
+        }
+        return res.status(201).json({ message: 'Rated virtual hairstyle successfully'});
     } catch (error) {
         console.error('Error retriving feedback options:', error);
         return res.status(500).json({ message: 'Internal server error.' });

@@ -49,7 +49,7 @@ const AppointmentDetail = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        (data.role.name === 'Web Administrator' || data.role === 'Salon Owner') ? setUpdateEnable(true) : setUpdateEnable(false);
+        (data.role.id === 2 || data.role.id === 4) ? setUpdateEnable(true) : setUpdateEnable(false);
       } else {
         setUpdateEnable(false);
         console.error('Failed to fetch permission:', data.message);
@@ -106,7 +106,7 @@ const AppointmentDetail = () => {
       {appointmentDetails ? (
         <div className='container mt-2'>
           <div className='row'>
-            {setUpdateEnable ?
+            {updateEnable ?
               <div className='col-md-3 bg-white rounded-4 p-4 border border-2'>
                 <h4 className='border-bottom pb-1'>Customer</h4>
                 <div className='text-start px-3 mt-4'>

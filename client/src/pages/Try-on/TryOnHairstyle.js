@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import config from '../../config';
 import WebcamWithGuide from '../../components/webcam-with-guide';
 import FaceDetection from '../../components/face-detection';
 import 'react-calendar/dist/Calendar.css';
 import FormBox from '../../components/form-box';
 import OptionsSections from '../../components/options-section';
+import RatingStars from '../../components/rating-star';
 import Loader from '../../components/loading-spinner';
 
 const TryOnHairstyle = () => {
@@ -15,9 +17,10 @@ const TryOnHairstyle = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [faceDetected, setFaceDetected] = useState(false);
   const [faceDetector, setFaceDetector] = useState(new FaceDetection(setFaceDetected));
-
+  const navigate = useNavigate();
   //for hairstyle options customization
   const [customize, setCustomize] = useState(false);
+  const [preset, setPreset] = useState(null);
   const [optionShow, setOptionShow] = useState(false);
   const [optionSelected, setOptionSelected] = useState({
     haircut: null,
@@ -40,9 +43,12 @@ const TryOnHairstyle = () => {
   //---------------------------- options for hairstyle customization -------------------------------//
   const [tryOnOptionCategories, setTryOnOptionCategories] = useState([]);
   const [tryOnOptions, setTryOnOptions] = useState([]);
+  const [tryOnRecommendations, setTryOnRecommendations] = useState([]);
   const [tryOnLoading, setLoading] = useState(true);
-
+  //---------------------------- rating state -------------------------------//
+  const [rating, setRating] = useState(0);
   //---------------------------- remote option api request -------------------------------//
+  
   const fetchTryOnData = async () => {
     try {
 
@@ -71,6 +77,7 @@ const TryOnHairstyle = () => {
       } else {
         console.error('Failed to fetch try-on category information:', categoriesData.message);
       }
+
       const feedbackOptionsResponse = await fetch(config.serverUrl + `/try-on/feedback/options`, {
         credentials: 'include'
       });
@@ -78,7 +85,35 @@ const TryOnHairstyle = () => {
       if (feedbackOptionsResponse.ok) {
         setFeedbackOptions(feedbackOptionsData.result);
       } else {
-        console.error('Failed to fetch try-on category information:', categoriesData.message);
+        console.error('Failed to fetch try-on category information:', feedbackOptionsData.message);
+      }
+    } catch (error) {
+      console.error('Error fetching salon data:', error);
+      //setLoading(false);
+    }
+  }
+  const fetchRecommendationData = async () => {
+    try {
+      const recommendationsResponse = await fetch(config.serverUrl + `/try-on/recommendation`, {
+        credentials: 'include'
+      });
+
+      const recommendationsData = await recommendationsResponse.json();
+      if (recommendationsResponse.ok) {
+        setTryOnRecommendations(recommendationsData.result);
+      } else {
+        console.error('Failed to fetch try-on option information:', recommendationsData.message);
+        return;
+      }
+
+      const feedbackOptionsResponse = await fetch(config.serverUrl + `/try-on/feedback/options`, {
+        credentials: 'include'
+      });
+      const feedbackOptionsData = await feedbackOptionsResponse.json();
+      if (feedbackOptionsResponse.ok) {
+        setFeedbackOptions(feedbackOptionsData.result);
+      } else {
+        console.error('Failed to fetch try-on category information:', feedbackOptionsData.message);
       }
     } catch (error) {
       console.error('Error fetching salon data:', error);
@@ -86,29 +121,39 @@ const TryOnHairstyle = () => {
     }
   }
   useEffect(() => {
-    if (customize) {
+    if(customize){
       fetchTryOnData();
+    }else
+    {
+      fetchRecommendationData();
     }
   }, [customize])
   //---------------------------- remote api request submit image and prompt -------------------------------//
-  const [tryOnResult, setTryOnResult] = useState([]);
+  const [tryOnResult, setTryOnResult] = useState({
+    images_url : [],
+    prompt_id : null
+  });
   const [feedback, setFeedback] = useState(null);
 
   const generateTryOnResult = async () => {
     try {
       // Create a new FormData object
       const formData = new FormData();
-
-      // Append the selected options to the FormData object
-      formData.append('options', JSON.stringify(optionSelected));
-
-      // Append the selected image to the FormData object
-      formData.append('tryOnImage', selectedImageFile);
-
       let url = config.serverUrl + '/try-on/generate';
       if (feedback !== null) {
         url += `?feedbackId=${feedback}`;
       }
+      // Append the selected options to the FormData object
+      if(customize)
+      {
+        formData.append('options', JSON.stringify(optionSelected));
+      }
+      if (!customize && preset !== null) {
+        // If there's already a query parameter in the URL, append presetId using "&"
+        url += feedback !== null ? `&presetId=${preset}` : `?presetId=${preset}`;
+      }
+      // Append the selected image to the FormData object
+      formData.append('tryOnImage', selectedImageFile);
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
@@ -117,9 +162,12 @@ const TryOnHairstyle = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setTryOnResult(data.result);
+        setTryOnResult({
+          images_url : data.result.images_url,
+          prompt_id : data.result.prompt_id
+      });
         setLoading(false);
-        console.log('Generated result images:', data.result);
+        console.log('Generated result images:', data.result.images_url);
       } else {
         console.error('Failed to generate result images:', data.message);
         setLoading(false);
@@ -129,16 +177,43 @@ const TryOnHairstyle = () => {
       setLoading(false);
     }
   };
-
+  const ratingTryOn = async () => {
+    try {
+      // Create a new FormData object
+      let url = config.serverUrl + '/try-on/rate';
+      // Append the selected image to the FormData object
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'rating':rating,
+          'try_on_id':tryOnResult.prompt_id
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Successful rating result');
+      } 
+    } catch (error) {
+      console.error('Error rating results:', error);
+    }
+  };
   const handleRegenerateTryOnResult = async () => {
     if (feedback !== null) {
-      setTryOnResult([]);
-      generateTryOnResult();
+      setLoading(true);
+      setTryOnResult({
+        images_url : [],
+        prompt_id : null
+      });
+      await generateTryOnResult();
       setFeedback(null);
     }
   }
   useEffect(() => {
-    if (currentStep === 5 && Object.values(optionSelected).some(value => value !== null)) {
+    if (currentStep === 5 && (Object.values(optionSelected).some(value => value !== null) || preset != null)) {
       generateTryOnResult();
     }
   }, [currentStep])
@@ -146,6 +221,20 @@ const TryOnHairstyle = () => {
   //---------------------------- user interaction handling -------------------------------//
   const handlePrevStep = () => {
     setCurrentStep(currentStep - 1);
+    if(currentStep === 4){
+      setPreset(null);
+      setOptionSelected({
+        haircut: null,
+        color: null,
+        texture: null,
+        attire: null,
+        highlight: null,
+        parting: null,
+        volume: null,
+        accessories: null,
+        styling: null,
+    });
+    }
   };
 
   const handleNextStep = () => {
@@ -153,7 +242,9 @@ const TryOnHairstyle = () => {
   };
 
   const handleComplete = async () => {
-    setCurrentStep(currentStep + 1);
+    await ratingTryOn();
+    setRating(0);
+    navigate('/explore');
   };
 
   const captureImage = async () => {
@@ -342,8 +433,20 @@ const TryOnHairstyle = () => {
             {/* Step 4 content */}
             {currentStep === 4 && !customize && (
               <div>
-                <h2 className='text-start'>Trends Hairstyles</h2>
-                <div className='step-content d-flex justify-content-center mt-5'>
+                <h2 className='text-start'>Preset Hairstyles</h2>
+                <div className='step-content d-flex justify-content-center align-items-center mt-5'>
+                  <div className='row full-width'>
+                    {tryOnRecommendations.map(recommendation => (
+                      <div className='col-md-3' key={recommendation.id}>
+                        <FormBox className={`responsive-tab ${preset == recommendation.id?'bg-light':'bg-white'}`} onClick={() => setPreset(recommendation.id)}>
+                          <div className='px-5'>
+                            <img src={`${process.env.PUBLIC_URL}/sample-image/${recommendation.image_url}`} alt={recommendation.description} className='image-square-medium rounded-circle' />
+                            <p className='fs-4 text-secondary fw-semibold mt-3'>{recommendation.description}</p>
+                          </div>
+                        </FormBox>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -460,9 +563,9 @@ const TryOnHairstyle = () => {
                 <h2 className='text-start'></h2>
                 <div className='step-content d-flex justify-content-center mt-3'>
                   {!tryOnLoading ? (
-                    tryOnResult.length > 0 ? (
+                    tryOnResult.images_url.length > 0 ? (
                       <div className='row'>
-                        {tryOnResult.map((image, index) => (
+                        {tryOnResult.images_url.map((image, index) => (
                           <div key={index} className='col-auto'>
                             <FormBox>
                               <img src={image.url} alt={`result-${index}`} style={{ aspectRatio: '1/1', width: '21em' }} />
@@ -488,29 +591,21 @@ const TryOnHairstyle = () => {
                 </div>
               </div>
             )}
-
-            {/* Complete content */}
-            {currentStep > totalSteps && creationStatus && (
+            {/*currentStep > totalSteps && creationStatus && (
               <div>
-                <h2 className='text-start'>Suggesting Salons</h2>
+                <h2 className='text-start'>Rating for your Virtual hairstyle</h2>
                 <div className='step-content d-flex justify-content-center mt-5'>
+                  <RatingStars rating={rating} onRate={setRating} />
                 </div>
               </div>
-            )}
-            {/* Step Loading content */}
-            {currentStep > totalSteps && creationStatus === null && (
-              <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            )}
+            )*/}
           </div>
         </div>
+
         {(currentStep < totalSteps && currentStep > 2) && (
           <div className={`d-flex justify-content-between`}>
             <button className="btn btn-lg btn-secondary me-3" onClick={handlePrevStep}>Prev Step</button>
-            {(Object.values(optionSelected).some(value => value !== null) && currentStep != 3) && (
+            {((Object.values(optionSelected).some(value => value !== null) || preset != null) && currentStep != 3) && (
               <div>
                 {currentStep !== totalSteps ? (
                   <button className="btn btn-lg btn-primary" onClick={() => handleNextStep()}>Generate</button>
@@ -521,10 +616,10 @@ const TryOnHairstyle = () => {
             )}
           </div>
         )}
-        {currentStep === 5 && tryOnResult.length > 0 && (
+        {currentStep === 5 && (
           <div className={`d-flex justify-content-center`}>
-            <button className="btn btn-lg btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#regenerateFeedbackModal" >Regenerate</button>
-            <button className="btn btn-lg btn-success" onClick={handleComplete}>Complete</button>
+            <button className="btn btn-lg btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#regenerateFeedbackModal">Regenerate</button>
+            <button className="btn btn-lg btn-success" data-bs-toggle="modal" data-bs-target="#ratingModal">Complete</button>
           </div>
         )}
 
@@ -556,8 +651,27 @@ const TryOnHairstyle = () => {
               </div>
             </div>
             <div className="modal-footer d-flex justify-content-center">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" disabled={feedback === null}>Send</button>
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setFeedback(null)}>Close</button>
+              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" disabled={feedback === null} onClick={() => handleRegenerateTryOnResult()}>Send</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => handleComplete()}>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="modal fade left-indent" id="ratingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true" >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="ratingModalLabel">Rating for your virtual hairstyle</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <div className="w-100 text-start px-3 d-flex justify-content-center">
+                <RatingStars rating={rating} onRate={setRating} />
+              </div>
+            </div>
+            <div className="modal-footer d-flex justify-content-center">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => handleComplete()}>Close</button>
+              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" disabled={rating == 0} onClick={() => handleComplete()}>Rate</button>
             </div>
           </div>
         </div>
