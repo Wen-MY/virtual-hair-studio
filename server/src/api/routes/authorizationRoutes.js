@@ -37,7 +37,6 @@ router.post('/signin', async (req, res) => {
                 const userData = {
                     id: user.id,
                     username: user.username,
-                    email: user.email,
                     first_name: user.first_name,
                     last_name: user.last_name,
                     gender: user.gender
@@ -64,7 +63,7 @@ router.get('/validate/email/:email', async (req, res) => {
         const [rows, fields] = await database.poolUM.execute('SELECT * FROM users WHERE email = ?', [email]);
 
         if (rows.length > 0) {
-            res.status(200).json({ valid: false, message: 'Email already exists.' });
+            res.status(422).json({ valid: false, message: 'Email already exists.' });
         } else {
             res.status(200).json({ valid: true, message: 'Email is available.' });
         }
@@ -81,7 +80,7 @@ router.get('/validate/username/:username', async (req, res) => {
         const [rows, fields] = await database.poolUM.execute('SELECT * FROM users WHERE username = ?', [username]);
 
         if (rows.length > 0) {
-            res.status(200).json({ valid: false, message: 'Username already exists.' });
+            res.status(422).json({ valid: false, message: 'Username already exists.' });
         } else {
             res.status(200).json({ valid: true, message: 'Username is available.' });
         }
@@ -93,15 +92,15 @@ router.get('/validate/username/:username', async (req, res) => {
 // Create User
 router.post('/create', async (req, res) => {
     try {
-        const { type , email, password} = req.body;
+        const { type , username, password} = req.body;
 
-        if (!email || !password || !type) {
-            return res.status(400).json({ message: 'Username/Email and password are required.' });
+        if (!username || !password || !type) {
+            return res.status(400).json({ message: 'Username and password are required.' });
         }
         // Hash the password before storing it in the database
         const hash = await bcrypt.hash(password, 10);
         //insert new user into user table
-        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [email, hash, email]);
+        const [rows, fields] = await database.poolUM.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, hash]);
         //get user id from user last query
         const userId = rows.insertId;
         //insert user to user_group table to assign authorities
@@ -110,7 +109,7 @@ router.post('/create', async (req, res) => {
         if(result){
             const userData = {
                 id: userId,
-                email: email,
+                username: username,
             };
             req.session.user = userData;
             console.log('userid :' , req.session.user.id);

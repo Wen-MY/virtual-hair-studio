@@ -4,6 +4,7 @@ import Loader from '../../components/loading-spinner';
 import config from '../../config';
 import 'react-toastify/dist/ReactToastify.css';
 import Select from 'react-select'
+import * as bootstrap from 'bootstrap';
 
 const SalonManagement = () => {
   const [loading, setLoading] = useState(true);
@@ -28,13 +29,22 @@ const SalonManagement = () => {
     hairstylists: [],
     desc: '',
   });
-
-
+  const [formError, setFormError] = useState({
+    field : '',
+    message : ''
+  });
+  const resetFormError = () => {
+    setFormError({
+      field : '',
+      message : ''
+    });
+  }
   const [newHairstylistFormData, setNewHairstylistFormData] = useState({
     name: '',
     position: '',
     image: null
   });
+  const [newHairstylistFormError, setNewHairstylistFormError] = useState(null);
   //updating services
   const [selectedService, setSelectedService] = useState(null);
 
@@ -141,6 +151,20 @@ const SalonManagement = () => {
   const updateSelectedService = async (service) => {
     //
     const serviceToUpdate = service ? service : selectedService;
+    if (!serviceToUpdate.duration) {
+      setFormError({
+        field : 'duration',
+        message : 'Service Duration is required.'
+      });
+      return; 
+    }
+    if (serviceToUpdate.hairstylists.length === 0) {
+      setFormError({
+        field : 'hairstylists',
+        message : 'At least one Hairstylist is required.'
+    });
+      return; 
+    }
     try {
       // Fetch salon details using salon ID
       const updateResponse = await fetch(
@@ -162,6 +186,8 @@ const SalonManagement = () => {
         fetchSalonData();
         console.log("Success to update salon information")
         toast.success(updateData.message, { autoClose: 3000 });
+        const closeButton = document.getElementById('closeUpdateServiceModalX');
+        closeButton.click();
       } else {
         console.error("Failed to update salon information:", updateData.message);
         toast.warning(updateData.message, { autoClose: 3000 });
@@ -170,10 +196,41 @@ const SalonManagement = () => {
       console.error("Error fetching salon data:", error);
     }
     setSelectedService(null);
+    resetFormError();
   }
   const addNewService = async () => {
     //
+    
+    if (!newServiceFormData.serviceName) {
+      setFormError({
+        field : 'serviceName',
+        message : 'Service Name is required.'
+      });
+      return; 
+    }
+    if (!newServiceFormData.categoryId) {
+      setFormError({
+        field : 'categoryId',
+        message : 'Service Category is required.'
+      });
+      return; 
+    }
+    if (!newServiceFormData.duration) {
+      setFormError({
+        field : 'duration',
+        message : 'Service Duration is required.'
+      });
+      return; 
+    }
+    if (newServiceFormData.hairstylists.length === 0) {
+      setFormError({
+        field : 'hairstylists',
+        message : 'At least one Hairstylist is required.'
+    });
+      return; 
+    }
     const serviceToAdd = newServiceFormData;
+    
     console.log(serviceToAdd);
     try {
       // Fetch salon details using salon ID
@@ -196,6 +253,9 @@ const SalonManagement = () => {
         fetchSalonData();
         console.log("Success to update salon information")
         toast.success(createData.message, { autoClose: 3000 });
+        const closeButton = document.getElementById('closeAddServiceModalX');
+        closeButton.click();
+        
       } else {
         console.error("Failed to update salon information:", createData.message);
         toast.warning(createData.message, { autoClose: 3000 });
@@ -233,6 +293,27 @@ const SalonManagement = () => {
     setSelectedService(null);
   }
   const addNewHairstylist = async () => {
+    if (!newHairstylistFormData.name) {
+      setFormError({
+        field : 'name',
+        message : 'Hairstylist\'s Name is required.'
+      });
+      return; 
+    }
+    if (!newHairstylistFormData.position) {
+      setFormError({
+        field : 'position',
+        message : 'Hairstylist\'s Position is required.'
+      });
+      return; 
+    }
+    if (!newHairstylistFormData.image) {
+      setFormError({
+        field : 'image',
+        message : 'Hairstylist\'s Image is required.'
+      });
+      return; 
+    }
     try {
       const formData = new FormData();
       formData.append('name', newHairstylistFormData.name);
@@ -255,6 +336,8 @@ const SalonManagement = () => {
         fetchSalonData();
         console.log("Success to update salon information")
         toast.success(createData.message, { autoClose: 3000 });
+        const closeButton = document.getElementById('closeAddHairstylistModalX');
+        closeButton.click();
       } else {
         console.error("Failed to update salon information:", createData.message);
         toast.warning(createData.message, { autoClose: 3000 });
@@ -292,6 +375,7 @@ const SalonManagement = () => {
       hairstylists: [],
       desc: '',
     }) //clear new form data
+    resetFormError();
   }
   //----------------------------------------- update service form change handling ----------
   const handleSelectedServiceFormInputChange = (e) => {
@@ -338,6 +422,7 @@ const SalonManagement = () => {
       position: '',
       image: null
     }) //clear new form data
+    resetFormError();
   }
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -347,6 +432,7 @@ const SalonManagement = () => {
       image: file
     }));
   };
+
   if (loading) {
     return (
       <Loader />
@@ -463,15 +549,16 @@ const SalonManagement = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h4 className="modal-title px-2 fw-bold">New Service</h4>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewServiceForm()}></button>
+              <button type="button" id="closeAddServiceModalX" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewServiceForm()}></button>
             </div>
             <div className="modal-body">
               <form className="w-100 text-start px-3">
+              {formError.field && <p className="alert alert-danger" >{formError.message}</p>}
                 <div className="mb-3">
                   <label htmlFor="serviceName" className='form-label fw-semibold'>Service Name</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${formError.field === 'serviceName' ?'border-danger':''}`}
                     name="serviceName"
                     value={newServiceFormData.serviceName}
                     onChange={handleNewServiceFormInputChange}
@@ -486,6 +573,8 @@ const SalonManagement = () => {
                     name='categoryId'
                     placeholder='Category'
                     onChange={handleNewServiceFormSelectChange}
+                    required
+                    className={`${formError.field === 'categoryId' ?'border border-danger rounded-2':''}`}
                   />
 
                 </div>
@@ -495,11 +584,12 @@ const SalonManagement = () => {
                     <div className='col-auto'>
                       <input
                         type="number"
-                        className="form-control"
+                        className={`form-control ${formError.field === 'duration' ?'border-danger':''}`}
                         name="duration"
                         value={newServiceFormData.duration}
                         onChange={handleNewServiceFormInputChange}
                         id="duration"
+                        required
                       />
                     </div>
                     <div className='col-auto'><span className='input-group-text'>minutes</span></div>
@@ -518,6 +608,8 @@ const SalonManagement = () => {
                     isMulti
                     placeholder="Hairstylist"
                     onChange={handleNewServiceMultiSelectChange}
+                    required
+                    className={`${formError.field === 'hairstylist' ?'border border-danger rounded-2':''}`}
                   />
                 </div>
                 <div className="mb-3">
@@ -533,7 +625,7 @@ const SalonManagement = () => {
               </form>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => addNewService()}>Add Service</button>
+              <button type="button" className="btn btn-primary" onClick={() => addNewService()}>Add Service</button>
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => clearNewServiceForm()}>Cancel</button>
             </div>
           </div>
@@ -545,10 +637,11 @@ const SalonManagement = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h4 className="modal-title fw-bold">Update Service</h4>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setSelectedService(null)}></button>
+              <button type="button" id="closeUpdateServiceModalX" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setSelectedService(null)}></button>
             </div>
             <div className="modal-body">
               <form className="w-100 text-start px-3">
+              {formError.field && <p className="alert alert-danger" >{formError.message}</p>}
                 <div className="mb-3">
                   <label htmlFor="serviceName" className='form-label fw-semibold'>Service Name</label>
                   <input
@@ -576,7 +669,7 @@ const SalonManagement = () => {
                     <div className='col-auto'>
                       <input
                         type="number"
-                        className="form-control"
+                        className={`form-control ${formError.field === 'duration' ?'border-danger':''}`}
                         name="duration"
                         value={selectedService?.duration}
                         onChange={handleSelectedServiceFormInputChange}
@@ -599,6 +692,7 @@ const SalonManagement = () => {
                     isMulti
                     placeholder="Hairstylist"
                     onChange={handleSelectedServiceMultiSelectChange}
+                    className={`${formError.field === 'hairstylist' ?'border border-danger rounded-2':''}`}
                   />
                 </div>
                 <div className="mb-3">
@@ -607,15 +701,15 @@ const SalonManagement = () => {
                     className="form-control p-3"
                     name="desc"
                     value={selectedService?.desc}
-                    onChange={handleNewServiceFormInputChange}
+                    onChange={handleSelectedServiceFormInputChange}
                     id="desc"
                   />
                 </div>
               </form>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => updateSelectedService()}>Save Changes</button>
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setSelectedService(null)}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={() => updateSelectedService()}>Save Changes</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => {setSelectedService(null); resetFormError();}}>Cancel</button>
             </div>
           </div>
         </div>
@@ -644,10 +738,11 @@ const SalonManagement = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="addHairstylistModalLabel">Add Hairstylist</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewHairstylistForm()}></button>
+              <button type="button" className="btn-close" id="closeAddHairstylistModalX" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewHairstylistForm()}></button>
             </div>
             <div className="modal-body">
               <form className="w-100 text-start px-3">
+              {formError.field && <p className="alert alert-danger" >{formError.message}</p>}
                 <div className="mb-3">
                   {/* Hidden file input */}
                   <div className="d-flex justify-content-center">
@@ -663,7 +758,7 @@ const SalonManagement = () => {
                       <img
                         src={newHairstylistFormData.image ? URL.createObjectURL(newHairstylistFormData.image) : process.env.PUBLIC_URL + '/sample-image/person_thumbnail.png'}
                         alt="Salon"
-                        className="img rounded-circle image-square-large"
+                        className={`img rounded-circle image-square-large  ${formError.field === 'image' ?'border border-2 border-danger':''}`}
                         required
                       />
                     </label>
@@ -673,7 +768,7 @@ const SalonManagement = () => {
                   <label htmlFor="hairstylistName" className='form-label fw-semibold'>Name</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${formError.field === 'name' ?'border-danger':''}`}
                     name="name"
                     value={newHairstylistFormData.name}
                     onChange={handleNewHairstylistInputChange}
@@ -685,7 +780,7 @@ const SalonManagement = () => {
                   <label htmlFor="position" className='form-label fw-semibold'>Position</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${formError.field === 'position' ?'border-danger':''}`}
                     name="position"
                     value={newHairstylistFormData.position}
                     onChange={handleNewHairstylistInputChange}
@@ -696,7 +791,7 @@ const SalonManagement = () => {
               </form>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => addNewHairstylist()}>Add</button>
+              <button type="button" className="btn btn-primary" onClick={() => addNewHairstylist()}>Add</button>
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => clearNewHairstylistForm()}>Close</button>
             </div>
           </div>

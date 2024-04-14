@@ -15,12 +15,17 @@ const AppointmentsList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [limit, setLimit] = useState(10);
-  const [dateRange, setDateRange] = useState([new Date(),new Date()]);
+  //default one week before today and one week after today
+  const [dateRange, setDateRange] = useState([new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]);
   const [searching, setSearching] = useState(0);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`${config.serverUrl}/appointment/retrieve?status=${statusFilter}&searchTerm=${searchTerm}&limit=${limit}&currentPage=${currentPage}`,{
+      let url =`${config.serverUrl}/appointment/retrieve?status=${statusFilter}&searchTerm=${searchTerm}&limit=${limit}&currentPage=${currentPage}`;
+      if(dateRange[0] && dateRange[1]){
+        url += `&range=${dateRange[0]}_${dateRange[1]}`
+      }
+      const response = await fetch(url,{
         method: 'GET',
         credentials: 'include'
       });

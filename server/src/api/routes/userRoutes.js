@@ -44,9 +44,9 @@ router.delete('/delete/:id', async (req, res) => {
 // Update User
 router.post('/update', async (req, res) => {
   try {
-    const { email, username, first_name, last_name, gender } = req.body;
+    const { email, first_name, last_name, gender } = req.body;
     const [results, fields] = await database.poolUM.execute(
-      'UPDATE users SET username = ?, first_name = ?, last_name = ?,gender = ? WHERE id = ?', [username, first_name, last_name, gender, req.userId]);
+      'UPDATE users SET email = ?, first_name = ?, last_name = ?,gender = ? WHERE id = ?', [email, first_name, last_name, gender, req.userId]);
     if (results.affectedRows > 0) {
       res.status(200).json({ message: 'User account updated sucessfully!' });
     } else {

@@ -72,7 +72,13 @@ const SalonDashboard = () => {
         setSalonImageFile(file);
         setSalonInfo({ ...salonInfo, image_url: URL.createObjectURL(file)});
     };
-    
+    //fix image not return original bug
+    useEffect(()=>{
+    if(isEditing)
+    { 
+        fetchSalonData();
+    }
+    },[isEditing])
     const handleChange = (e) => {
         const { name, value } = e.target;
         setSalonInfo((prevSalonInfo) => ({

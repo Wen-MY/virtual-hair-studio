@@ -12,7 +12,6 @@ const Account = () => {
     const [edit, setEdit] = useState(false);
     const [userData, setUserData] = useState({});
     const [formData, setFormData] = useState({
-        username: '',
         email: '',
         first_name: '',
         last_name: '',
@@ -215,24 +214,24 @@ const Account = () => {
                         )}
                 </div>
                 <div className="input-group mb-3">
-                    <span className="input-group-text label-text-box">Email</span>
+                    <span className="input-group-text label-text-box">Username</span>
                     <input
                         type="text"
                         className="form-control"
-                        name="email"
+                        name="text"
                         readOnly
                         disabled
-                        value={formData.email}
+                        value={formData.username}
                         onChange={handleInputChange}
                     />
                 </div>
                 <div className="input-group mb-3">
-                <span className="input-group-text label-text-box">Username</span>
+                <span className="input-group-text label-text-box">Email</span>
                     <input
-                        type="text"
+                        type="email"
                         className="form-control"
-                        name="username"
-                        value={formData.username}
+                        name="email"
+                        value={formData.email}
                         onChange={handleInputChange}
                         disabled={!edit}
                     />
