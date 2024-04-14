@@ -1,0 +1,7 @@
+// open-ai-config.js
+module.exports = {
+  openai: {
+    apiKey: '',
+    organization: ''
+  },
+};

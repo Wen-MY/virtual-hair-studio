@@ -31,6 +31,11 @@ const AppointmentsList = () => {
         setTotalResults(data.totalResults);
         setTotalPages(Math.ceil(data.totalResults / limit));
       }
+      else{
+        setAppointments([]);
+        setTotalResults(0);
+        setTotalPages(0);
+      }
     };
     // Fetch appointments data from the API if initial result is empty
       fetchData();
@@ -91,7 +96,8 @@ const AppointmentsList = () => {
         </thead>
 
         <tbody>
-          {appointments.map((appointment) => (
+          {appointments.length > 0 ?(
+          appointments.map((appointment) => (
             <tr 
               key={appointment.id}
               onClick={() => handleRowClick(appointment.id)}
@@ -102,7 +108,13 @@ const AppointmentsList = () => {
               <td className="col-md-2 text-center align-middle p-4">{formatTime(appointment.booking_datetime)}</td>
               <td className="col-md-2 text-center align-middle p-4"><StatusBadge status={appointment.status}/></td>
             </tr>
-          ))}
+          ))
+        ):(
+          <tr><td colSpan={5}>No Result</td></tr>
+              
+        )
+
+        }
         </tbody>
       </table>
       </div>

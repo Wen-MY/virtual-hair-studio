@@ -25,6 +25,7 @@ router.get('/retrieve', async (req, res) => {
                 SELECT COUNT(appointments.id) as total
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
+                JOIN salons ON services.salon_id = salons.id
                 WHERE appointments.customer_id = ?`;
             queryParams.push(req.userId);
         } else if (userGroupId === 4 || userGroupId === 2) {
@@ -33,11 +34,13 @@ router.get('/retrieve', async (req, res) => {
                 SELECT appointments.*, services.service_name, services.duration
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
+                JOIN salons ON services.salon_id = salons.id
                 WHERE services.salon_id = ?`;
             countQuery = `
                 SELECT COUNT(appointments.id) as total
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
+                JOIN salons ON services.salon_id = salons.id
                 WHERE services.salon_id = ?`;
             queryParams.push(req.userId);
         } else {
@@ -53,8 +56,8 @@ router.get('/retrieve', async (req, res) => {
             queryParams.push(status);
         }
         if (searchTerm) {
-            baseQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
-            countQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR appointments.salon_name LIKE '%${searchTerm}%')`;
+            baseQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR salons.name LIKE '%${searchTerm}%')`;
+            countQuery += ` AND (services.service_name LIKE '%${searchTerm}%' OR salons.name LIKE '%${searchTerm}%')`;
         }
         if (range) {
             const startDate = range.split('_')[0];

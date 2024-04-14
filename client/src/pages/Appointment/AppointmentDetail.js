@@ -6,20 +6,31 @@ import { formatDate, formatTime } from '../../utils/datetimeFormatter';
 import config from '../../config';
 import StatusBadge from '../../components/status-pill';
 import Loader from '../../components/loading-spinner';
+import RatingStars from '../../components/rating-star';
 
 const AppointmentDetail = () => {
   const { state } = useLocation();
   const appointmentId = state.id;
   const [appointmentDetails, setAppointmentDetails] = useState(null);
+  const [review, setReview] = useState({
+    rating: '',
+    comment: '',
+    created_at: null
+  });
+  const [errors, setErrors] = useState({
+    rating: '',
+    comment: ''
+  });
   const [updateEnable, setUpdateEnable] = useState(false);
   const genderMap = {
     'm': 'Male',
     'f': 'Female',
     'o': 'Other'
-};
+  };
   useEffect(() => {
     if (appointmentId) {
       fetchAppointmentDetails();
+      fetchReview();
       fetchPermission();
     }
   }, [appointmentId]);
@@ -59,7 +70,88 @@ const AppointmentDetail = () => {
       console.error('Error during fetch permission:', error);
     }
   };
+  const fetchReview = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/review/get/${appointmentId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setReview({
+          comment: data.results.comment,
+          rating: data.results.rating,
+          created_at: data.results.created_at
+        })
+      } else {
+        setReview({
+          comment: '',
+          rating: null,
+          created_at: null
+        })
+        console.error('Failed to fetch review:', data.message);
+      }
+    } catch (error) {
+      console.error('Error during fetch review:', error);
+    }
+  }
+  
+  const handleUpdateAppointmentReview = async () => {
+      // Validate rating
+    if (!review.rating) {
+      setErrors(prev => ({
+        ...prev,
+        rating: 'Please provide a rating.'
+      }));
+      return;
+    }else{
+      setErrors(prev => ({
+        ...prev,
+        rating: ''
+      }));
+    }
 
+    // Validate comment
+    if (!review.comment.trim()) {
+      setErrors(prev => ({
+        ...prev,
+        comment: 'Please provide a comment.'
+      }));
+      return;
+    }else{
+      setErrors(prev => ({
+        ...prev,
+        comment: ''
+      }));
+    }
+    try{
+      const updateReviewResponse = await fetch(`${config.serverUrl}/review/create`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appointmentId : appointmentId,
+            customerId : appointmentDetails.customer_id,
+            serviceId : appointmentDetails.service_id,
+            rating : review.rating,
+            comment : review.comment
+          }),
+          credentials: 'include'
+        });
+      if (updateReviewResponse.ok) {
+        toast.success('Appointment review created successfully', { autoClose: 3000 })
+        fetchReview();
+      } else {
+        toast.warning(updateReviewResponse.json().message, { autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.warning('Failed to create review, try again later!', { autoClose: 3000 });
+      console.error('Failed to create review :', error);
+    }
+  }
+  
   const handleUpdateAppointmentStatus = async (status) => {
     try {
       const updateStatusResponse = await fetch(`${config.serverUrl}/appointment/update/${appointmentDetails.id}`,
@@ -203,6 +295,48 @@ const AppointmentDetail = () => {
                 </div>
               </div>
             </div>
+            {appointmentDetails.status === 'COMPLETED' && !updateEnable && (
+              <div className='col-md-12 bg-white rounded-4 p-4 pb-3 border border-2 mt-2'>
+                <h4 className='border-bottom pb-1'>Review</h4>
+                <div className='text-start mt-3'>
+                  {review.created_at ? (
+                    <div>
+                      <RatingStars rating={review.rating} onRate={() => {}}  className={'fs-3'}/>
+                      <div className='row mt-3 ps-2'>
+                        <label className='fw-bold col-1'>Comment :</label>
+                        <p className='col-10 ' >{review.comment??""}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <RatingStars rating={review.rating} onRate={(newRating) => setReview(prev => ({
+                        ...prev,
+                        rating: newRating
+                      }))} className={'fs-3'} />
+                      {errors.rating && <p className="text-danger">{errors.rating}</p>}
+                      <div className="form-floating m-2">
+                        <textarea
+                          className="form-control"
+                          placeholder="Leave a comment here"
+                          id="floatingTextarea"
+                          style={{ height: '85px' }}
+                          onChange={(event) => setReview(prev => ({
+                            ...prev,
+                            comment: event.target.value
+                          }))}
+                          value={review.comment || ''}
+                        ></textarea>
+                        <label htmlFor="floatingTextarea">Comments</label>
+                        {errors.comment && <p className="text-danger">{errors.comment}</p>}
+                      </div>
+                      <div className='text-center'>
+                        <button className='btn btn-lg btn-primary' onClick={()=>handleUpdateAppointmentReview()}>Submit Review</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           {appointmentDetails.status !== 'COMPLETED' && appointmentDetails.status !== 'CANCELLED' && appointmentDetails.status !== 'IN PROGRESS' && (<div className='mt-3 border-top pt-3 d-flex justify-content-center'>
             {(updateEnable && appointmentDetails.status === 'PENDING') ? (
@@ -216,8 +350,9 @@ const AppointmentDetail = () => {
               </div>
             )}
           </div>)}
+
         </div>
-        
+
       ) : (
         <div style={{ maxHeight: '60vh' }}>
           <p className='fs-4 fw-semibold'>Loading Appointemnt Details. </p>
@@ -249,5 +384,6 @@ const AppointmentDetail = () => {
     </div>
   );
 };
+
 
 export default AppointmentDetail;

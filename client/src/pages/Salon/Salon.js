@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import config from '../../config';
 import Loader from '../../components/loading-spinner';
 import { Link, useParams } from 'react-router-dom';
-import { formatContactNumber,formatTime,formatBusinessHour } from '../../utils/salonInformationFormatter';
+import { formatContactNumber, formatTime, formatBusinessHour } from '../../utils/salonInformationFormatter';
 import NotFound from '../NotFound';
 
 const Salon = () => {
@@ -21,7 +21,8 @@ const Salon = () => {
   })
   const [services, setServices] = useState([]);
   const [hairstylists, setHairstylists] = useState([]);
-  const[reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsPage, setReviewPage] = useState(1);
 
   //------------------------------api-request------------------------------//
   useEffect(() => {
@@ -60,12 +61,12 @@ const Salon = () => {
           console.error('Failed to fetch salon information:', hairstylistsData.message);
         }
 
-        const reviewsResponse = await fetch(config.serverUrl + `/review/retrieve?salonId=${salonId}&limit=2&offset=${reviews.length}`, {
+        const reviewsResponse = await fetch(config.serverUrl + `/review/retrieve?salonId=${salonId}&limit=3&offset=${reviews.length}`, {
           credentials: 'include',
         });
         const reviewsData = await reviewsResponse.json();
         if (reviewsResponse.ok) {
-          setReviews(reviewsData.results);
+          setReviews(reviewsData);
         } else {
           console.error('Failed to fetch salon information:', reviewsData.message);
         }
@@ -79,16 +80,37 @@ const Salon = () => {
 
     fetchSalonData();
   }, [salonId]);
+  useEffect(() => {
+    const fetchReviews = async () => {
+      console.log(reviewsPage);
+      try {
+        const reviewsResponse = await fetch(config.serverUrl + `/review/retrieve?salonId=${salonId}&limit=3&offset=${(reviewsPage - 1) * 3}`, {
+          credentials: 'include',
+        });
+        const reviewsData = await reviewsResponse.json();
+        if (reviewsResponse.ok) {
+          setReviews(reviewsData);
+        } else {
+          console.error('Failed to fetch salon information:', reviewsData.message);
+        }
+        setLoading(false);
 
+      } catch (error) {
+        console.error('Error fetching salon data:', error);
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, [reviewsPage]);
   if (loading) {
     return (
       <Loader />
     );
   }
 
-  if(!salonInformation.id){
+  if (!salonInformation.id) {
     return (
-      <NotFound/>
+      <NotFound />
     );
   }
   //------------------------------html------------------------------//
@@ -100,7 +122,7 @@ const Salon = () => {
           {/* Salon Name and Salon Picture */}
           <div className="row">
             <div className="col-12 p-3 pt-2">
-              <img src={salonInformation.image_url?salonInformation.image_url:process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'} alt="Salon Profile Main" className="img-fluid rounded-4" />
+              <img src={salonInformation.image_url ? salonInformation.image_url : process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'} alt="Salon Profile Main" className="img-fluid rounded-4" />
             </div>
           </div>
           {/* Salon Name */}
@@ -133,9 +155,9 @@ const Salon = () => {
             <div className="col border border-2 rounded-4 p-5 bg-white pt-4">
               <h2 className='section-title text-start mb-4'>Services Provided</h2>
               <ul className="nav nav-tabs" id="services-tabs">
-            
+
                 {/* Since services is now an array of service objects, we need to group them by category */}
-                { services && services.length > 0 && Array.from(new Set(services.map(service => service.category))).map((category, index) => {
+                {services && services.length > 0 && Array.from(new Set(services.map(service => service.category))).map((category, index) => {
                   // Sanitize category name to make it a valid selector
                   const sanitizedCategory = category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   return (
@@ -157,7 +179,7 @@ const Salon = () => {
               </ul>
               <div className="tab-content">
                 {/* Render service items grouped by category */}
-                { services && services.length > 0 ? (Array.from(new Set(services.map(service => service.category))).map((category, index) => {
+                {services && services.length > 0 ? (Array.from(new Set(services.map(service => service.category))).map((category, index) => {
                   // Sanitize category name to make it a valid selector
                   const sanitizedCategory = category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   return (
@@ -181,7 +203,7 @@ const Salon = () => {
                       </ul>
                     </div>
                   );
-                })):(
+                })) : (
                   <li className="list-group-item text-center"><p className='fs-4 fw-semibold m-3 mt-5'>No Service Available</p></li>
                 )}
               </div>
@@ -192,7 +214,7 @@ const Salon = () => {
             <div className="col border border-2 rounded-4 p-5 bg-white pt-4">
               <h2 className='section-title mb-5 text-start py-0'>Hairstylists Available</h2>
               <div className="row">
-                {hairstylists.length?(hairstylists.map((hairstylist, index) => (
+                {hairstylists.length ? (hairstylists.map((hairstylist, index) => (
                   <div key={index} className="col mb-3">
                     <div className="card mx-auto border-dark text-start" style={{ width: '12rem' }}>
                       <img src={`https://picsum.photos/120/100?random=${hairstylist.id}`} className="card-img-top" alt={hairstylist.name} />
@@ -210,7 +232,7 @@ const Salon = () => {
                       </div>
                     </div>
                   </div>
-                ))):(
+                ))) : (
                   <div className="text-center"><p className='fs-4 fw-semibold m-3'>No Hairstylist Available</p></div>
                 )}
               </div>
@@ -219,16 +241,27 @@ const Salon = () => {
 
           {/* Ratings and Comments Section */}
           <div className="row">
-            <div className="col border border-2 rounded-4 p-5 bg-white pt-4">
-              <h2 className='section-title text-start mb-5'>Customer Reviews</h2>
+            <div className="col border border-2 rounded-4 p-5 pb-1 bg-white pt-4">
+              <h2 className='section-title text-start mb-3'>Customer Reviews</h2>
               <ul className="list-group">
-                {reviews.map((review, index) => (
+                {reviews.results.map((review, index) => (
                   <li key={index} className="list-group-item text-start">
                     <strong>{review.username}</strong> - Rating: {review.rating} <i className="bi bi-star-fill"></i>
                     <p>{review.comment}</p>
                   </li>
                 ))}
               </ul>
+              <nav className='mt-3'>
+                <ul className="pagination justify-content-end ">
+                  <li className={`page-item ${reviewsPage <= 1 ? 'disabled' : ''}`} ><button className="page-link" onClick={() => reviewsPage > 1 ? setReviewPage(reviewsPage - 1) : null}>Previous</button></li>
+                  {Array.from({ length: Math.ceil(reviews.totalResults / 3) }, (_, index) => index + 1).map((page) => (
+                    <li key={page} className={`page-item ${reviewsPage === page ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setReviewPage(page)}>{page}</button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${reviewsPage >= reviews.totalResults / 3 ? 'disabled' : ''}`}><button className="page-link" onClick={() => reviewsPage < Math.ceil(reviews.totalResults / 3) ? setReviewPage(reviewsPage + 1) : null}>Next</button></li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>

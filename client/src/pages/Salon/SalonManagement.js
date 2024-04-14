@@ -233,14 +233,14 @@ const SalonManagement = () => {
     setSelectedService(null);
   }
   const addNewHairstylist = async () => {
-    //
-    const hairstylistToAdd = newHairstylistFormData;
     try {
       const formData = new FormData();
-      formData.append('name', hairstylistToAdd.name);
-      formData.append('position', hairstylistToAdd.position);
-      formData.append('image', hairstylistToAdd.image);
+      formData.append('name', newHairstylistFormData.name);
+      formData.append('position', newHairstylistFormData.position);
+      formData.append('image', newHairstylistFormData.image);
       // Fetch salon details using salon ID
+      console.log(newHairstylistFormData.name);
+      console.log(newHairstylistFormData.position);
       const createResponse = await fetch(
         config.serverUrl + `/hairstylist/add/${salonId}`,
         {
@@ -334,7 +334,7 @@ const SalonManagement = () => {
   };
   const clearNewHairstylistForm = () => {
     setNewHairstylistFormData({
-      hairstylistName: '',
+      name: '',
       position: '',
       image: null
     }) //clear new form data
@@ -342,7 +342,10 @@ const SalonManagement = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     // Handle file upload logic here
-    setNewHairstylistFormData({ image: file });
+    setNewHairstylistFormData(prevFormData => ({
+      ...prevFormData,
+      image: file
+    }));
   };
   if (loading) {
     return (

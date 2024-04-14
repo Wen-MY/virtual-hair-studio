@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const RatingStars = ({ rating, onRate }) => {
+const RatingStars = ({ rating, onRate, className }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleStarHover = (hoveredRating) => {
@@ -18,7 +18,7 @@ const RatingStars = ({ rating, onRate }) => {
         return (
           <span
             key={index}
-            className={`fs-1 mx-2 ${starValue <= (hoverRating || rating) ? 'bi bi-star-fill text-warning' : 'bi bi-star text-secondary'}`}
+            className={`mx-2 ${starValue <= (hoverRating || rating) ? 'bi bi-star-fill text-warning' : 'bi bi-star text-secondary'} ${className??""}`}
             onMouseEnter={() => handleStarHover(starValue)}
             onMouseLeave={() => handleStarHover(0)}
             onClick={() => handleStarClick(starValue)}

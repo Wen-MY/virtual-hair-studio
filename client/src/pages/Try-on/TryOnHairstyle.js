@@ -666,7 +666,7 @@ const TryOnHairstyle = () => {
             </div>
             <div className="modal-body">
               <div className="w-100 text-start px-3 d-flex justify-content-center">
-                <RatingStars rating={rating} onRate={setRating} />
+                <RatingStars rating={rating} onRate={setRating} className={'fs-1'}/>
               </div>
             </div>
             <div className="modal-footer d-flex justify-content-center">
