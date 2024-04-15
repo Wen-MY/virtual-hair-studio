@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import moment from 'moment';
 import config from '../../config';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+import Loader from '../../components/loading-spinner';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import '../../styles/customBigCalendar.css'
@@ -11,14 +12,15 @@ import '../../styles/customBigCalendar.css'
 const localizer = momentLocalizer(moment);
 
 const AppointmentReschedule = () => {
+  const { state } = useLocation();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [currentView, setCurrentView] = useState(null);// Initially set to month view
-  const [currentDate,setCurrentDate] = useState(null);
+  const [currentDate, setCurrentDate] = useState(null);
   const [rescheduling, setRescheduling] = useState(false);
   const DnDCalendar = withDragAndDrop(Calendar)
   const [rescheduledAppointment, setRescheduledAppointment] = useState([]);
-  const [temp,setTemp] = useState([]);
+  const [temp, setTemp] = useState([]);
   const fetchData = async (startDate, endDate) => {
     try {
       const response = await fetch(`${config.serverUrl}/appointment/retrieve?status=CONFIRMED&range=${startDate}_${endDate}`, {
@@ -44,18 +46,18 @@ const AppointmentReschedule = () => {
   const handleRangeChange = useCallback(async (range, view) => {
     let crView = view ? (view) : currentView;
     if (view) setCurrentView(view);
-    
+
     //console.log(crView);
     //console.log(range);
-    
+
     const today = new Date();
     let start, end;
     if (crView === 'week') {
-      setCurrentDate(getMostlyInRangeMonth(range[0],range[range.length - 1]));
+      setCurrentDate(getMostlyInRangeMonth(range[0], range[range.length - 1]));
       start = moment(range[0]).startOf('week').toDate().toLocaleString();
       end = moment(range[range.length - 1]).endOf('week').toDate().toLocaleString();
     } else if (crView === 'month') {
-      setCurrentDate(getMostlyInRangeMonth(range.start,range.end));
+      setCurrentDate(getMostlyInRangeMonth(range.start, range.end));
       start = moment(range.start).startOf('day').toDate().toLocaleString();
       end = moment(range.end).endOf('day').toDate().toLocaleString();
     } else if (crView === 'agenda') {
@@ -66,7 +68,7 @@ const AppointmentReschedule = () => {
 
   }, [currentView]);
   const handleRescheduling = (status) => {
-    if(status){
+    if (status) {
       setTemp(events);
     }
     setRescheduling(status);
@@ -131,82 +133,129 @@ const AppointmentReschedule = () => {
       console.error('Error saving rescheduled events:', error);
     }
   }
-    //initial fetch
-    useEffect(() => {
+  //initial fetch
+  useEffect(() => {
+    if (state?.appointmentDetails) {
+      console.log(state);
+      const today = new Date(state.appointmentDetails.booking_datetime);
+      setCurrentView('week');
+      fetchData(moment(today).startOf('week').toDate().toLocaleString(), moment(today).endOf('week').toDate().toLocaleString()); // Fetch data for the current day initially
+
+    } else {
       const today = new Date();
       setCurrentView('month');
       setCurrentDate(today);
       fetchData(moment(today).startOf('month').toDate().toLocaleString(), moment(today).endOf('month').toDate().toLocaleString()); // Fetch data for the current day initially
-      }, []);
+    }
 
-    //console.log(events);
-    const getMostlyInRangeMonth = (startDate, endDate) => {
-      // Convert startDate and endDate to Date objects if they are strings
-      if (typeof startDate === 'string') {
-        startDate = new Date(startDate);
-      }
-      if (typeof endDate === 'string') {
-        endDate = new Date(endDate);
-      }
-    
-      // Calculate the middle date between startDate and endDate
-      const middleDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
-    
-    
-      // Return the month index (0 for January, 1 for February, ..., 11 for December)
-      return middleDate;
-    };
-    return (
-      <div className='container-fluid my-3 full-width'>
-        <div className="row justify-content-center border border-2 rounded-4 p-3 bg-white">
-          <div className="col-md-12">
-            {rescheduling ? (
-              <DnDCalendar
-                localizer={localizer}
-                defaultDate={currentDate}
-                defaultView={currentView}
-                views={[currentView]}
-                events={events}
-                style={currentView==='month'?{ height: 700 }:{}}
-                eventPropGetter={() => ({ className: 'event bg-success' })}
-                step={15}
-                onEventDrop={handleEventDrop}
-                toolbar={false}
-                className={'pt-5'}
-                resizable={false}
-              />
-            ) : (
-              <Calendar
-                localizer={localizer}
-                defaultDate={currentDate}
-                defaultView={currentView?currentView:'month'}
-                views={['week', 'month', 'agenda']}
-                events={events}
-                style={currentView==='month'?{ height: 700 }:{}}
-                onRangeChange={handleRangeChange}
-                onSelectEvent={(event) => navigate('/appointments/detail', { state: { id: event.id } })}
-                eventPropGetter={() => ({ className: 'event bg-success' })}
-                step={15}
-              />
-            )}
-          </div>
-          <div className={`mt-3 ${currentView === 'agenda' ? 'd-none' : 'd-block'}`}>
-            {rescheduling ?
-              (
-                <div>
-                  <button className='btn btn-primary btn-lg me-3' onClick={() => handleSaveRescheduledEvent()}>Confirm</button>
-                  <button className='btn btn-secondary btn-lg' onClick={() => {handleRescheduling(false); returnOriginalEvent();}}>Cancel</button>
-                </div>
-              ) : (
-                <div>
-                  <button className='btn btn-primary btn-lg' onClick={() => handleRescheduling(true)}>Reschedule</button>
-                </div>
-              )
-            }
-          </div>
-        </div>
-      </div>
-    );
+  }, []);
+
+  //console.log(events);
+  const getMostlyInRangeMonth = (startDate, endDate) => {
+    // Convert startDate and endDate to Date objects if they are strings
+    if (typeof startDate === 'string') {
+      startDate = new Date(startDate);
+    }
+    if (typeof endDate === 'string') {
+      endDate = new Date(endDate);
+    }
+
+    // Calculate the middle date between startDate and endDate
+    const middleDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
+
+
+    // Return the month index (0 for January, 1 for February, ..., 11 for December)
+    return middleDate;
   };
 
-  export default AppointmentReschedule;
+  const scrollToAppointment = (appointment_id) => {
+    const appointmentElement = document.querySelector(`.event-${appointment_id}`);
+    if (appointmentElement) {
+        appointmentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        appointmentElement.classList.add('outlined-pop'); // Apply the CSS class
+
+    // Wait for 2 seconds and then remove the CSS class
+    setTimeout(() => {
+      appointmentElement.classList.remove('outlined-pop');
+      document.querySelector('#rescheduleBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelector('#rescheduleBtn').classList.add('outlined-pop');
+    }, 1000);
+    }
+  }
+  useEffect(() => {
+    
+    if (state?.appointmentDetails) {
+      if (currentView) {
+        scrollToAppointment(state.appointmentDetails.id);
+      }
+    }
+  }, [events]);
+
+  const eventPropGetter = useCallback((event) => {
+    return {
+      className: `event bg-success event-${event.id}`,
+    };
+  }, []);
+
+  if (!currentView) {
+    return (
+      <div style={{ maxHeight: '60vh' }}>
+        <p className='fs-4 fw-semibold'>Loading Appointemnt Details. </p>
+        <Loader />
+      </div>
+    )
+  }
+  return (
+    <div className='container-fluid my-3 full-width'>
+      <div className="row justify-content-center border border-2 rounded-4 p-3 bg-white">
+        <div className="col-md-12">
+          {rescheduling ? (
+            <DnDCalendar
+              localizer={localizer}
+              defaultDate={currentDate}
+              defaultView={currentView}
+              views={[currentView]}
+              events={events}
+              style={currentView === 'month' ? { height: 700 } : {}}
+              eventPropGetter={eventPropGetter}
+              step={15}
+              onEventDrop={handleEventDrop}
+              toolbar={false}
+              className={'pt-5'}
+              resizable={false}
+            />
+          ) : (
+            <Calendar
+              localizer={localizer}
+              defaultDate={currentDate}
+              defaultView={currentView ? currentView : 'month'}
+              views={['week', 'month', 'agenda']}
+              events={events}
+              eventPropGetter={eventPropGetter}
+              style={currentView === 'month' ? { height: 700 } : {}}
+              onRangeChange={handleRangeChange}
+              onSelectEvent={(event) => navigate('/appointments/detail', { state: { id: event.id } })}
+              step={15}
+            />
+          )}
+        </div>
+        <div className={`mt-3 ${currentView === 'agenda' ? 'd-none' : 'd-block'}`}>
+          {rescheduling ?
+            (
+              <div>
+                <button className='btn btn-primary btn-lg me-3' onClick={() => handleSaveRescheduledEvent()}>Confirm</button>
+                <button className='btn btn-secondary btn-lg' onClick={() => { handleRescheduling(false); returnOriginalEvent(); }}>Cancel</button>
+              </div>
+            ) : (
+              <div>
+                <button className='btn btn-primary btn-lg' id='rescheduleBtn' onClick={() => handleRescheduling(true)}>Reschedule</button>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AppointmentReschedule;

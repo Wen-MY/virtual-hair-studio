@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 
-const RatingStars = ({ rating, onRate, className }) => {
+const RatingStars = ({ rating, onRate, className, responsive = true }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleStarHover = (hoveredRating) => {
-    setHoverRating(hoveredRating);
+    if (responsive) {
+      setHoverRating(hoveredRating);
+    }
   };
 
   const handleStarClick = (clickedRating) => {

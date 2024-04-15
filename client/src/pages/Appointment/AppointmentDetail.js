@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { formatDate, formatTime } from '../../utils/datetimeFormatter';
@@ -10,6 +10,7 @@ import RatingStars from '../../components/rating-star';
 
 const AppointmentDetail = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const appointmentId = state.id;
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [review, setReview] = useState({
@@ -295,19 +296,19 @@ const AppointmentDetail = () => {
                 </div>
               </div>
             </div>
-            {appointmentDetails.status === 'COMPLETED' && !updateEnable && (
+            {appointmentDetails.status === 'COMPLETED' && (review.created_at || !updateEnable) && (
               <div className='col-md-12 bg-white rounded-4 p-4 pb-3 border border-2 mt-2'>
                 <h4 className='border-bottom pb-1'>Review</h4>
                 <div className='text-start mt-3'>
                   {review.created_at ? (
                     <div>
-                      <RatingStars rating={review.rating} onRate={() => {}}  className={'fs-3'}/>
+                      <RatingStars rating={review.rating} onRate={() => {}}  className={'fs-3'} responsive={false}/>
                       <div className='row mt-3 ps-2'>
                         <label className='fw-bold col-1'>Comment :</label>
                         <p className='col-10 ' >{review.comment??""}</p>
                       </div>
                     </div>
-                  ) : (
+                  ) : !updateEnable && (
                     <div>
                       <RatingStars rating={review.rating} onRate={(newRating) => setReview(prev => ({
                         ...prev,
@@ -344,9 +345,9 @@ const AppointmentDetail = () => {
                 <button className='btn btn-success me-3' onClick={() => handleUpdateAppointmentStatus('CONFIRMED')}>Accept Appointment</button>
                 <button className='btn btn-danger' data-bs-target="#cancelAppointmentConfirmationModal" data-bs-toggle="modal">Cancel Appointment</button>
               </div>
-            ) : (
+            ) : updateEnable && (
               <div>
-                <button className='btn btn-primary'>Reschedule Appointment Time</button>
+                <button className='btn btn-primary' onClick={()=>navigate('/appointment/reschedule', { state: { appointmentDetails } })}>Reschedule Appointment Time</button>
               </div>
             )}
           </div>)}

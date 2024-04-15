@@ -118,3 +118,18 @@ input[type="number"] {
 .icon-link:hover .bi-chevron-down {
   transform: translateY(20%);
 }
+.outlined-pop {
+  animation: pulse 1s ease-in-out; /* Apply animation for 2 seconds */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
