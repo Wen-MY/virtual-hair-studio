@@ -14,5 +14,23 @@ function formatDate(dateString) {
     hours = hours ? hours : 12;
     return hours + ":" + minutes + " " + postfix;
   }
+  function formatDateInverse(dateString) {
+    let date = new Date(dateString);
+    let day = ("0" + date.getDate()).slice(-2);
+    let month = ("0" + (date.getMonth() + 1)).slice(-2);
+    let year = date.getFullYear();;
+    return year + "-" + month + "-" + day;
+  }
+  function convertTo12HourFormat(timeString) {
+    const [hours, minutes, seconds] = timeString.split(':');
+    let postfix = 'AM';
+    let formattedHours = parseInt(hours, 10);
 
-  export { formatDate, formatTime };
+    if (formattedHours >= 12) {
+        postfix = 'PM';
+        formattedHours = formattedHours === 12 ? 12 : formattedHours - 12;
+    }
+
+    return `${formattedHours}:${minutes}:${seconds} ${postfix}`;
+}
+  export { formatDate, formatTime, formatDateInverse,convertTo12HourFormat };
