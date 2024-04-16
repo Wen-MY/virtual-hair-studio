@@ -6,7 +6,7 @@ const multer = require('multer');
 const upload = multer({
     storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
   });
-
+// get all hairstylist by salonId
 router.get('/get/:salonId', async (req, res) => {
     try {
         const { salonId } = req.params;
@@ -22,7 +22,7 @@ router.get('/get/:salonId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
+// add hairstylist by salonId
 router.post('/add/:salonId', upload.single('image'), async (req, res) => {
     try {
         const { salonId } = req.params;
@@ -54,7 +54,7 @@ router.post('/add/:salonId', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
+// delete hairstylist by salonId
 router.delete('/delete/:hairstylistId', async (req, res) => {
     try {
         const { hairstylistId } = req.params;

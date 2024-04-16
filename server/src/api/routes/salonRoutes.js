@@ -6,6 +6,7 @@ const multer = require('multer');
 const upload = multer({
     storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
   });
+//get salon by userId
 router.get('/id',async (req,res) => {
     const userId = req.userId;
     try{
@@ -21,7 +22,7 @@ router.get('/id',async (req,res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 })
-//get all with pagination
+//get all salon with pagination
 router.get('/retrieve',async (req,res) => {
     try{
         let baseQuery;
@@ -81,7 +82,6 @@ router.get('/retrieve',async (req,res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 })
-
 //get all information related to the salon
 router.get('/get/:salonId',async (req,res) => {
     try{
@@ -101,7 +101,6 @@ router.get('/get/:salonId',async (req,res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 })
-
 //update , check for user Id for its relevant salon, else unauthorized
 router.put('/update/:salonId', async (req, res) => {
     try {
@@ -137,7 +136,6 @@ router.put('/update/:salonId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
 //owner single use to create his/her salon
 router.post('/create', async (req, res) => {
     try {
@@ -165,6 +163,7 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+//update salon profile image
 router.post('/update-salon-image', upload.single('salonImage'), async (req, res) => {
     try {
   

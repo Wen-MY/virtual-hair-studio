@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
-
-
 router.get('/retrieve', async (req, res) => {
     try {
         const { salonId, limit, offset } = req.query;
@@ -83,8 +81,6 @@ router.get('/get/:appointmentId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-
 router.post('/create', async (req, res) => {
     try {
         const { appointmentId,customerId,serviceId, rating, comment } = req.body;
@@ -106,6 +102,4 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-
 module.exports = router;

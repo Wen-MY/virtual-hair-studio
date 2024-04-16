@@ -3,6 +3,7 @@ const router = express.Router();
 const database = require('../../../db-config');
 const bcrypt = require('bcrypt'); // for password hashing
 
+// Auth check and return role
 router.get('/', async (req,res) =>{
     try {
         if (req.session.user) {
@@ -16,7 +17,6 @@ router.get('/', async (req,res) =>{
         res.status(500).json({ login: null, message: 'Internal Server Error' });
     }
 })
-
 // Sign In
 router.post('/signin', async (req, res) => {
     const { username, password } = req.body;
@@ -54,7 +54,6 @@ router.post('/signin', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 }); 
-
 // Validate email existed (pending , wrong status send actually)
 router.get('/validate/email/:email', async (req, res) => {
     try {

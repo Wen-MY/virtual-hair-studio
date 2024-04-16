@@ -13,6 +13,8 @@ const { promptGeneratorUtils } = require('../../utils/promptGenerator');
 const upload = multer({
     storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
   });
+
+// Try on hairstyle generation connect to DALL-E-2
 router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
     try {
         const transactionId = uuidv4();
@@ -139,7 +141,7 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
+// get all try on hairstyle options
 router.get('/options',async (req,res) => {
     const {enabled,categoryId} = req.query;
     try{
@@ -169,7 +171,7 @@ router.get('/options',async (req,res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 })
-
+// get all try on hairstyle option categories
 router.get('/categories',async (req,res) => {
     try {
         const [results] = await database.poolTryOn.execute('SELECT * FROM options_categories', []);
@@ -183,6 +185,7 @@ router.get('/categories',async (req,res) => {
         return res.status(500).json({ message: 'Internal server error.' });
     }
 })
+// get all try on hairstyle option presets
 router.get('/recommendation',async (req,res) => {
     try{
         const sqlParams = []
@@ -203,15 +206,14 @@ router.get('/recommendation',async (req,res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 })
-// Route to save the user's acceptance of terms and conditions
+// route to save the user's acceptance of terms and conditions (session based)
 router.post('/term/accept', (req, res) => {
     // Save user's acceptance status in session or cookies
     req.session.acceptedTerms = true; // Example: Storing in session
 
     return res.status(200).send('Terms and conditions accepted successfully.');
 });
-
-// Route to check if the user has accepted the terms and conditions
+// route to check if the user has accepted the terms and conditions
 router.get('/term/check', (req, res) => {
     // Check if the user has accepted terms and conditions
     const hasAcceptedTerms = req.session.acceptedTerms || false; // Example: Retrieving from session
@@ -222,7 +224,7 @@ router.get('/term/check', (req, res) => {
         return res.status(403).send('User has not accepted terms and conditions.');
     }
 });
-
+// get all try on hairstyle regenerate feedback options
 router.get('/feedback/options',async (req,res)=> {
     try {
         const [results] = await database.poolTryOn.execute('SELECT * FROM feedback_types', []);
@@ -236,7 +238,7 @@ router.get('/feedback/options',async (req,res)=> {
         return res.status(500).json({ message: 'Internal server error.' });
     }
 })
-
+// save user rating on generations
 router.post('/rate',async (req,res)=> {
     try {
         const {rating, try_on_id} = req.body;
@@ -250,5 +252,9 @@ router.post('/rate',async (req,res)=> {
         console.error('Error retriving feedback options:', error);
         return res.status(500).json({ message: 'Internal server error.' });
     }
+})
+// get user's try-on attempt medias
+router.post('/attempts-media',async (req,res) =>{
+    
 })
 module.exports = router;

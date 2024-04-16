@@ -3,6 +3,7 @@ const router = express.Router();
 const database = require('../../../db-config');
 const DateUtils = require('../../utils/sqlDateFormatter')
 
+// retrieve all appointment by current user ownership
 router.get('/retrieve', async (req, res) => {
     try {
         // check user role
@@ -106,7 +107,7 @@ router.get('/retrieve', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
+// create appointment
 router.post('/create', async (req, res) => {
     try {
         const { serviceId, bookingDateTime, hairstylistId, remarks } = req.body;
@@ -142,8 +143,7 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-//full details 
+// get appointment details by appointmentId
 router.get('/get/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -193,6 +193,7 @@ router.get('/get/:id', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+// get appointment details by appointmentId
 router.post('/update/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -243,7 +244,7 @@ router.post('/update/:id', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
+// get timeslot available for selected datetime
 router.get('/timeslots', async (req, res) => {
     try {
         const { serviceId, appointmentDate } = req.query;
@@ -331,8 +332,7 @@ router.get('/timeslots', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-//owner use only , client user will not get result
+// get next appointment upcoming (owner use only , client user will not get result)
 router.get('/getNext', async (req, res) => {
     try {
         const userId = req.userId;
@@ -371,8 +371,7 @@ router.get('/getNext', async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-//owner use only , retrieve active appointment (confirmed , cancelled , pending)
+// get all active appointment (owner use only , active appointment : confirmed , cancelled , pending)
 router.get('/getActive', async (req, res) => {
     try {
         const userId = req.userId;
@@ -399,6 +398,8 @@ router.get('/getActive', async (req, res) => {
     }
 })
 
+//--helper--//
+// Function to check appointment ownership
 const checkAppointmentOwnership = async (userId, appointmentId) => {
     const [ownershipCheckClient] = await database.poolInfo.execute(
         'SELECT customer_id FROM appointments WHERE id = ?',
@@ -417,7 +418,6 @@ const checkAppointmentOwnership = async (userId, appointmentId) => {
         ownershipCheckOwner.length > 0 && ownershipCheckOwner[0].user_id === userId
     )
 }
-
 // Function to update appointment statuses
 const UpdateAppointmentStatus = async (appointmentIdList) => {
     try {
@@ -440,7 +440,7 @@ const UpdateAppointmentStatus = async (appointmentIdList) => {
         throw error;
     }
 }
-
+// Function to get all appointment customer by array of customerIds
 const getAppointmentCustomer = async (customerIds) => {
     const uniqueCustomerIds = [...new Set(customerIds)];
     const query = `

@@ -3,7 +3,7 @@ const router = express.Router();
 const database = require('../../../db-config');
 
 
-//by salon id
+//get all services by salon id
 router.get('/all/:salonId', async (req, res) => {
     const { salonId } = req.params;
     try {
@@ -49,8 +49,6 @@ router.get('/all/:salonId', async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
-
 //get service by service id
 router.get('/get/:serviceId', async (req, res) => {
     try {
@@ -86,8 +84,7 @@ router.get('/get/:serviceId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-
+// add service by service Id
 router.post('/add/:salonId', async (req, res) => {
     try {
         const { salonId } = req.params;
@@ -134,8 +131,7 @@ router.post('/add/:salonId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-// delete service 
+// delete service by service Id
 router.delete('/delete/:serviceId', async (req, res) => {
     try {
         const { serviceId } = req.params;
@@ -165,8 +161,7 @@ router.delete('/delete/:serviceId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
-
-// update service
+// update service by service Id
 router.put('/update/:serviceId', async (req, res) => {
     try {
         const { serviceId } = req.params;
@@ -224,7 +219,7 @@ router.put('/update/:serviceId', async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
-
+// get all service categories
 router.get('/categories', async (req, res) => {
     try {
         const [results] = await database.poolInfo.execute('SELECT * FROM categories', []);

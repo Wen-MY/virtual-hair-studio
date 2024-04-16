@@ -8,9 +8,7 @@ const { getProfilePicture, saveProfilePicture } = require('../firestore/userColl
 const upload = multer({
   storage: multer.memoryStorage(), // Store file in memory before uploading to Firebase
 });
-
-
-// Sign Out
+// Sign out
 router.post('/logout', (req, res) => {
   // Clear the session
   req.session.destroy((err) => {
@@ -22,8 +20,7 @@ router.post('/logout', (req, res) => {
     }
   });
 });
-
-// Delete User
+// Delete user
 router.delete('/delete/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -40,8 +37,7 @@ router.delete('/delete/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error.' });
   }
 });
-
-// Update User
+// Update user
 router.post('/update', async (req, res) => {
   try {
     const { email, first_name, last_name, gender } = req.body;
@@ -57,7 +53,7 @@ router.post('/update', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error.' });
   }
 })
-
+// retrieve user information
 router.get('/retrieve', async (req, res) => {
   try {
     const [results, fields] = await database.poolUM.execute(
@@ -77,7 +73,7 @@ router.get('/retrieve', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error.' });
   }
 })
-
+// change user password
 router.post('/change-password', async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
@@ -121,6 +117,7 @@ router.post('/change-password', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error.' });
   }
 });
+// update user profile picture
 router.post('/update-profile-picture', upload.single('profilePicture'), async (req, res) => {
   try {
 
