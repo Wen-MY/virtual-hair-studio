@@ -5,7 +5,7 @@ import Select from 'react-select';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import AsyncSelect from 'react-select/async';
-import { formatDate, formatTime, formatDateInverse,convertTo12HourFormat } from '../../utils/datetimeFormatter';
+import { formatDate, formatTime, formatDateInverse, convertTo12HourFormat } from '../../utils/datetimeFormatter';
 
 const AppointmentCreation = () => {
   //---------------------------- state variable -------------------------------//
@@ -302,29 +302,59 @@ const AppointmentCreation = () => {
               <div>
                 <h2 className='text-start'>Confirm Selection</h2>
                 <div className='step-content d-flex justify-content-center mt-5'>
-                  <div className='text-start px-3 mt-4 fs-5 full-width'>
-                    <div className='row'>
-                      <div className='col-2'>
-                        <label htmlFor='date' className='fw-bold col-form-label'>Date :</label>
+                  <div className='text-start mt-4 px-4 fs-5 full-width'>
+                  <div className='row'>
+                    <div className='col-6'>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='date' className='fw-bold col-form-label'>Salon :</label>
+                        </div>
+                        <div className='col-8'>
+                          <p className='form-control' id='salon'>{salonName}</p>
+                        </div>
                       </div>
-                      <div className='col-4'>
-                        <p className='form-control' id='date'>{formatDate(selectedDate)}</p>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='time' className='fw-bold col-form-label'>Service :</label>
+                        </div>
+                        <div className='col-8'>
+                          <p className='form-control' id='service'>{selectedService.label}</p>
+                        </div>
+                      </div>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='time' className='fw-bold col-form-label'>Hairstylist :</label>
+                        </div>
+                        <div className='col-8'>
+                        <p className='form-control' id='hairstylist'>{selectedHairstylist.label}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className='row'>
-                      <div className='col-2'>
-                        <label htmlFor='time' className='fw-bold col-form-label'>Time :</label>
+                    <div className='col-6'>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='date' className='fw-bold col-form-label'>Date :</label>
+                        </div>
+                        <div className='col-8'>
+                          <p className='form-control' id='date'>{formatDate(selectedDate)}</p>
+                        </div>
                       </div>
-                      <div className='col-4'>
-                        <p className='form-control' id='time'>{convertTo12HourFormat(selectedTime)}</p>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='time' className='fw-bold col-form-label'>Time :</label>
+                        </div>
+                        <div className='col-8'>
+                          <p className='form-control' id='time'>{convertTo12HourFormat(selectedTime)}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className='row'>
-                      <div className='col-2'>
-                        <label htmlFor='time' className='fw-bold col-form-label'>Remark :</label>
+                      <div className='row'>
+                        <div className='col-4'>
+                          <label htmlFor='time' className='fw-bold col-form-label'>Remark :</label>
+                        </div>
+                        <div className='col-8'>
+                          <textarea className='form-control' type="text" placeholder="Optional remarks for salon" value={remarks ?? ''} onChange={(e) => setRemarks(e.target.value)} style={{ resize: 'none', minHeight: '120px' }} autoFocus></textarea>
+                        </div>
                       </div>
-                      <div className='col-4'>
-                        <textarea className='form-control' type="text" placeholder="Optional remarks for salon" value={remarks??''} onChange={(e) => setRemarks(e.target.value)} style={{resize: 'none', minHeight: '120px'}} autoFocus></textarea>
                       </div>
                     </div>
                   </div>

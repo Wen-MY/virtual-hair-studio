@@ -143,6 +143,10 @@ const SalonExplore = () => {
                         <div className="row mb-3">
                             <div className="col-12">
                                 <label className="form-label fw-semibold">Select Service</label>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="radio" name="serviceRadio" id={`serviceRadio-all`} value={''} checked={filterService === ''} onChange={() => setFilterService('')} />
+                                    <label className="form-check-label" htmlFor={`serviceRadio-all`}>All</label>
+                                </div>
                                 {services.map((service) => (
                                     <div key={service.id} className="form-check">
                                         <input className="form-check-input" type="radio" name="serviceRadio" id={`serviceRadio-${service.id}`} value={service.id} checked={filterService === service.id} onChange={() => setFilterService(service.id)} />
@@ -170,20 +174,20 @@ const SalonExplore = () => {
                                 <label htmlFor="sortBySelector" className="col-sm-1 col-form-label">Sort By :</label>
                                 <div className="col-sm-2">
                                     <select id="sortBySelector" className="form-select" value={sortBy.option} onChange={(e) => setSortBy({option: e.target.value,direction : true})}>
-                                        <option value="">-- Sort By --</option>
+                                        <option value=''>-- Sort By --</option>
                                         {sortOptions.map((option, index) => (
                                             <option key={index} value={option}>{option}</option>
                                         ))}
                                     </select>  
                                 </div>
-                                <button className="btn btn-outline-secondary ms-2 d-flex align-items-center" onClick={() => setSortBy(prevOption => ({ ...prevOption, direction: !prevOption.direction }))}>{sortBy.direction?<i class="bi bi-arrow-down"></i>:<i class="bi bi-arrow-up"></i>}</button>
+                                <button className="btn btn-outline-secondary ms-2 d-flex align-items-center" onClick={() => setSortBy(prevOption => ({ ...prevOption, direction: !prevOption.direction }))}>{sortBy.direction?<i className="bi bi-arrow-down"></i>:<i className="bi bi-arrow-up"></i>}</button>
                             </div>
                         </div>
                     </div>
                     {/* Salon Listing Section */}
                     <div className="row">
                         <div className="col border border-2 rounded-4 p-5 bg-white min-height">
-                            {salons.length > 0 ? (
+                            {(salons.length > 0 && totalResults > 0) ? (
                                 <div className="row row-cols-1 row-cols-md-4 g-4">
                                     {salons.map((salon) => (
                                         <div className="col mb-4" key={salon.id} onClick={() => handleRowClick(salon.id)}>

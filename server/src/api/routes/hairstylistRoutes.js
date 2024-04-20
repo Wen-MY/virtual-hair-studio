@@ -63,13 +63,13 @@ router.delete('/delete/:hairstylistId', async (req, res) => {
             `UPDATE hairstylists
                 SET deleted_at = CURRENT_TIMESTAMP
                 WHERE id = ?`
-            , [serviceId]);
+            , [hairstylistId]);
         if (result.affectedRows > 0)
             res.status(200).json({ message: 'Hairstylist deleted successfully' });
         else
             res.status(404).json({ message: 'Hairstylist not found' });
     } catch (error) {
-        console.error('Error during service deletion:', error);
+        console.error('Error during hairstylist deletion:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 });

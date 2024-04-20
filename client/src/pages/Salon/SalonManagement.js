@@ -47,6 +47,7 @@ const SalonManagement = () => {
   const [newHairstylistFormError, setNewHairstylistFormError] = useState(null);
   //updating services
   const [selectedService, setSelectedService] = useState(null);
+  const [selectedHairstylist,setSelectedHairstylist]  = useState(null);
 
   //----------------api-request-----------------------//
   useEffect(() => {
@@ -347,6 +348,32 @@ const SalonManagement = () => {
     }
     clearNewHairstylistForm();
   }
+  const deleteSelectedHairstylist = async (id) => {
+    //
+    try {
+      // Fetch salon details using salon ID
+      const deleteResponse = await fetch(
+        config.serverUrl + `/hairstylist/delete/${id}`,
+        {
+          method: 'DELETE',
+          credentials: "include",
+        }
+      );
+
+      const deleteData = await deleteResponse.json();
+      if (deleteResponse.ok) {
+        fetchSalonData();
+        console.log("Success to delete salon information")
+        toast.success(deleteData.message, { autoClose: 3000 });
+      } else {
+        console.error("Failed to delete salon information:", deleteData.message);
+        toast.warning(deleteData.message, { autoClose: 3000 });
+      }
+    } catch (error) {
+      console.error("Error fetching salon data:", error);
+    }
+    setSelectedHairstylist(null);
+  }
   //----------------------------------------- add service form change handling ----------
   const handleNewServiceFormInputChange = (e) => {
     setNewServiceFormData({
@@ -512,6 +539,7 @@ const SalonManagement = () => {
             <div className="col" key={hairstylist.id}>
               <div className="card">
                 <div className="card-body text-start">
+                <button className='btn btn-outline-danger rounded-circle float-end btn-sm' data-bs-toggle="modal" data-bs-placement="top" title="Delete" data-bs-target="#deleteHairstylistModal" onClick={() => setSelectedHairstylist(hairstylist.id)}><span className="bi-trash"></span></button>
                   <div className='service-thumbnail float-start mx-4'>
                     <img className='img-thumbnail rounded-circle image-square-medium' src={hairstylist.image_url?hairstylist.image_url:`https://picsum.photos/100/100?random=${hairstylist.id}`}></img>
                   </div>
@@ -793,6 +821,24 @@ const SalonManagement = () => {
             <div className="modal-footer">
               <button type="button" className="btn btn-primary" onClick={() => addNewHairstylist()}>Add</button>
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => clearNewHairstylistForm()}>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Modal for delete existing hairstylist */}
+      <div className={`modal fade`} id="deleteHairstylistModal" tabIndex="-1" aria-labelledby="deleteHairstylistModalLabel" aria-hidden="true" >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title fw-bold">Delete Hairstylist</h4>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setSelectedHairstylist(null)}></button>
+            </div>
+            <div className="modal-body">
+              <p>The Hairstylist <strong>deleted</strong> will not able to recover.<br></br> Please confirm that you really want to delete this Hairstylist.</p>      
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => deleteSelectedHairstylist(selectedHairstylist)}>Confirm Delete</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setSelectedHairstylist(null)}>Cancel</button>
             </div>
           </div>
         </div>

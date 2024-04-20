@@ -398,7 +398,7 @@ router.get('/getActive', async (req, res) => {
     }
 })
 
-//--helper--//
+//----------------------------------------
 // Function to check appointment ownership
 const checkAppointmentOwnership = async (userId, appointmentId) => {
     const [ownershipCheckClient] = await database.poolInfo.execute(
@@ -455,4 +455,6 @@ const getAppointmentCustomer = async (customerIds) => {
         throw error;
     }
 }
+//
+//------------------------------------------
 module.exports = router;

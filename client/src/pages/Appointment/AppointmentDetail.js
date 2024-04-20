@@ -320,7 +320,7 @@ const AppointmentDetail = () => {
                           className="form-control"
                           placeholder="Leave a comment here"
                           id="floatingTextarea"
-                          style={{ height: '85px' }}
+                          style={{ minHeight: '85px',maxHeight: '200px' }}
                           onChange={(event) => setReview(prev => ({
                             ...prev,
                             comment: event.target.value
@@ -339,7 +339,7 @@ const AppointmentDetail = () => {
               </div>
             )}
           </div>
-          {appointmentDetails.status !== 'COMPLETED' && appointmentDetails.status !== 'CANCELLED' && appointmentDetails.status !== 'IN PROGRESS' && (<div className='mt-3 border-top pt-3 d-flex justify-content-center'>
+          {appointmentDetails.status !== 'COMPLETED' && appointmentDetails.status !== 'CANCELLED' && (<div className='mt-3 border-top pt-3 d-flex justify-content-center'>
             {(updateEnable && appointmentDetails.status === 'PENDING') ? (
               <div>
                 <button className='btn btn-success me-3' onClick={() => handleUpdateAppointmentStatus('CONFIRMED')}>Accept Appointment</button>
@@ -351,7 +351,12 @@ const AppointmentDetail = () => {
               </div>
             )}
           </div>)}
-
+            {!updateEnable && appointmentDetails.status === 'PENDING' && (
+            <div>
+              <button className='btn btn-danger' data-bs-target="#cancelAppointmentConfirmationModal" data-bs-toggle="modal">Cancel Appointment</button>
+            </div>
+            ) 
+            }
         </div>
 
       ) : (
