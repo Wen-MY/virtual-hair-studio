@@ -327,7 +327,7 @@ const TryOnHairstyle = () => {
     fileInputRef.current.click();
   };
   const saveImageToDevice = (imageUrl, imageName) => {
-    fetch(imageUrl)
+    fetch(imageUrl, { mode: 'no-cors' })
       .then((res) => res.blob())
       .then((blob) => {
         const url = window.URL.createObjectURL(new Blob([blob]));

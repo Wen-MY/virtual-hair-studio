@@ -68,7 +68,7 @@ const promptGeneratorUtils = {
         const messages = [
             {
                 "role": "system",
-                "content": "You are a dall-e-2 image editing prompt generator that generate high accuracy and precise prompt that changing image's hair from hair options provided. Sample prompt : " + sample_prompt.prompt
+                "content": "You are a dall-e-2 image editing prompt generator that generate high accuracy and precise prompt that changing image's hair from hair options provided.The prompt should not longer than 1000 characters with space. Sample prompt : " + sample_prompt.prompt
             },
             {
                 "role": "user",
@@ -77,12 +77,12 @@ const promptGeneratorUtils = {
                 Haircut : ${haircut??'remain unchanged'}
                 Hair texture : ${texture??'remain unchanged'}
                 Context : ${attire??'remain unchanged'}`+
-                (volume? `\nHair Volume : ${volume}`:'')+
-                (highlight? `\nHair Highlight Color: ${highlight}`:'')+
-                (parting? `\nHair Parting : ${parting}`:'')+
-                (styling? `\nHair Styling Technique : ${styling}`:'')+
-                (accessory? `\nHair Accessory : ${accessory}`:'')+
-                `From the hair options provided above, generate a specific prompt that will be used by dall-e-2 image model that editing the hair in a image with description for each option so dall-e-2 model can understand the hair options' professional terms.Make the prompt in one paragraph and add a short notice in prompt to take note in integration of hair should be realistic as it is editing real image.`
+                (volume? `Hair Volume : ${volume}`:'')+
+                (highlight? `Hair Highlight Color: ${highlight}`:'')+
+                (parting? `Hair Parting : ${parting}`:'')+
+                (styling? `Hair Styling Technique : ${styling}`:'')+
+                (accessory? `Hair Accessory : ${accessory}`:'')+
+                `From the hair options provided above, generate a specific prompt that will be used by dall-e-2 image model that editing the hair in a image with description for each option so dall-e-2 model can understand the hair options' professional terms.Make the prompt in one paragraph and add a short notice in prompt to take note in integration of hair should be realistic as it is editing real image. The prompt should not longer than 1000 characters with space`
             },
         ];
         const requestBody = {
@@ -105,8 +105,10 @@ const promptGeneratorUtils = {
             const responseData = await response.json();
             console.log(responseData);
             return {
-                prompt : responseData.choices[0].message.content,
-                sample_id : sample_prompt.id
+                prompt : promptGeneratorUtils.trimPrompt(responseData.choices[0].message.content),
+                completion_tokens : responseData.usage.completion_tokens,
+                sample_id : sample_prompt.id,
+
             };
         } catch (error) {
             console.log('Error Generating Prompt using GPT 4 , using fixed prompt format : Error '+ error);
@@ -126,6 +128,18 @@ const promptGeneratorUtils = {
             // Update the usage time for the selected prompt in the database
         await database.poolTryOn.execute('UPDATE `try-on_attempts` SET `usage` = `usage` + 1 WHERE id = ?', [topPrompt.id]);
         return topPrompt;
+    }
+    ,
+    trimPrompt: (prompt) => {
+        const maxLength = 999; // Maximum length including spaces
+        if (prompt.length > maxLength) {
+            console.warn(`Prompt length exceeds ${maxLength} characters. Prompt Length = ${prompt.length}`);
+            const trimmedPrompt = prompt.substring(1, maxLength); // Trim prompt to maximum length
+            console.log(`Prompt length after trimmed = ${trimmedPrompt.length}`);
+            return trimmedPrompt;
+        } else {
+            return prompt; // Return original prompt if within limit
+        }
     }
 };
 

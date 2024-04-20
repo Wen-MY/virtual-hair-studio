@@ -120,7 +120,8 @@ router.post('/generate', upload.single('tryOnImage'), async (req, res) => {
         try {
             const mediaURLsArray = await Promise.all(saveImagePromises);
             const mediaURLs = mediaURLsArray.join(',');
-            const [result] = await database.poolTryOn.execute('INSERT INTO `try-on_attempts` (transaction_id,user_id,media_URLS,prompt,sample_id) VALUES (?,?,?,?,?)',[transactionId,userId,mediaURLs,prompt,preset_id?null:prompt_generated.sample_id]);
+            const completionTokens = prompt_generated.completion_tokens !== undefined ? prompt_generated.completion_tokens : 0;
+            const [result] = await database.poolTryOn.execute('INSERT INTO `try-on_attempts` (transaction_id,user_id,media_URLS,prompt,completion_token,sample_id) VALUES (?,?,?,?,?,?)',[transactionId,userId,mediaURLs,prompt,completionTokens,preset_id?null:prompt_generated.sample_id]);
             if(result.affectedRows <= 0){
                 console.error('Error saving try-on attempts to database');
             }
@@ -242,10 +243,11 @@ router.get('/feedback/options',async (req,res)=> {
 router.post('/rate',async (req,res)=> {
     try {
         const {rating, try_on_id} = req.body;
-        const [sampleId] = await database.poolTryOn.execute('SELECT sample_id FROM `try-on_attempts` WHERE id = ?',[try_on_id]);
-        if(sampleId.length > 0)
+        const [sampleIdRows] = await database.poolTryOn.execute('SELECT sample_id FROM `try-on_attempts` WHERE id = ?',[try_on_id]);
+        if(sampleIdRows.length > 0)
         {
-            const [updateSamplePrompt] = await database.poolTryOn.execute('UPDATE `try-on_attempts` SET score = score + ? WHERE id = ?', [rating,sampleId[0]]);
+            const sampleId = JSON.parse(sampleIdRows[0].sample_id);
+            const [updateSamplePrompt] = await database.poolTryOn.execute('UPDATE `try-on_attempts` SET score = score + ? WHERE id = ?', [rating,sampleId]);
         }
         return res.status(201).json({ message: 'Rated virtual hairstyle successfully'});
     } catch (error) {
