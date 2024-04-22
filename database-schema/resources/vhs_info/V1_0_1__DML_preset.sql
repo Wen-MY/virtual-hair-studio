@@ -66,7 +66,7 @@ insert  into `appointments`(`id`,`customer_id`,`service_id`,`hairstylist_id`,`bo
 (47,2,1,1,'2024-04-04 15:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-07 12:52:01'),
 (48,2,1,1,'2024-04-12 15:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-13 15:03:25'),
 (49,2,2,1,'2024-04-12 13:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-13 15:03:25'),
-(50,2,1,1,'2024-04-12 15:00:00','PENDING','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
+(50,2,1,1,'2024-04-12 15:00:00','CANCELLED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-17 12:30:19'),
 (51,2,2,1,'2024-04-12 13:15:00','CANCELLED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:34'),
 (52,2,1,1,'2024-04-12 15:00:00','PENDING','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
 (53,2,1,1,'2024-04-12 15:00:00','PENDING','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
@@ -90,9 +90,22 @@ insert  into `appointments`(`id`,`customer_id`,`service_id`,`hairstylist_id`,`bo
 (71,2,1,1,'2024-04-04 15:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-07 12:52:01'),
 (72,1,1,2,'2024-04-10 20:00:00','PENDING',NULL,'2024-04-07 22:03:54','2024-04-07 22:03:54'),
 (73,1,1,1,'2024-04-12 12:30:00','COMPLETED',NULL,'2024-04-07 22:07:00','2024-04-13 15:03:25'),
-(74,2,1,1,'2024-04-18 15:00:00','CONFIRMED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
-(75,2,5,1,'2024-04-19 15:00:00','CONFIRMED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
-(76,2,6,1,'2024-04-22 15:00:00','CONFIRMED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14');
+(74,2,1,1,'2024-04-18 15:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-20 15:18:31'),
+(75,2,5,1,'2024-04-19 15:00:00','COMPLETED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-20 15:18:31'),
+(76,2,6,1,'2024-04-22 15:00:00','CONFIRMED','This is a dummy remarks for Wednesday','2024-03-26 18:13:52','2024-04-01 14:27:14'),
+(77,2,2,1,'2024-04-24 10:30:00','CONFIRMED',NULL,'2024-04-16 15:34:20','2024-04-22 12:39:53'),
+(78,2,2,1,'2024-04-24 12:30:00','CONFIRMED',NULL,'2024-04-16 15:34:20','2024-04-22 12:39:50'),
+(79,2,3,1,'2024-04-24 11:30:00','CONFIRMED',NULL,'2024-04-16 15:34:20','2024-04-22 12:42:00'),
+(80,2,6,1,'2024-04-17 16:30:00','COMPLETED',NULL,'2024-04-16 15:34:20','2024-04-22 12:41:57'),
+(81,2,2,1,'2024-04-26 18:30:00','CONFIRMED',NULL,'2024-04-16 15:34:20','2024-04-22 12:39:49'),
+(82,2,1,1,'2024-04-23 08:30:00','CONFIRMED',NULL,'2024-04-16 15:34:20','2024-04-22 12:41:55'),
+(83,2,3,1,'2024-04-25 20:30:00','CONFIRMED',NULL,'2024-04-16 15:37:42','2024-04-22 12:41:53'),
+(84,2,5,1,'2024-04-23 14:30:00','CONFIRMED',NULL,'2024-04-16 15:42:49','2024-04-22 12:41:52'),
+(85,2,1,1,'2024-04-24 12:30:00','CONFIRMED',NULL,'2024-04-16 15:53:13','2024-04-22 12:39:46'),
+(86,2,1,2,'2024-04-25 13:00:00','CONFIRMED','The haircut should have ......','2024-04-16 16:13:53','2024-04-22 12:39:46'),
+(87,2,26,3,'2024-04-25 13:30:00','CONFIRMED',NULL,'2024-04-16 16:14:52','2024-04-22 12:39:45'),
+(88,1,2,2,'2024-04-27 20:30:00','CONFIRMED',NULL,'2024-04-22 00:12:15','2024-04-22 12:39:45'),
+(89,25,4,1,'2024-04-25 16:30:00','PENDING','This is an optional remarks.','2024-04-22 11:58:53','2024-04-22 12:41:07');
 
 /*Data for the table `categories` */
 
@@ -112,30 +125,32 @@ insert  into `hairstylist_scopes`(`id`,`hairstylist_id`,`service_id`,`created_at
 (1,1,2,'2024-02-13 09:47:13'),
 (2,2,2,'2024-02-13 19:06:33'),
 (15,2,4,'2024-03-27 22:35:55'),
-(28,1,1,'2024-03-27 22:56:41'),
-(29,2,1,'2024-03-27 22:56:41'),
 (30,1,25,'2024-03-27 23:17:44'),
-(33,3,26,'2024-03-28 11:41:58'),
 (34,1,3,'2024-04-07 23:29:59'),
 (35,2,3,'2024-04-07 23:29:59'),
 (36,1,7,'2024-04-07 23:32:14'),
 (38,9,29,'2024-04-14 22:58:58'),
 (39,9,30,'2024-04-14 23:14:29'),
 (40,9,28,'2024-04-14 23:23:50'),
-(41,10,28,'2024-04-14 23:23:50');
+(41,10,28,'2024-04-14 23:23:50'),
+(44,1,1,'2024-04-17 13:03:34'),
+(45,2,1,'2024-04-17 13:03:34'),
+(46,3,26,'2024-04-21 23:15:25'),
+(47,3,31,'2024-04-21 23:16:55');
 
 /*Data for the table `hairstylists` */
 
 insert  into `hairstylists`(`id`,`name`,`salon_id`,`position`,`rating`,`image_url`,`updated_at`,`created_at`,`deleted_at`) values 
-(1,'David Heng Tiek Tet',1,'Senior Hairstylist',5,NULL,'2024-02-05 17:56:11','2024-02-05 17:56:11',NULL),
-(2,'Tiffany Chew Sien Meh',1,NULL,NULL,NULL,'2024-02-05 17:56:36','2024-02-05 17:56:36',NULL),
-(3,'Yong Yao Wen',1,'Manager',NULL,NULL,'2024-03-27 23:41:24','2024-03-27 23:41:24',NULL),
-(4,'Wong Wee',1,'Manager',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F4%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=ace982d4-f743-44e5-8047-300021ff6d26','2024-04-07 15:17:39','2024-04-07 15:17:39',NULL),
-(7,'undefined',55,'undefined',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F7%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=71a3b5cb-2dfc-48ca-a5f8-bb5c42b2cc1c','2024-04-14 13:48:06','2024-04-14 13:48:06',NULL),
-(8,'undefined',55,'undefined',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F8%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=2921f370-a786-4aea-b3ab-6d42422ed01a','2024-04-14 13:53:24','2024-04-14 13:53:24',NULL),
-(9,'New new',55,'Senior Hairstylist',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F9%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=d6188a3b-4dcd-4563-ae63-a4f2ecb8d469','2024-04-14 13:57:26','2024-04-14 13:57:26',NULL),
-(10,'test',55,'test',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F10%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=0af67a48-df49-497a-90bb-7d9c8c156376','2024-04-14 13:58:07','2024-04-14 13:58:07',NULL),
-(11,'Wong Wee',55,'Manager',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F11%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=37cbd056-1437-42e0-bcee-52dc8773bd0a','2024-04-14 23:33:05','2024-04-14 23:33:04',NULL);
+(1,'David Heng Tiek Tet',1,'Senior Hairstylist',5,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F1%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=c7e27e3b-aa93-4f4e-9f01-576e609146d2','2024-04-22 21:20:21','2024-02-05 17:56:11',NULL),
+(2,'Tiffany Chew Sien Meh',1,NULL,4,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F2%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=2e9b7903-b2e3-426b-86e9-da5231fc1359','2024-04-22 21:20:31','2024-02-05 17:56:36',NULL),
+(3,'Yong Yao Wen',1,'Manager',4,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F12%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=c61d45b7-67d6-4390-8938-42e094c47085','2024-04-22 21:20:34','2024-03-27 23:41:24',NULL),
+(4,'Wong Wee',1,'Manager',5,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F4%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=ace982d4-f743-44e5-8047-300021ff6d26','2024-04-22 21:20:36','2024-04-07 15:17:39','2024-04-17 13:19:03'),
+(7,'undefined',55,'undefined',3,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F7%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=71a3b5cb-2dfc-48ca-a5f8-bb5c42b2cc1c','2024-04-22 21:20:37','2024-04-14 13:48:06',NULL),
+(8,'undefined',55,'undefined',3,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F8%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=2921f370-a786-4aea-b3ab-6d42422ed01a','2024-04-22 21:20:38','2024-04-14 13:53:24',NULL),
+(9,'New new',55,'Senior Hairstylist',5,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F9%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=d6188a3b-4dcd-4563-ae63-a4f2ecb8d469','2024-04-22 21:20:38','2024-04-14 13:57:26',NULL),
+(10,'test',55,'test',5,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F10%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=0af67a48-df49-497a-90bb-7d9c8c156376','2024-04-22 21:20:39','2024-04-14 13:58:07',NULL),
+(11,'Wong Wee',55,'Manager',5,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F11%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=37cbd056-1437-42e0-bcee-52dc8773bd0a','2024-04-22 21:20:40','2024-04-14 23:33:04',NULL),
+(12,'Travis Scott',1,'Junior Hairstylist',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/hairstylists%2F12%2Fmedia%2Fprofile%2Fthumbnail.jpg?alt=media&token=c61d45b7-67d6-4390-8938-42e094c47085','2024-04-21 23:15:50','2024-04-21 23:14:49','2024-04-21 23:15:50');
 
 /*Data for the table `reviews` */
 
@@ -174,7 +189,8 @@ insert  into `reviews`(`id`,`customer_id`,`appointment_id`,`service_id`,`rating`
 (36,2,0,19,5,'The waxing service was quick and efficient. Pleased with the results.','2024-02-27 11:45:00'),
 (37,2,0,19,3,'The waxing service left some redness and irritation on my skin.','2024-02-28 14:00:00'),
 (38,2,16,4,5,'Good!','2024-04-14 15:41:22'),
-(39,2,17,3,5,'tEST','2024-04-14 15:47:14');
+(39,2,17,3,5,'tEST','2024-04-14 15:47:14'),
+(40,1,73,1,4,'gOOF DOO','2024-04-15 15:27:27');
 
 /*Data for the table `salons` */
 
@@ -238,7 +254,7 @@ insert  into `salons`(`id`,`user_id`,`name`,`address`,`state`,`contact_number`,`
 /*Data for the table `services` */
 
 insert  into `services`(`id`,`salon_id`,`service_name`,`category_id`,`availability`,`duration`,`desc`,`updated_at`,`created_at`,`deleted_at`) values 
-(1,1,'Haircut',1,1,30,'Classic haircut for men and women','2024-02-05 17:36:35','2024-03-27 22:56:41',NULL),
+(1,1,'Haircut',1,1,30,'Classic haircut for men and women','2024-04-17 13:03:34','2024-03-27 22:56:41',NULL),
 (2,1,'Balayage Color',2,1,120,'Hand-painted highlights for a natural look','2024-02-05 17:36:35','2024-02-15 16:50:20',NULL),
 (3,1,'Keratin Treatment',5,1,90,'Smoothing treatment for frizz-free hair','2024-02-05 17:36:35','2024-04-07 23:29:59',NULL),
 (4,1,'Updo Styling',3,1,60,'Elegant updo styling for special occasions','2024-02-05 17:36:35','2024-02-15 16:50:21',NULL),
@@ -261,11 +277,12 @@ insert  into `services`(`id`,`salon_id`,`service_name`,`category_id`,`availabili
 (21,3,'Tanning',6,1,30,'Spray tanning services','2024-02-15 16:50:23','2024-02-15 16:50:23',NULL),
 (22,3,'Makeup',6,1,60,'Professional makeup services','2024-02-15 16:50:24','2024-02-15 16:50:24',NULL),
 (25,1,'New Haircut',1,1,12,'sadsa','2024-03-27 23:17:44','2024-03-27 23:34:11','2024-03-27 23:34:11'),
-(26,1,'Undercut',1,1,15,'New fashion haircut for men','2024-03-28 00:01:11','2024-03-28 11:41:58',NULL),
+(26,1,'Undercut',1,1,30,'New fashion haircut for men','2024-04-21 23:15:25','2024-03-28 11:41:58',NULL),
 (27,55,'Normal Haircut',1,1,20,'New fashion haircut for men','2024-04-14 13:39:44','2024-04-14 13:40:36',NULL),
 (28,55,'New Haircut',1,1,12,'Test','2024-04-14 23:23:50','2024-04-14 22:50:18',NULL),
 (29,55,'New Color',2,1,12,'test','2024-04-14 22:58:58','2024-04-14 22:58:58',NULL),
-(30,55,'New Styling',3,1,12,'new styling','2024-04-14 23:33:27','2024-04-14 23:14:29','2024-04-14 23:33:27');
+(30,55,'New Styling',3,1,12,'new styling','2024-04-14 23:33:27','2024-04-14 23:14:29','2024-04-14 23:33:27'),
+(31,1,'Mohawk Haircut',1,1,120,'A new mohawk punk style haircut','2024-04-21 23:17:09','2024-04-21 23:16:55','2024-04-21 23:17:09');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -28,22 +28,22 @@ const SalonDashboard = () => {
         image_url: null,
     });
     const states = [
-      'Johor',
-      'Kedah',
-      'Kelantan',
-      'Melaka',
-      'Negeri Sembilan',
-      'Pahang',
-      'Perak',
-      'Perlis',
-      'Penang',
-      'Sabah',
-      'Sarawak',
-      'Selangor',
-      'Terengganu',
-      'Kuala Lumpur',
-      'Labuan',
-      'Putrajaya'
+        'Johor',
+        'Kedah',
+        'Kelantan',
+        'Melaka',
+        'Negeri Sembilan',
+        'Pahang',
+        'Perak',
+        'Perlis',
+        'Penang',
+        'Sabah',
+        'Sarawak',
+        'Selangor',
+        'Terengganu',
+        'Kuala Lumpur',
+        'Labuan',
+        'Putrajaya'
     ];
     const [customerRating, setCustomerRating] = useState([0, 0, 0, 0, 0]);
     const [isEditing, setIsEditing] = useState(false);
@@ -70,15 +70,14 @@ const SalonDashboard = () => {
         const file = e.target.files[0];
         // Handle file upload logic here
         setSalonImageFile(file);
-        setSalonInfo({ ...salonInfo, image_url: URL.createObjectURL(file)});
+        setSalonInfo({ ...salonInfo, image_url: URL.createObjectURL(file) });
     };
     //fix image not return original bug
-    useEffect(()=>{
-    if(isEditing)
-    { 
-        fetchSalonData();
-    }
-    },[isEditing])
+    useEffect(() => {
+        if (isEditing) {
+            fetchSalonData();
+        }
+    }, [isEditing])
     const handleChange = (e) => {
         const { name, value } = e.target;
         setSalonInfo((prevSalonInfo) => ({
@@ -125,7 +124,7 @@ const SalonDashboard = () => {
             ...prevSalonInfo,
             state: value
         }));
-      }; 
+    };
 
     //------------------------------useEffect update state------------------------------//
 
@@ -307,6 +306,20 @@ const SalonDashboard = () => {
                 },
                 options: {
                     indexAxis: "y",
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Salon Services Ranking",
+                            padding: {
+                                top: 10,
+                                bottom: 15,
+                            },
+                            font: {
+                                size: 16,
+                                weight: "bold",
+                            },
+                        }
+                    }
                 },
             }
         );
@@ -341,6 +354,22 @@ const SalonDashboard = () => {
                         },
                     ],
                 },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Overall Appointment Completed In Salon",
+                            padding: {
+                                top: 10,
+                                bottom: 15,
+                            },
+                            font: {
+                                size: 16,
+                                weight: "bold",
+                            },
+                        }
+                    }
+                }
             }
         );
 
@@ -541,7 +570,7 @@ const SalonDashboard = () => {
                     state: salonData.result.state || prevState.state,
                     phoneNumber: salonData.result.contact_number || prevState.phoneNumber,
                     businessHour: salonData.result.business_hour || prevState.businessHour,
-                    image_url : salonData.result.image_url || prevState.image_url
+                    image_url: salonData.result.image_url || prevState.image_url
                 }));
             } else {
                 console.error("Failed to fetch salon information:", salonData.message);
@@ -704,12 +733,12 @@ const SalonDashboard = () => {
                                         </label>
                                         <div className="col-md-8">
                                             <select className="form-select" value={salonInfo.state} name='state' onChange={handleOptionSelectChange} disabled={!isEditing}>
-                                            <option value="">Select a state</option>
-                                            {states.map((state, index) => (
-                                                <option key={index} value={state} >
-                                                {state}
-                                                </option>
-                                            ))}
+                                                <option value="">Select a state</option>
+                                                {states.map((state, index) => (
+                                                    <option key={index} value={state} >
+                                                        {state}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                     </div>
@@ -826,10 +855,10 @@ const SalonDashboard = () => {
                                     {/* Clickable image */}
                                     <label htmlFor="imageUpload" className="cursor-pointer">
                                         <img
-                                            src={salonInfo.image_url?salonInfo.image_url:process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'}
+                                            src={salonInfo.image_url ? salonInfo.image_url : process.env.PUBLIC_URL + '/sample-image/default_salon.jpg'}
                                             alt="Salon"
                                             className="img-fluid rounded-5"
-                                            style={{width:400,height:285}}
+                                            style={{ width: 400, height: 285 }}
                                         />
                                     </label>
                                 </div>
@@ -841,9 +870,9 @@ const SalonDashboard = () => {
                     <SalonCard
                         imageSrc="https://picsum.photos/400/300"
                         cardText={`Upcoming Appointment: ${upcomingCustomer
-                            ? (upcomingCustomer.appointmentTime?upcomingCustomer.appointmentTime:"00:00") +
+                            ? (upcomingCustomer.appointmentTime ? upcomingCustomer.appointmentTime : "00:00") +
                             "\nAppointment Service: " +
-                            (upcomingCustomer.service?upcomingCustomer.service:'')
+                            (upcomingCustomer.service ? upcomingCustomer.service : '')
                             : ""
                             } `}
                         cardTitle={
