@@ -5,8 +5,8 @@ import FormBox from '../../components/form-box'
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
-    username : '',
-    password : ''
+    username: '',
+    password: ''
   });
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -48,7 +48,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  //change to Floating Label !!!
   return (
     <FormBox>
       <form onSubmit={handleSubmit} className='needs-validation'>
@@ -58,7 +57,7 @@ const Login = () => {
         <div className="mb-3 form-floating">
           <input
             type="text"
-            className={`form-control ${errorMessage.username?'border-danger':''}`}
+            className={`form-control ${errorMessage.username ? 'border-danger' : ''}`}
             id="username"
             placeholder="Enter Username"
             name="username"
@@ -71,7 +70,7 @@ const Login = () => {
         <div className="mb-3 form-floating">
           <input
             type="password"
-            className={`form-control ${errorMessage.password?'border-danger':''}`}
+            className={`form-control ${errorMessage.password ? 'border-danger' : ''}`}
             id="password"
             placeholder="Enter Password"
             name="password"
@@ -80,7 +79,7 @@ const Login = () => {
           <label htmlFor="password">
             Password
           </label>
-          
+
         </div>
         <div className="d-grid mb-3">
           <button

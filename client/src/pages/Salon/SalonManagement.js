@@ -765,7 +765,7 @@ const SalonManagement = () => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="addHairstylistModalLabel">Add Hairstylist</h5>
+              <h4 className="modal-title fw-bold" id="addHairstylistModalLabel">Add Hairstylist</h4>
               <button type="button" className="btn-close" id="closeAddHairstylistModalX" data-bs-dismiss="modal" aria-label="Close" onClick={() => clearNewHairstylistForm()}></button>
             </div>
             <div className="modal-body">

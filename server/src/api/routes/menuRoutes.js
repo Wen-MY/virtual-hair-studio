@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const database = require('../../../db-config');
 
-//get menu by user's authorization
+//get menu by current user's authorization
 router.get('/', async (req, res) => {
     const userId = req.userId;
     try {   
