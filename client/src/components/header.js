@@ -30,7 +30,7 @@ const Header = () => {
     <header className='header'>
       <div className={username? 'logo left-indent':'logo'}>
         <Link to="/" style={{ textDecoration: 'none', }}>
-          <h1>LOGO</h1>
+          <img className='image-square-small' src={`${process.env.PUBLIC_URL}/logo512.png`} alt='logo'></img>
         </Link>
       </div>
       <div className='userIcon'>

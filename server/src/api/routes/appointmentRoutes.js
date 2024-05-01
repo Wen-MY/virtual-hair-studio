@@ -125,7 +125,7 @@ router.post('/create', async (req, res) => {
                 //console.log(result);
                 if (result[0].affectedRows > 0) {
                     // Appointment made successfully
-                    res.status(200).json({ message: 'Appointment made successfully!' });
+                    res.status(201).json({ message: 'Appointment made successfully!' });
                 } else {
                     // Failed to make appointment
                     res.status(500).json({ message: 'Failed to make appointment.' });

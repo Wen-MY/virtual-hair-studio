@@ -217,7 +217,7 @@ const Salon = () => {
                 {hairstylists.length ? (hairstylists.map((hairstylist, index) => (
                   <div key={index} className="col mb-3">
                     <div className="card mx-auto border-dark text-start" style={{ width: '12rem' }}>
-                      <img src={`https://picsum.photos/120/100?random=${hairstylist.id}`} className="card-img-top" alt={hairstylist.name} />
+                      <img src={hairstylist.image_url??`https://picsum.photos/120/100?random=${hairstylist.id}`} className="card-img-top" alt={hairstylist.name} />
                       <div className="card-body">
                         <h5 className="card-title">{hairstylist.name}</h5>
                         <p className='card-text mb-0'>{hairstylist.position || 'Unassigned'}</p>
