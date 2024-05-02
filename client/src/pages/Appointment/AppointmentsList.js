@@ -22,7 +22,7 @@ const AppointmentsList = () => {
   useEffect(() => {
     const fetchData = async () => {
       let url =`${config.serverUrl}/appointment/retrieve?status=${statusFilter}&searchTerm=${searchTerm}&limit=${limit}&currentPage=${currentPage}`;
-      if(dateRange[0] && dateRange[1]){
+      if(dateRange && dateRange[0] && dateRange[1]){
         url += `&range=${dateRange[0]}_${dateRange[1]}`
       }
       const response = await fetch(url,{
