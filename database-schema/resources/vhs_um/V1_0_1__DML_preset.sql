@@ -83,18 +83,20 @@ insert  into `user_group`(`id`,`user_id`,`group_id`) values
 (19,21,4),
 (20,22,4),
 (21,23,4),
-(22,24,3);
+(22,24,3),
+(23,25,3);
 
 /*Data for the table `users` */
 
 insert  into `users`(`id`,`username`,`password`,`email`,`first_name`,`last_name`,`gender`,`image_url`,`created_at`,`updated_at`) values 
-(1,'admin','$2b$10$vOlc5KVNGgLxiOA9U9pUdunZywUchfknpg2OAVQzp1oQhynUGJvny','admin@example.com','','','m','https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F1%2Fmedia%2Fprofile.jpg?alt=media&token=29388fc7-6423-4b8d-8706-5f34c50e3a33','2023-12-27 09:03:41','2024-04-08 13:47:51'),
-(2,'client','$2b$10$4heodR5YWu5VZCtN.Kvud.aW/cxskmWqvBeJe.3VGdhN/U.kS/vQG','client@example.com','Yong','Yao Wen','f','https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F2%2Fmedia%2Fprofile.jpg?alt=media&token=2fef4821-84f6-4af0-a3a9-d46f1be1281b','2023-12-29 14:58:26','2024-04-07 13:39:02'),
+(1,'admin','$2b$10$vOlc5KVNGgLxiOA9U9pUdunZywUchfknpg2OAVQzp1oQhynUGJvny','admin@example.com','','','o','https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F1%2Fmedia%2Fprofile.jpg?alt=media&token=29388fc7-6423-4b8d-8706-5f34c50e3a33','2023-12-27 09:03:41','2024-04-21 19:36:29'),
+(2,'client','$2b$10$4heodR5YWu5VZCtN.Kvud.aW/cxskmWqvBeJe.3VGdhN/U.kS/vQG','client@example.com','Yong','Yao Wen','f','https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F2%2Fmedia%2Fprofile.jpg?alt=media&token=ede90523-8469-4b71-9902-ad8a2d87fe37','2023-12-29 14:58:26','2024-04-24 22:15:43'),
 (3,'owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','owner@example.com','owner','owner','o',NULL,'2023-12-29 14:59:49','2023-12-29 14:59:49'),
 (4,'lee_owner','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','leeowner','lee','owner','o',NULL,'2024-02-21 20:34:27','2024-02-21 20:34:27'),
 (5,'yong','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','yong',NULL,NULL,'m',NULL,'2024-02-21 20:35:01','2024-02-21 20:35:01'),
 (23,'ahwen2a7a9@g1','$2b$10$/2C9M/KFCG3HZkAL/o2GfO7CnU0amO8gvinCoY8QfVV9HCfsvMqDW','ahwen2a7a9@g1',NULL,NULL,NULL,NULL,'2024-03-29 13:39:41','2024-03-29 13:39:41'),
-(24,'admintest','$2b$10$MeZzpGxDe9PRQPDu7k2XcutuUpx4HJUX.U2k7lk7MnEs2QVp6YBlq','admintest@example.com','Tong','Tang Ting',NULL,NULL,'2024-04-14 20:09:32','2024-04-14 20:14:31');
+(24,'admintest','$2b$10$MeZzpGxDe9PRQPDu7k2XcutuUpx4HJUX.U2k7lk7MnEs2QVp6YBlq','admintest@example.com','Tong','Tang Ting',NULL,NULL,'2024-04-14 20:09:32','2024-04-14 20:14:31'),
+(25,'Yong Yao Wen','$2b$10$TMTIo1DORT3xdMrCQsqKs.e6Ga0XFt22bvxbbcocfZOIXoBXvAVKy','yongyaowen@1utar.my','Yong','Yao Wen',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F25%2Fmedia%2Fprofile.jpg?alt=media&token=663689d7-16b6-4c83-9ae1-955004711546','2024-04-21 19:17:30','2024-04-21 19:39:11');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
