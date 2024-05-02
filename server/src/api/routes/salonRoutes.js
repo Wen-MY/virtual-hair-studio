@@ -38,7 +38,7 @@ router.get('/retrieve',async (req,res) => {
         WHERE 1 = 1
         `;
         countQuery = `
-        SELECT COUNT(salons.id) as total
+        SELECT COUNT(DISTINCT salons.id) as total
         FROM salons
         LEFT JOIN services ON salons.id = services.salon_id
         WHERE 1 = 1

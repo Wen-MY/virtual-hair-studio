@@ -36,13 +36,13 @@ router.get('/retrieve', async (req, res) => {
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 JOIN salons ON services.salon_id = salons.id
-                WHERE services.salon_id = ?`;
+                WHERE salons.user_id = ?`;
             countQuery = `
                 SELECT COUNT(appointments.id) as total
                 FROM appointments
                 JOIN services ON appointments.service_id = services.id
                 JOIN salons ON services.salon_id = salons.id
-                WHERE services.salon_id = ?`;
+                WHERE salons.user_id = ?`;
             queryParams.push(req.userId);
         } else {
             // Unauthorized user
@@ -354,7 +354,7 @@ router.get('/getNext', async (req, res) => {
         if (appointmentResults[0].length > 0) {
             const { id, customer_id, booking_datetime, service_name } = appointmentResults[0][0];
             const customerName = await database.poolUM.execute(
-                `SELECT username , first_name , last_name 
+                `SELECT username , first_name , last_name , image_url
                 FROM users 
                 WHERE id = ?`,
                 [customer_id]

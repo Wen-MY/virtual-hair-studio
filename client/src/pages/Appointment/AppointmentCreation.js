@@ -81,9 +81,10 @@ const AppointmentCreation = () => {
   }, [selectedService]);
 
   useEffect(() => {
+    //console.log(selectedDate);
     const loadAvailableTimeSlots = async () => {
       try {
-        const response = await fetch(`${config.serverUrl}/appointment/timeslots?serviceId=${selectedService.value}&appointmentDate=${selectedDate.toISOString().split('T')[0]}`, { credentials: 'include' });
+        const response = await fetch(`${config.serverUrl}/appointment/timeslots?serviceId=${selectedService.value}&appointmentDate=${formatDateInverse(selectedDate)}`, { credentials: 'include' });
         const data = await response.json();
         if (!response.ok) {
           console.log('Failed to fetch data :', data.message);

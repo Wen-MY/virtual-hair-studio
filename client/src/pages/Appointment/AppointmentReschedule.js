@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import { useLocation, useNavigate } from 'react-router-dom'
 import moment from 'moment';
@@ -8,7 +9,7 @@ import Loader from '../../components/loading-spinner';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import '../../styles/customBigCalendar.css'
-
+import 'react-toastify/dist/ReactToastify.css';
 const localizer = momentLocalizer(moment);
 
 const AppointmentReschedule = () => {
@@ -104,13 +105,17 @@ const AppointmentReschedule = () => {
           credentials: 'include'
         });
         // Handle response
+        const updateData = await response.json();
         if (response.ok) {
           // Update successful, remove the event from rescheduledAppointment
           setRescheduledAppointment(prevRescheduledAppointments =>
             prevRescheduledAppointments.filter(e => e.id !== event.id)
           );
+          toast.success(updateData.message, { autoClose: 3000 });
+          navigate('/appointment/reschedule');
         } else {
           console.error('Failed to update event:', response.statusText);
+          toast.warning(updateData.message, { autoClose: 3000 });
         }
       }));
 
@@ -138,6 +143,7 @@ const AppointmentReschedule = () => {
     if (state?.appointmentDetails) {
       console.log(state);
       const today = new Date(state.appointmentDetails.booking_datetime);
+      setCurrentDate(today);
       setCurrentView('week');
       fetchData(moment(today).startOf('week').toDate().toLocaleString(), moment(today).endOf('week').toDate().toLocaleString()); // Fetch data for the current day initially
 
@@ -184,7 +190,7 @@ const AppointmentReschedule = () => {
   }
   useEffect(() => {
     
-    if (state?.appointmentDetails) {
+    if (state?.appointmentDetails && !rescheduling) {
       if (currentView) {
         scrollToAppointment(state.appointmentDetails.id);
       }
@@ -207,6 +213,9 @@ const AppointmentReschedule = () => {
   }
   return (
     <div className='container-fluid my-3 full-width'>
+      <ToastContainer
+        position='top-center'
+      />
       <div className="row justify-content-center border border-2 rounded-4 p-3 bg-white">
         <div className="col-md-12">
           {rescheduling ? (

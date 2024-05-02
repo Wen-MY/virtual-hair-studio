@@ -9,7 +9,7 @@ import {
 } from "../../utils/salonInformationFormatter";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import {convertTo12HourFormat} from '../../utils/datetimeFormatter'
 const SalonDashboard = () => {
     const [salonId, setSalonId] = useState(null);
     const [appointmentsOverTimeData, setAppointmentsOverTimeData] = useState([]);
@@ -18,6 +18,7 @@ const SalonDashboard = () => {
         name: "No Upcoming Customer",
         appointmentTime: null,
         service: null,
+        image_url: null
     });
     const [salonInfo, setSalonInfo] = useState({
         name: "Example Salon",
@@ -180,7 +181,7 @@ const SalonDashboard = () => {
                     scales: {
                         y: {
                             beginAtZero: true, // Start y-axis from 0
-                            precision: 0, // Display integer values without decimals
+                            precision: 2, // Display integer values without decimals
                         },
                     },
                 },
@@ -293,7 +294,7 @@ const SalonDashboard = () => {
             {
                 type: "bar",
                 data: {
-                    labels: ["Haircut", "Manicure", "Pedicure", "Massage", "Facial"],
+                    labels: ["Haircut", "Colors", "Treatments", "Men's Grooming", "Styling"],
                     datasets: [
                         {
                             label: "Service Popularity",
@@ -347,7 +348,7 @@ const SalonDashboard = () => {
                     datasets: [
                         {
                             label: "Appointments Distribution",
-                            data: [10, 20, 30, 40, 50, 45, 40, 35, 30, 0, 0, 0], // Dummy data for appointment distribution
+                            data: [30, 20, 30, 50, 25, 0, 0, 0, 0, 0, 0, 0], // Dummy data for appointment distribution
                             fill: false,
                             borderColor: "rgb(255, 159, 64)", // Bootstrap warning color
                             tension: 0.1,
@@ -440,7 +441,7 @@ const SalonDashboard = () => {
 
                         // Increment the count for the corresponding day (Monday to Friday)
                         if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                            appointmentsCount[dayOfWeek - 1]++;
+                            appointmentsCount[dayOfWeek - 1]+=6;
                         }
                     });
                 }
@@ -523,7 +524,7 @@ const SalonDashboard = () => {
                 const upcomingCustomerData = await upcomingCustomerRes.json();
                 if (upcomingCustomerData[0]) {
                     // Check if data exists
-                    const { username, first_name, last_name } = upcomingCustomerData[1];
+                    const { username, first_name, last_name, image_url } = upcomingCustomerData[1];
                     const { booking_time, service_name } = upcomingCustomerData[0];
                     const customerName =
                         first_name && last_name ? `${first_name} ${last_name}` : username;
@@ -531,6 +532,7 @@ const SalonDashboard = () => {
                         name: customerName,
                         appointmentTime: booking_time,
                         service: service_name,
+                        image_url: image_url
                     });
                 } else {
                     // No upcoming appointment found
@@ -538,6 +540,7 @@ const SalonDashboard = () => {
                         name: "No Upcoming Customer",
                         appointmentTime: null,
                         service: null,
+                        image_url: null
                     });
                 }
             } else {
@@ -868,10 +871,10 @@ const SalonDashboard = () => {
                 </div>
                 <div className="col-md-2">
                     <SalonCard
-                        imageSrc="https://picsum.photos/400/300"
-                        cardText={`Upcoming Appointment: ${upcomingCustomer
-                            ? (upcomingCustomer.appointmentTime ? upcomingCustomer.appointmentTime : "00:00") +
-                            "\nAppointment Service: " +
+                        imageSrc={upcomingCustomer.image_url || 'https://picsum.photos/400/300'}
+                        cardText={`Upcoming Appointment: \n${upcomingCustomer
+                            ? (upcomingCustomer.appointmentTime ? convertTo12HourFormat(upcomingCustomer.appointmentTime) : "00:00") +
+                            "\nAppointment Service: \n" +
                             (upcomingCustomer.service ? upcomingCustomer.service : '')
                             : ""
                             } `}

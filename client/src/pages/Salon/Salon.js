@@ -243,6 +243,8 @@ const Salon = () => {
           <div className="row">
             <div className="col border border-2 rounded-4 p-5 pb-1 bg-white pt-4">
               <h2 className='section-title text-start mb-3'>Customer Reviews</h2>
+              {reviews.length > 0 ? (
+              <div>
               <ul className="list-group">
                 {reviews.results.map((review, index) => (
                   <li key={index} className="list-group-item text-start">
@@ -262,6 +264,15 @@ const Salon = () => {
                   <li className={`page-item ${reviewsPage >= reviews.totalResults / 3 ? 'disabled' : ''}`}><button className="page-link" onClick={() => reviewsPage < Math.ceil(reviews.totalResults / 3) ? setReviewPage(reviewsPage + 1) : null}>Next</button></li>
                 </ul>
               </nav>
+              </div>)
+              :
+              (
+              <div className='my-3 fs-5 fw-semibold list-group'>
+                <div className='list-group-item py-5'>
+                  No rating in records
+                </div>
+              </div>
+            )}
             </div>
           </div>
         </div>

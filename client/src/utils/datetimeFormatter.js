@@ -31,6 +31,6 @@ function formatDate(dateString) {
         formattedHours = formattedHours === 12 ? 12 : formattedHours - 12;
     }
 
-    return `${formattedHours}:${minutes}:${seconds} ${postfix}`;
+    return `${formattedHours}:${minutes}${seconds ? `:${seconds}` : ' '}${postfix}`;
 }
   export { formatDate, formatTime, formatDateInverse,convertTo12HourFormat };

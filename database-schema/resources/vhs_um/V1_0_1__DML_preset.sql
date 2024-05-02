@@ -84,7 +84,9 @@ insert  into `user_group`(`id`,`user_id`,`group_id`) values
 (20,22,4),
 (21,23,4),
 (22,24,3),
-(23,25,3);
+(23,25,3),
+(24,26,3),
+(25,27,4);
 
 /*Data for the table `users` */
 
@@ -96,7 +98,9 @@ insert  into `users`(`id`,`username`,`password`,`email`,`first_name`,`last_name`
 (5,'yong','$2a$10$QzdcD8hUTAlNC9KW9tHkL.GrnlEgZw9xnWecTQEp/K93iYQ7Ntmo6','yong',NULL,NULL,'m',NULL,'2024-02-21 20:35:01','2024-02-21 20:35:01'),
 (23,'ahwen2a7a9@g1','$2b$10$/2C9M/KFCG3HZkAL/o2GfO7CnU0amO8gvinCoY8QfVV9HCfsvMqDW','ahwen2a7a9@g1',NULL,NULL,NULL,NULL,'2024-03-29 13:39:41','2024-03-29 13:39:41'),
 (24,'admintest','$2b$10$MeZzpGxDe9PRQPDu7k2XcutuUpx4HJUX.U2k7lk7MnEs2QVp6YBlq','admintest@example.com','Tong','Tang Ting',NULL,NULL,'2024-04-14 20:09:32','2024-04-14 20:14:31'),
-(25,'Yong Yao Wen','$2b$10$TMTIo1DORT3xdMrCQsqKs.e6Ga0XFt22bvxbbcocfZOIXoBXvAVKy','yongyaowen@1utar.my','Yong','Yao Wen',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F25%2Fmedia%2Fprofile.jpg?alt=media&token=663689d7-16b6-4c83-9ae1-955004711546','2024-04-21 19:17:30','2024-04-21 19:39:11');
+(25,'Yong Yao Wen','$2b$10$TMTIo1DORT3xdMrCQsqKs.e6Ga0XFt22bvxbbcocfZOIXoBXvAVKy','yongyaowen@1utar.my','Yong','Yao Wen',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F25%2Fmedia%2Fprofile.jpg?alt=media&token=663689d7-16b6-4c83-9ae1-955004711546','2024-04-21 19:17:30','2024-04-21 19:39:11'),
+(26,'demo-client','$2b$10$QQqe8OrVIltkTm7QEdfS6eFAAVnDKyupDIPBC0O8uL5MZdIiRI.lS','demo@example.com','Justin','Kelley','f','https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F26%2Fmedia%2Fprofile.jpg?alt=media&token=00296756-b9b8-4294-8e04-966b89295ccd','2024-05-02 16:33:30','2024-05-02 16:43:42'),
+(27,'demo-owner','$2b$10$ZH0JuIoCeAS3RlokKaEwkuh8sVhgxWczHCjkr.3v/zbqDHmB8cj7K','demo@example.com','Darrell','Meyer',NULL,'https://firebasestorage.googleapis.com/v0/b/virtual-hair-studio.appspot.com/o/users%2F27%2Fmedia%2Fprofile.jpg?alt=media&token=b28f90f4-2709-484a-9272-eb10ae610592','2024-05-02 16:45:16','2024-05-02 16:46:26');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
