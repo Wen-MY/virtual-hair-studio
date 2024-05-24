@@ -1,6 +1,6 @@
 # Virtual Hair Studio
 
-![Virtual Hair Studio Logo](client/public/logo512.png)
+![Virtual Hair Studio Logo](client/public/logo192.png)
 
 Virtual Hair Studio is a modern web application built using React.js and Express.js, designed to cater to both salon owners and salon users. It offers an array of features, including user profiles, appointment booking and scheduling, as well as a unique virtual hair try-on experience.
 
