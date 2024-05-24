@@ -1,12 +1,10 @@
 # Virtual Hair Studio
 
-![Virtual Hair Studio Logo](link_to_logo.png)
+![Virtual Hair Studio Logo](client/public/logo512.png)
 
-Virtual Hair Studio is a modern web application built using React.js, designed to cater to both salon owners and salon users. It offers an array of features, including user profiles, appointment booking and scheduling, as well as a unique virtual hair try-on experience.
+Virtual Hair Studio is a modern web application built using React.js and Express.js, designed to cater to both salon owners and salon users. It offers an array of features, including user profiles, appointment booking and scheduling, as well as a unique virtual hair try-on experience.
 
 ## Table of Contents
-
-- [Project Progress Log](#project-progress-log)
 - [Features](#features)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
@@ -17,39 +15,6 @@ Virtual Hair Studio is a modern web application built using React.js, designed t
 - [Contributing](#contributing)
 - [License](#license)
 
-## Project Progress Log
-
-Keep track of the development progress of this project.
-
-### Finished
-```diff
-+ Overall Architecture Initialization. 3 module in total.
-+ Account Login/Logout and Registration Implemented.
-+ Side Navigation Initialized.
-```
-### Planned
-```diff
-@@ **Next Milestone:** Implement Appointment Module. @@
-@@ Plan for user account information manipulation. @@
-@@ Design UI/UX improvements. @@
-```
-### In Progress
-```diff
-! User Group and Authorization setup.
-! Side navigation menu integrated user authorities
-! Guest landing/Home page.
-```
-### Pending
-```diff
-# Feature A : Hairstyle Try-on Module.
-# Feature B : Appointment Module.
-# Feature C : Salon Owner Profile Customization Module.
-# Feature D : Messaging Module. TBD
-```
-### Bug Found
-```diff
-- null.
-```
 ## Features
 
 - **User Profiles**: Salon owners and salon users can create and manage their profiles with personalized information, photos, and preferences.
@@ -110,10 +75,10 @@ Virtual Hair Studio caters to two types of users:
 
 Virtual Hair Studio is built with a range of technologies and tools:
 
-- React.js
-- Redux for state management
+- React.js for UI
+- Express.js for backend server
 - React Router for routing
-- MySQL for data storage
+- MySQL and Firebase for data storage
 - Python for Image Processing related scripting
 
 ## Contributing
